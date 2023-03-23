@@ -123,19 +123,19 @@ int pixel_check_and_erase(unsigned char img_matrix[DIMENSION][DIMENSION], int x,
 
 
 int pixel_surround_check(unsigned char img_matrix[DIMENSION][DIMENSION], int x, int y) {
-    int limit_x[2];
-    int limit_y[2];
+    int limit_x[2] = {-1, 2};
+    int limit_y[2] = {-1, 2};;
     if(x == 0)
         limit_x[0] = 0, limit_x[1] = 2;
     if(x == 9)
         limit_x[0] = -1, limit_x[1] = 1;
     if(y == 0)
         limit_y[0] = 0, limit_x[1] = 2;
-    if(x == 9)
+    if(y == 9)
         limit_x[0] = -1, limit_x[1] = 1;
     
-    for(int i = -1; i < 2; i++) {
-        for(int j = -1; j < 2; j++) {
+    for(int i = limit_x[0]; i < limit_x[1]; i++) {
+        for(int j = limit_y[0]; j < limit_y[1]; j++) {
             if(img_matrix[x + i][y + j] != 255) {
                 return 0;
             }
