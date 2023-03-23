@@ -14,8 +14,8 @@
 void move_along_line(FILE*, int, int);
 
 /* Pixel evaluation functions */
-int pixel_check_and_erase(unsigned char[DIMENSION][DIMENSION], int, int);
-int pixel_surround_check(unsigned char[DIMENSION][DIMENSION], int, int);
+int pixel_check_and_erase(int, int, unsigned char (*)[DIMENSION]);
+int pixel_surround_check(int, int, unsigned char (*)[DIMENSION]);
 
 int main(int argc, char* argv[]) {
 
@@ -87,6 +87,7 @@ int main(int argc, char* argv[]) {
 
         printf("[%d %d %d] ", img[i], img[i + 1], img[i + 2]);
     }
+    printf("\n----------------------------------------\n");
 
     /* Not dynamically allocating memory, less flexibility, more memory safety */
     unsigned char img_matrix[DIMENSION][DIMENSION];
@@ -96,7 +97,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    pixel_surround_check(img_matrix, 5, 5);
+    printf("Return value of  pixel_surround: %d\n", pixel_surround_check(1, 2, img_matrix));
 
     /* Closing file */
     fclose(file);
@@ -112,7 +113,7 @@ void move_along_line(FILE* file, int x, int y) {
 }
 
 /* Checks if pixel is useful, "erases" it if yes and returns 0 */
-int pixel_check_and_erase(unsigned char img_matrix[DIMENSION][DIMENSION], int x, int y) {
+int pixel_check_and_erase(int x, int y, unsigned char (*img_matrix)[DIMENSION]) {
     if(img_matrix[x][y] != 255) {
         img_matrix[x][y] = 255;
         return 0;
@@ -122,7 +123,7 @@ int pixel_check_and_erase(unsigned char img_matrix[DIMENSION][DIMENSION], int x,
 }
 
 
-int pixel_surround_check(unsigned char img_matrix[DIMENSION][DIMENSION], int x, int y) {
+int pixel_surround_check(int x, int y, unsigned char (*img_matrix)[DIMENSION]) {
     int limit_x[2] = {-1, 2};
     int limit_y[2] = {-1, 2};;
     if(x == 0)
@@ -133,10 +134,16 @@ int pixel_surround_check(unsigned char img_matrix[DIMENSION][DIMENSION], int x, 
         limit_y[0] = 0, limit_x[1] = 2;
     if(y == 9)
         limit_x[0] = -1, limit_x[1] = 1;
+
+    //Debug
+    printf("limit_x: %d, %d\n", limit_x[0], limit_x[1]);
+    printf("limit_y: %d, %d\n", limit_y[0], limit_y[1]);
     
     for(int i = limit_x[0]; i < limit_x[1]; i++) {
         for(int j = limit_y[0]; j < limit_y[1]; j++) {
-            if(img_matrix[x + i][y + j] != 255) {
+            printf("i = %d, j = %d\n", i, j);
+            printf("Inside pixel_surround_check: %d\n", img_matrix[x + i][y + j]);
+            if(img_matrix[x + i][y + j] != 255) { // doesnt work
                 return 0;
             }
         }
