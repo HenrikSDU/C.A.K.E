@@ -1,6 +1,10 @@
 #include <stdio.h>
 #define DIMENSION 10 //Has to be manually set for every function that uses it, suboptimal, but I don't want to get into preprocessors yet
 
+
+/* Checks pixels around current pixel specified by x in y in the specified matrix 
+   Every pixel that shares an edge or vertex with the current one
+   Returns 0 if there are any non white(255), returns 1 if there aren't */
 int pixel_surround_check(int x, int y, unsigned char (*img_matrix)[DIMENSION]) {
     int limit_x[2] = {-1, 2};
     int limit_y[2] = {-1, 2};;
