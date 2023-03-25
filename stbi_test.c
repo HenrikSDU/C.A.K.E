@@ -97,7 +97,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    printf("Return value of  pixel_surround: %d\n", pixel_surround_check(1, 2, img_matrix));
+    printf("Return value of  pixel_surround: %d\n", pixel_surround_check(0, 0, img_matrix));
 
     /* Closing file */
     fclose(file);
@@ -140,12 +140,11 @@ int pixel_surround_check(int x, int y, unsigned char (*img_matrix)[DIMENSION]) {
     printf("limit_y: %d, %d\n", limit_y[0], limit_y[1]);
     
     for(int i = limit_x[0]; i < limit_x[1]; i++) {
-        for(int j = limit_y[0]; j < limit_y[1]; j++) {
+        for(int j = -1; j < 2/*limit_y[0]; j < limit_y[1]*/; j++) {
             printf("i = %d, j = %d\n", i, j);
             printf("Inside pixel_surround_check: %d\n", img_matrix[x + i][y + j]);
-            if(img_matrix[x + i][y + j] != 255) { // doesnt work
+            if(img_matrix[x + i][y + j] == 0 && i != 0 && j != 0)
                 return 0;
-            }
         }
     }
     return 1;
