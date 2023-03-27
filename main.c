@@ -9,17 +9,10 @@
 
 /* Functions made by me, in different files to clean up the main c file */
 #include "include/cursor_pos.h" //Custom function, would move the cursor in the terminal
-#include "include/pixel_surround_check.h" 
+#include "include/pixel_functions.h"  
+#include "include/instructions.h" //All functions used to create the gcode file
 
-#define DIMENSION 10 /* Define the number of rows and columns of the PNG here */
-#define file_FILE_LENGHT 12 /* Max length of the file name the instructions are saved in */
-
-/* Instruction writing functions */
-void move_along_line(FILE*, int, int);
-
-/* Pixel evaluation functions */
-int pixel_check_and_erase(int, int, unsigned char (*)[DIMENSION]);
-int pixel_surround_check(int, int, unsigned char (*)[DIMENSION]);
+#define DIMENSION 10 /* Define the number of rows and columns of the PNG here, for now has to be defined in every header where it's used */
 
 int main(int argc, char* argv[]) {
 
@@ -108,8 +101,13 @@ int main(int argc, char* argv[]) {
     }
 
     printf("\n----------------------------------------\n");
-    printf("Return value of pixel_surround: %d\n", pixel_surround_check(3, 1, img_matrix));
+    //Currently useless
+    //printf("Return value of pixel_surround: %d\n", pixel_surround_check(3, 1, img_matrix));
 
+    //Testing functions
+    printf("Return of pixel_check_up: % d\n", pixel_check_up(6, 2, img_matrix));
+    printf("Return of pixel_check_down: % d\n", pixel_check_down(6, 2, img_matrix));
+    printf("The midpoint of the current column: %d", average(pixel_check_up(6, 2, img_matrix), pixel_check_down(6, 2, img_matrix)));
 
     /* Closing file */
     fclose(file);
@@ -118,20 +116,6 @@ int main(int argc, char* argv[]) {
     free(filename);
     stbi_image_free(img);
     return 0;
-}
-
-void move_along_line(FILE* file, int x, int y) {
-    fprintf(file, "X%dY%d", x, y);
-}
-
-/* Checks if pixel is useful, "erases" it if yes and returns 0 */
-int pixel_check_and_erase(int x, int y, unsigned char (*img_matrix)[DIMENSION]) {
-    if(img_matrix[x][y] != 255) {
-        img_matrix[x][y] = 255;
-        return 0;
-    }
-    else
-        return 1;
 }
 
 
