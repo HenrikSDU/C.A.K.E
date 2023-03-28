@@ -1,8 +1,9 @@
 /* All functions related to pixel checking, setting or clearing */
+/* Error as a return value is mostly used for error messages */
 
 #include <stdio.h>
 #define DIMENSION 10 //Has to be manually set for every function that uses it, suboptimal, but I don't want to get into preprocessors yet
-
+#define ERROR -2
 
 /* Checks pixels around current pixel specified by x in y in the specified matrix 
    Every pixel that shares an edge or vertex with the current one
@@ -57,36 +58,67 @@ int pixel_check_and_erase(int x, int y, unsigned char (*img_matrix)[DIMENSION]) 
 int pixel_check_up(int x, int y, unsigned char (*matrix)[DIMENSION]) {
     int x_up;
 
+    
+    if(matrix[x][y] == 255) // Error handling
+        return ERROR;
     if(x == 0) {
-        return 0;
+        return -1;
     }
-
     for(x_up = x; x_up > -1; x_up--) {
-        printf("current check %d\n", matrix[x_up][y]);
+        //printf("current check %d\n", matrix[x_up][y]);
         if(matrix[x_up][y] == 255) {
             return x_up;
         }
     }
+    return -1;
 }
 
 /* Same as previous function just downwards, graphically down */
 int pixel_check_down(int x, int y, unsigned char (*matrix)[DIMENSION]) {
     int x_down;
 
+    if(matrix[x][y] == 255) // Error handling
+        return ERROR;
     if(x == 9) {
-        return 0;
+        return DIMENSION;
     }
 
     for(x_down = x; x_down < DIMENSION; x_down++) {
-        printf("current check %d\n", matrix[x_down][y]);
+        //printf("current check %d\n", matrix[x_down][y]);
         if(matrix[x_down][y] == 255) {
             return x_down;
         }
     }
+    return DIMENSION;
 }
 
 /* I don't think I have to explain this */
 int average(int m, int n) {
+    /*
+    if(m == ERROR || n == ERROR) // Error handling
+        return ERROR;
+    */
+   printf("check up value inside average: %d\n", m);
+   printf("check down value inside average: %d\n", n);
     float average = (m + n) / 2;
     return (int)average; // For now just typecasting to int, but I may add rounding
+}
+
+/* Remaking functions bc they suck */
+int vertical_average(int x, int y, unsigned char (*matrix)[DIMENSION]) {
+    float average = 0.0;
+    int x_up;
+    int x_down;
+
+    if(matrix[x][y] == 255) // If passed pixel is white then return ERROR(-2)
+        return ERROR;
+
+        
+    if(x == 0)
+        x_up = -1;
+    if(x == 9)
+        x_down = 10;
+
+    average = (x_up + x_down) / 2;
+    return (int)average;
 }

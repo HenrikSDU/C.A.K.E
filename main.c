@@ -75,15 +75,7 @@ int main(int argc, char* argv[]) {
     /* Just some cool info about the image */
     printf("Loaded image, width: %dpx, height: %dpx, channels: %d\n", width, height, channels);
     printf("The RGB pixel values of the image:\n\n");
-    /* One way to display the pixel values, 3 8 bit numbers give the Red Green Blue values of one pixel */
-    /*
-    for(int i = 0; i < (width*height*channels); i = i + 3) {
-        if(i % width == 0) 
-            printf("\n");
 
-        printf("[%d %d %d] ", img[i], img[i + 1], img[i + 2]);
-    }
-    */
 
     /* Not dynamically allocating memory, less flexibility, more memory safety */
     unsigned char img_matrix[DIMENSION][DIMENSION];
@@ -105,10 +97,31 @@ int main(int argc, char* argv[]) {
     //printf("Return value of pixel_surround: %d\n", pixel_surround_check(3, 1, img_matrix));
 
     //Testing functions
+    /*
     printf("Return of pixel_check_up: % d\n", pixel_check_up(6, 2, img_matrix));
     printf("Return of pixel_check_down: % d\n", pixel_check_down(6, 2, img_matrix));
-    printf("The midpoint of the current column: %d", average(pixel_check_up(6, 2, img_matrix), pixel_check_down(6, 2, img_matrix)));
+    printf("The midpoint of the current column: %d\n", average(pixel_check_up(6, 2, img_matrix), pixel_check_down(6, 2, img_matrix)));
+    printf("ßßßßßßßßßß\n");
+    printf("Return of pixel_check_up: % d\n", pixel_check_up(9, 0, img_matrix));
+    printf("Return of pixel_check_down: % d\n", pixel_check_down(9, 0, img_matrix));
+    printf("The midpoint of the current column: %d\n", average(pixel_check_up(9, 0, img_matrix), pixel_check_down(9, 0, img_matrix)));
+    printf("ßßßßßßßßßß\n");
+    printf("Return of pixel_check_up: % d\n", pixel_check_up(8, 0, img_matrix));
+    printf("Return of pixel_check_down: % d\n", pixel_check_down(8, 0, img_matrix));
+    printf("The midpoint of the current column: %d\n", average(pixel_check_up(8, 0, img_matrix), pixel_check_down(8, 0, img_matrix)));
 
+    printf("ßßßßßßßßßß\n");
+    printf("ßßßßßßßßßß\n");
+    */
+    
+    for(int i =  0; i < 10; i++) {
+        for(int y = 0; y < 10; y++) {
+            printf("Pixel num: %d\n", i * DIMENSION + y);
+            printf("testing every pixel average: %d\n", average(pixel_check_up(i, y, img_matrix), pixel_check_down(i, y, img_matrix)));
+            printf("\n");
+        }
+    }
+ 
     /* Closing file */
     fclose(file);
 
@@ -117,9 +130,6 @@ int main(int argc, char* argv[]) {
     stbi_image_free(img);
     return 0;
 }
-
-
-
 
 
 /*
@@ -139,3 +149,6 @@ How it works in my head:
         If yes, proceed
         If no, end of line
 */
+
+
+
