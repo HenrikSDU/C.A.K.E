@@ -91,29 +91,22 @@ int main(int argc, char* argv[]) {
         }
         printf("\n");
     }
+    printf("\n");
+
+    /* Displaying the img_matrix but differently */
+    for(int i = 0; i < DIMENSION; i++) {
+        for(int j = 0; j < DIMENSION; j++) {
+            if(img_matrix[i][j] == 0)
+                printf("O ");
+            else if(img_matrix[i][j] == 255)
+                printf("w ");
+        }
+        printf("\n");
+    }
 
     printf("\n----------------------------------------\n");
-    //Currently useless
-    //printf("Return value of pixel_surround: %d\n", pixel_surround_check(3, 1, img_matrix));
 
     //Testing functions
-    /*
-    printf("Return of pixel_check_up: % d\n", pixel_check_up(6, 2, img_matrix));
-    printf("Return of pixel_check_down: % d\n", pixel_check_down(6, 2, img_matrix));
-    printf("The midpoint of the current column: %d\n", average(pixel_check_up(6, 2, img_matrix), pixel_check_down(6, 2, img_matrix)));
-    printf("ßßßßßßßßßß\n");
-    printf("Return of pixel_check_up: % d\n", pixel_check_up(9, 0, img_matrix));
-    printf("Return of pixel_check_down: % d\n", pixel_check_down(9, 0, img_matrix));
-    printf("The midpoint of the current column: %d\n", average(pixel_check_up(9, 0, img_matrix), pixel_check_down(9, 0, img_matrix)));
-    printf("ßßßßßßßßßß\n");
-    printf("Return of pixel_check_up: % d\n", pixel_check_up(8, 0, img_matrix));
-    printf("Return of pixel_check_down: % d\n", pixel_check_down(8, 0, img_matrix));
-    printf("The midpoint of the current column: %d\n", average(pixel_check_up(8, 0, img_matrix), pixel_check_down(8, 0, img_matrix)));
-
-    printf("ßßßßßßßßßß\n");
-    printf("ßßßßßßßßßß\n");
-    */
-    
     for(int i =  0; i < 10; i++) {
         for(int y = 0; y < 10; y++) {
             printf("Pixel num: %d\n", i * DIMENSION + y);
