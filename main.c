@@ -11,6 +11,7 @@
 #include "include/cursor_pos.h" //Custom function, would move the cursor in the terminal
 #include "include/pixel_functions.h"  
 #include "include/instructions.h" //All functions used to create the gcode file
+#include "include/matrix_display.h"  
 
 #define DIMENSION 10 /* Define the number of rows and columns of the PNG here, for now has to be defined in every header where it's used */
 
@@ -94,30 +95,22 @@ int main(int argc, char* argv[]) {
     printf("\n");
 
     /* Displaying the img_matrix but differently */
-    for(int i = 0; i < DIMENSION; i++) {
-        for(int j = 0; j < DIMENSION; j++) {
-            if(img_matrix[i][j] == 0)
-                printf("O ");
-            else if(img_matrix[i][j] == 255)
-                printf("w ");
-        }
-        printf("\n");
-    }
+    matrix_display(DIMENSION, img_matrix);
 
     printf("\n----------------------------------------\n");
 
     //Testing functions
-    unsigned char temp_matrix[DIMENSION][DIMENSION];
+    unsigned char avg_matrix[DIMENSION][DIMENSION];
     /* Filling the matrix with values*/
     for(int i = 0; i < DIMENSION; i++) {
         for(int j = 0; j < DIMENSION; j++) {
-            temp_matrix[i][j] = 255;
+            avg_matrix[i][j] = 255;
         }
     }
 
     for(int i =  0; i < 10; i++) {
         for(int y = 0; y < 10; y++) {
-            temp_matrix[average_no_comment(pixel_check_up(i, y, img_matrix), pixel_check_down(i, y, img_matrix))][y] = 0;
+            avg_matrix[average_no_comment(pixel_check_up(i, y, img_matrix), pixel_check_down(i, y, img_matrix))][y] = 0;
 
             printf("Pixel num: %d\n", i * DIMENSION + y);
             printf("testing every pixel average: %d\n", average(pixel_check_up(i, y, img_matrix), pixel_check_down(i, y, img_matrix)));
@@ -126,16 +119,8 @@ int main(int argc, char* argv[]) {
     }
     printf("\n");
  
-    /* Displaying the img_matrix but differently */
-    for(int i = 0; i < DIMENSION; i++) {
-        for(int j = 0; j < DIMENSION; j++) {
-            if(temp_matrix[i][j] == 0)
-                printf("O ");
-            else if(temp_matrix[i][j] == 255)
-                printf("w ");
-        }
-        printf("\n");
-    }
+    /* Displaying the average matrix */
+    matrix_display(DIMENSION, avg_matrix);
 
     /* Closing file */
     fclose(file);

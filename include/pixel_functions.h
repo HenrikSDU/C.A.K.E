@@ -2,6 +2,8 @@
 /* Error as a return value is mostly used for error messages */
 
 #include <stdio.h>
+#include <math.h>
+
 #define DIMENSION 10 //Has to be manually set for every function that uses it, suboptimal, but I don't want to get into preprocessors yet
 #define ERROR -2
 
@@ -94,23 +96,15 @@ int pixel_check_down(int x, int y, unsigned char (*matrix)[DIMENSION]) {
 
 /* I don't think I have to explain this */
 int average(int m, int n) {
-    /*
-    if(m == ERROR || n == ERROR) // Error handling
-        return ERROR;
-    */
    printf("check up value inside average: %d\n", m);
    printf("check down value inside average: %d\n", n);
-    float average = (m + n) / 2;
-    return (int)average; // For now just typecasting to int, but I may add rounding
+    float average = (m + n) / 2.0;
+    return (int)round(average); // For now just typecasting to int, but I may add rounding
 }
 
 /* Average funcion without comments for now */
 int average_no_comment(int m, int n) {
-    /*
-    if(m == ERROR || n == ERROR) // Error handling
-        return ERROR;
-    */
-    float average = (m + n) / 2;
-    return (int)average; // For now just typecasting to int, but I may add rounding
+    float average =((float)m + (float)n) / 2.0;
+    return (int)round(average); // For now just typecasting to int, but I may add rounding
 }
 
