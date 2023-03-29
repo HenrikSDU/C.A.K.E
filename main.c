@@ -107,14 +107,36 @@ int main(int argc, char* argv[]) {
     printf("\n----------------------------------------\n");
 
     //Testing functions
+    unsigned char temp_matrix[DIMENSION][DIMENSION];
+    /* Filling the matrix with values*/
+    for(int i = 0; i < DIMENSION; i++) {
+        for(int j = 0; j < DIMENSION; j++) {
+            temp_matrix[i][j] = 255;
+        }
+    }
+
     for(int i =  0; i < 10; i++) {
         for(int y = 0; y < 10; y++) {
+            temp_matrix[average_no_comment(pixel_check_up(i, y, img_matrix), pixel_check_down(i, y, img_matrix))][y] = 0;
+
             printf("Pixel num: %d\n", i * DIMENSION + y);
             printf("testing every pixel average: %d\n", average(pixel_check_up(i, y, img_matrix), pixel_check_down(i, y, img_matrix)));
             printf("\n");
         }
     }
+    printf("\n");
  
+    /* Displaying the img_matrix but differently */
+    for(int i = 0; i < DIMENSION; i++) {
+        for(int j = 0; j < DIMENSION; j++) {
+            if(temp_matrix[i][j] == 0)
+                printf("O ");
+            else if(temp_matrix[i][j] == 255)
+                printf("w ");
+        }
+        printf("\n");
+    }
+
     /* Closing file */
     fclose(file);
 

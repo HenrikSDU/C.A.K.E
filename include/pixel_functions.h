@@ -104,21 +104,13 @@ int average(int m, int n) {
     return (int)average; // For now just typecasting to int, but I may add rounding
 }
 
-/* Remaking functions bc they suck */
-int vertical_average(int x, int y, unsigned char (*matrix)[DIMENSION]) {
-    float average = 0.0;
-    int x_up;
-    int x_down;
-
-    if(matrix[x][y] == 255) // If passed pixel is white then return ERROR(-2)
+/* Average funcion without comments for now */
+int average_no_comment(int m, int n) {
+    /*
+    if(m == ERROR || n == ERROR) // Error handling
         return ERROR;
-
-        
-    if(x == 0)
-        x_up = -1;
-    if(x == 9)
-        x_down = 10;
-
-    average = (x_up + x_down) / 2;
-    return (int)average;
+    */
+    float average = (m + n) / 2;
+    return (int)average; // For now just typecasting to int, but I may add rounding
 }
+
