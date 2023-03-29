@@ -6,6 +6,8 @@
 
 #define DIMENSION 10 //Has to be manually set for every function that uses it, suboptimal, but I don't want to get into preprocessors yet
 #define ERROR -2
+#define SUCCESS 0
+#define FAIL 1
 
 /* Checks pixels around current pixel specified by x in y in the specified matrix 
    Every pixel that shares an edge or vertex with the current one
@@ -108,3 +110,34 @@ int average_no_comment(int m, int n) {
     return (int)round(average); // For now just typecasting to int, but I may add rounding
 }
 
+/* Checks the column of pixels from x_up to x_down in the next column */
+int pixel_check_forward(int x, int y, unsigned char (*matrix)[DIMENSION]) {
+    int x_up = pixel_check_up(x, y, matrix);
+    int x_down = pixel_check_down(x, y, matrix);
+
+    if(x_up == ERROR || x_down == ERROR) { // Error handling and propagation
+        return FAIL;
+    }
+    for(int i = x_up; i <= x_down; i++) {
+        if(matrix[i][y+1] == 0) {
+            return SUCCESS;
+        }
+    }
+    return FAIL;
+}
+
+/* Checks the column of pixels from x_up to x_down in the previous column */
+int pixel_check_back(int x, int y, unsigned char (*matrix)[DIMENSION]) {
+    int x_up = pixel_check_up(x, y, matrix);
+    int x_down = pixel_check_down(x, y, matrix);
+
+    if(x_up == ERROR || x_down == ERROR) { // Error handling and propagation
+        return FAIL;
+    }
+    for(int i = x_up; i <= x_down; i++) {
+        if(matrix[i][y-1] == 0) {
+            return SUCCESS;
+        }
+    }
+    return FAIL;
+}

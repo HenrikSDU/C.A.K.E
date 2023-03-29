@@ -121,6 +121,10 @@ int main(int argc, char* argv[]) {
  
     /* Displaying the average matrix */
     matrix_display(DIMENSION, avg_matrix);
+    printf("\n");
+
+    printf("Pixel check forward: %d\n", pixel_check_forward(4, 2, img_matrix));
+    printf("Pixel check backwards: %d\n", pixel_check_back(4, 2, img_matrix));
 
     /* Closing file */
     fclose(file);
