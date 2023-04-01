@@ -96,6 +96,13 @@ int pixel_check_down(int x, int y, unsigned char (*matrix)[DIMENSION]) {
     return DIMENSION;
 }
 
+/* Deletes from x_top until x_bottom in the column y */
+void pixel_column_delete(int x_top, int x_down, int y, unsigned char matrix[DIMENSION][DIMENSION]) {
+    for(int i = x_top; i >= x_down; i--) {
+        matrix[i][y] = 255;
+    }
+}
+
 /* I don't think I have to explain this */
 int average(int m, int n) {
    printf("check up value inside average: %d\n", m);
@@ -110,34 +117,56 @@ int average_no_comment(int m, int n) {
     return (int)round(average); // For now just typecasting to int, but I may add rounding
 }
 
-/* Checks the column of pixels from x_up to x_down in the next column */
+/* Checks the column of pixels from x_up to x_down in the next column, returns ROW coordinate of the first non-white point from top to bottom */
 int pixel_check_forward(int x, int y, unsigned char (*matrix)[DIMENSION]) {
     int x_up = pixel_check_up(x, y, matrix);
     int x_down = pixel_check_down(x, y, matrix);
 
     if(x_up == ERROR || x_down == ERROR) { // Error handling and propagation
-        return FAIL;
+        return ERROR;
     }
     for(int i = x_up; i <= x_down; i++) {
         if(matrix[i][y+1] == 0) {
-            return SUCCESS;
+            return i;
         }
     }
-    return FAIL;
+    return ERROR;
 }
 
-/* Checks the column of pixels from x_up to x_down in the previous column */
+/* Checks the column of pixels from x_up to x_down in the previous column, returns ROW coordinate of the first non-white point from top to bottom */
 int pixel_check_back(int x, int y, unsigned char (*matrix)[DIMENSION]) {
     int x_up = pixel_check_up(x, y, matrix);
     int x_down = pixel_check_down(x, y, matrix);
 
     if(x_up == ERROR || x_down == ERROR) { // Error handling and propagation
-        return FAIL;
+        return ERROR;
     }
     for(int i = x_up; i <= x_down; i++) {
         if(matrix[i][y-1] == 0) {
-            return SUCCESS;
+            return i;
         }
     }
-    return FAIL;
+    return ERROR;
+}
+
+/* Goes through the matrix, returns ROW number of first point with 0 as its value */
+int pixel_scan_x(unsigned char (*matrix)[DIMENSION]) {
+    for(int i = 0; i < DIMENSION; i++) {
+        for(int j = 0; j < DIMENSION; j++) {
+            if(matrix[i][j] == 0) 
+                return i;
+        }
+    }
+    return ERROR;
+}
+
+/* Goes through the matrix, returns COLUMN number of first point with 0 as its value */
+int pixel_scan_y(unsigned char (*matrix)[DIMENSION]) {
+    for(int i = 0; i < DIMENSION; i++) {
+        for(int j = 0; j < DIMENSION; j++) {
+            if(matrix[i][j] == 0) 
+                return j;
+        }
+    }
+    return ERROR;
 }

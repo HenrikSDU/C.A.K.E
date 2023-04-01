@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "pixel_functions.h": "c",
-        "instructions.h": "c"
+        "instructions.h": "c",
+        "stdio.h": "c"
     }
 }

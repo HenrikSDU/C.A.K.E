@@ -58,7 +58,7 @@ int main(int argc, char* argv[]) {
     // first argument is the name of the file, second is the mode of opening, this case is w for write, creating a file 
 
     //Test
-    move_along_line(file, 10, 10);
+    move_to_point(file, 10, 10);
 
     char* name = argv[1]; /* Change this to change the picture that will be processed */
     //char* name = "test4.png"; /* Change this to change the picture that will be processed */
@@ -86,20 +86,11 @@ int main(int argc, char* argv[]) {
         }
     }
     /* Displaying the img_matrix */
-    for(int i = 0; i < DIMENSION; i++) {
-        for(int j = 0; j < DIMENSION; j++) {
-            printf("%d ", img_matrix[i][j]);
-        }
-        printf("\n");
-    }
+    printf("IMG_MATRIX\n");
+    matrix_display(DIMENSION, img_matrix);
     printf("\n");
 
-    /* Displaying the img_matrix but differently */
-    matrix_display(DIMENSION, img_matrix);
-
-    printf("\n----------------------------------------\n");
-
-    //Testing functions
+    /* Average matrix */
     unsigned char avg_matrix[DIMENSION][DIMENSION];
     /* Filling the matrix with values*/
     for(int i = 0; i < DIMENSION; i++) {
@@ -108,23 +99,134 @@ int main(int argc, char* argv[]) {
         }
     }
 
+    unsigned char del_matrix[DIMENSION][DIMENSION];
+    /* Filling the matrix with values*/
+    for(int i = 0; i < DIMENSION; i++) {
+        for(int j = 0; j < DIMENSION; j++) {
+            del_matrix[i][j] = img_matrix[i][j];
+        }
+    }
+
+    /* Displaying the img_matrix but differently */
+    printf("DEL_matrix\n");
+    matrix_display(DIMENSION, del_matrix);
+    printf("\n");
+    printf("DEL_matrix\n");
+    matrix_display(DIMENSION, del_matrix);
+
+    printf("\n----------------------------------------\n");
+
+    /* Deleting a column from x1 to x2 in column y */
+    printf("DEL_matrix\n");
+    matrix_display(DIMENSION, del_matrix);
+    printf("\n");
+    printf("Pixel_check_up + 1: %d, Pixel_check_down: %d\n", pixel_check_up(0, 0, del_matrix) + 1, pixel_check_down(0, 0, del_matrix));
+    { // Extra indentation bc local_i_top should not exist outside the for loop, function to set the max of i didn't work, this is a solution
+        int local_i_top = pixel_check_down(0, 0, del_matrix);
+        for(int i = pixel_check_up(0, 0, del_matrix) + 1; i < local_i_top; i++) {
+            del_matrix[i][0] = 255;
+        }
+    }
+    printf("DEL_matrix\n");
+    matrix_display(DIMENSION, del_matrix);
+    
+    //Testing functions
+
     for(int i =  0; i < 10; i++) {
         for(int y = 0; y < 10; y++) {
             avg_matrix[average_no_comment(pixel_check_up(i, y, img_matrix), pixel_check_down(i, y, img_matrix))][y] = 0;
 
+            /* Debugging printfs */
+            /*
             printf("Pixel num: %d\n", i * DIMENSION + y);
-            printf("testing every pixel average: %d\n", average(pixel_check_up(i, y, img_matrix), pixel_check_down(i, y, img_matrix)));
-            printf("\n");
+            printf("testing every pixel average: %d\n\n", average(pixel_check_up(i, y, img_matrix), pixel_check_down(i, y, img_matrix)));
+            */
         }
     }
     printf("\n");
  
     /* Displaying the average matrix */
+    printf("AVG_MATRIX\n");
     matrix_display(DIMENSION, avg_matrix);
     printf("\n");
 
     printf("Pixel check forward: %d\n", pixel_check_forward(4, 2, img_matrix));
     printf("Pixel check backwards: %d\n", pixel_check_back(4, 2, img_matrix));
+    printf("\n");
+
+    /* ******************************************************************************** */
+    /* The main procedure with all the stuff */
+    // New matrix, will be edited along the way
+    unsigned char temp_matrix[DIMENSION][DIMENSION];
+    for(int i = 0; i < DIMENSION; i++) {
+        for(int j = 0; j < DIMENSION; j++) {
+            temp_matrix[i][j] = img_matrix[i][j]; // Copying the matrix because this will be wiped as it is being processed
+        }
+    }
+    // Wiping avg_matrix, this will be handled better, but for testing purposes the previous operations help
+    for(int i = 0; i < DIMENSION; i++) {
+        for(int j = 0; j < DIMENSION; j++) {
+            avg_matrix[i][j] = 255;
+        }
+    }
+
+    for(int i = 0; i < DIMENSION; i++) {
+        for(int j = 0; j < DIMENSION; j++) {
+            unsigned char line_end_flag = 0;
+
+            int x = i;
+            int y = j;
+
+            int x_lim = DIMENSION;
+            int y_lim = DIMENSION;
+
+            if(temp_matrix[x][y] == 0) {
+                extruder_down(file);
+            }
+
+
+                int x_top = pixel_check_up(x, y, temp_matrix);
+                int x_down = pixel_check_down(x, y, temp_matrix);
+                int avg = average_no_comment(x_top, x_down);
+
+                // Filter for edge-cases
+                if(y > 0 || y < 9) { // Not on the edge
+                    if(pixel_check_back(x, y, temp_matrix) != -2) {
+                    
+                    }
+                    else if(pixel_check_forward(x, y, temp_matrix) != -2) {
+
+                    }
+                    else {
+                        line_end_flag = 1;
+                    }
+                }
+                else if(y == 0) { // On the edge left side
+                    if(pixel_check_forward(x, y, temp_matrix) != -2) {
+
+                    }
+                    else {
+                        line_end_flag = 1;
+                    }
+                }
+                else if(y == 9) { // On the edge right side
+                    if(pixel_check_back(x, y, temp_matrix) != -2) {
+
+                    }
+                    else {
+                        line_end_flag = 1;
+                    } 
+                }
+
+
+                // Clearing the column so it won't be checked again
+                for(int i = x_top + 1; i < x_down; i++) {
+                    temp_matrix[i][y] = 255;
+                }
+            
+        }
+    }
+
 
     /* Closing file */
     fclose(file);
@@ -134,25 +236,3 @@ int main(int argc, char* argv[]) {
     stbi_image_free(img);
     return 0;
 }
-
-
-/*
-Line separator 2000
-
-How it works in my head:
-    First pixel
-        Record position of current pixel if useful (not white (255))
-        Write current pixel to white (not useful)
-        Test every neighbouring pixel if they have a value other than white (255)
-        If yes, proceed
-        If no, end of line
-    Next pixel
-        Record position of current pixel if useful (not white (255))
-        Write current pixel to white (not useful)
-        Test every neighbouring pixel if they have a value other than white (255)
-        If yes, proceed
-        If no, end of line
-*/
-
-
-
