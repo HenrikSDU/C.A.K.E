@@ -96,17 +96,10 @@ int pixel_check_down(int x, int y, unsigned char (*matrix)[DIMENSION]) {
     return DIMENSION;
 }
 
-/* Deletes from x_top until x_bottom in the column y */
-void pixel_column_delete(int x_top, int x_down, int y, unsigned char matrix[DIMENSION][DIMENSION]) {
-    for(int i = x_top; i >= x_down; i--) {
-        matrix[i][y] = 255;
-    }
-}
-
 /* I don't think I have to explain this */
 int average(int m, int n) {
-   printf("check up value inside average: %d\n", m);
-   printf("check down value inside average: %d\n", n);
+   //printf("check up value inside average: %d\n", m);
+   //printf("check down value inside average: %d\n", n);
     float average = (m + n) / 2.0;
     return (int)round(average); // For now just typecasting to int, but I may add rounding
 }
@@ -169,4 +162,11 @@ int pixel_scan_y(unsigned char (*matrix)[DIMENSION]) {
         }
     }
     return ERROR;
+}
+
+/* Deletes from x_top until x_bottom in the column y */
+void pixel_column_del(int x_top, int x_down, int y, unsigned char (*matrix)[DIMENSION]) {
+    for(int i = x_top; i < x_down; i++) {
+        matrix[i][y] = 255;
+    }
 }

@@ -111,24 +111,12 @@ int main(int argc, char* argv[]) {
     printf("DEL_matrix\n");
     matrix_display(DIMENSION, del_matrix);
     printf("\n");
+    // Showcase of the column_del function
+    pixel_column_del(pixel_check_up(1, 1, del_matrix), pixel_check_down(1, 1, del_matrix), 1, del_matrix);
     printf("DEL_matrix\n");
     matrix_display(DIMENSION, del_matrix);
 
     printf("\n----------------------------------------\n");
-
-    /* Deleting a column from x1 to x2 in column y */
-    printf("DEL_matrix\n");
-    matrix_display(DIMENSION, del_matrix);
-    printf("\n");
-    printf("Pixel_check_up + 1: %d, Pixel_check_down: %d\n", pixel_check_up(0, 0, del_matrix) + 1, pixel_check_down(0, 0, del_matrix));
-    { // Extra indentation bc local_i_top should not exist outside the for loop, function to set the max of i didn't work, this is a solution
-        int local_i_top = pixel_check_down(0, 0, del_matrix);
-        for(int i = pixel_check_up(0, 0, del_matrix) + 1; i < local_i_top; i++) {
-            del_matrix[i][0] = 255;
-        }
-    }
-    printf("DEL_matrix\n");
-    matrix_display(DIMENSION, del_matrix);
     
     //Testing functions
 
@@ -146,6 +134,9 @@ int main(int argc, char* argv[]) {
     printf("\n");
  
     /* Displaying the average matrix */
+    printf("AVG_MATRIX\n");
+    matrix_display(DIMENSION, avg_matrix);
+    printf("\n");
     printf("AVG_MATRIX\n");
     matrix_display(DIMENSION, avg_matrix);
     printf("\n");
@@ -172,7 +163,28 @@ int main(int argc, char* argv[]) {
 
     for(int i = 0; i < DIMENSION; i++) {
         for(int j = 0; j < DIMENSION; j++) {
-            unsigned char line_end_flag = 0;
+
+            int x;
+            int y;
+            int line_end_flag = 0;
+
+            while(line_end_flag == 0 && )
+            
+        }
+    }
+
+
+    /* Closing file */
+    fclose(file);
+
+    /* VERY IMPORTANT! ALWAYS FREE IMAGE WITH stbi_image_free(), otherwise there'll be a memory leak */
+    free(filename);
+    stbi_image_free(img);
+    return 0;
+}
+
+/*
+unsigned char line_end_flag = 0;
 
             int x = i;
             int y = j;
@@ -220,19 +232,4 @@ int main(int argc, char* argv[]) {
 
 
                 // Clearing the column so it won't be checked again
-                for(int i = x_top + 1; i < x_down; i++) {
-                    temp_matrix[i][y] = 255;
-                }
-            
-        }
-    }
-
-
-    /* Closing file */
-    fclose(file);
-
-    /* VERY IMPORTANT! ALWAYS FREE IMAGE WITH stbi_image_free(), otherwise there'll be a memory leak */
-    free(filename);
-    stbi_image_free(img);
-    return 0;
-}
+*/
