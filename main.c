@@ -168,7 +168,7 @@ int main(int argc, char* argv[]) {
             int y;
             int line_end_flag = 0;
 
-            while(line_end_flag == 0 && )
+            
             
         }
     }
