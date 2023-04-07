@@ -3,6 +3,7 @@
         "pixel_functions.h": "c",
         "instructions.h": "c",
         "stdio.h": "c",
-        "process.h": "c"
+        "process.h": "c",
+        "decoding_functions.h": "c"
     }
 }

@@ -1,0 +1,12 @@
+/* Useful examples
+    // Example usage
+    for(double t = 0.0; t <= 1.0; t = t + (1.0 / (double)RESOLUTION_OF_T)) {
+        printf("t = %lf\nx: %lf, y: %lf\n\n", t, cubic_bezier_x((double)0, (double)0, (double)1, (double)1, t), cubic_bezier_y((double)0, (double)1, (double)1, (double)0, t));
+    }
+
+    // atof() returns a double, converts string to double
+    char* str = "10.1";
+    printf("\n%lf", atof(str));
+    char* str2 = "L";
+    printf("\n%lf", atof(str2));
+*/

@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 int main(int argc, char **argv) {
     if(argc != 3) {
@@ -16,6 +17,11 @@ int main(int argc, char **argv) {
     char *args[] = {"autotrace.exe", arg1, arg2, arg3, arg4, NULL};
 
     _spawnv(_P_WAIT, "autotrace.exe", (const char * const*)args);
+
+    /* Trying exponential function */
+    double x = 0.25;
+    x = pow((double)x, (double)2);
+    printf("%lf\n", x);
 
     return 0;
 }
