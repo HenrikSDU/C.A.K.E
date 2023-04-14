@@ -26,7 +26,7 @@ enum path_line {
 
 int main() {
     /* fp stands for file pointer, and is of type file(FILE) pointer(*) */
-    FILE* fp = fopen("test13.svg", "r"); // fopen will get the address of a file, and open it in a mode, here read
+    FILE* fp = fopen("test14.svg", "r"); // fopen will get the address of a file, and open it in a mode, here read
     FILE* gcode = fopen("test14.gcode", "w");
 
     unsigned int width, height;
@@ -111,7 +111,12 @@ int main() {
     }
 
     // I can do this but it`s quite pointless at this time
-    fprintf(stderr, "gddf");
+    fprintf(stderr, "gddf\n");
+    fprintf(stdout, "gddf\n");
+    printf("%c%c\n", 219, 219);
+    printf("%c%c\n", 220, 177);
+    printf("%c%c\n", 192, 193);
+
 
 
     printf("\nThe remaining characters\n");
