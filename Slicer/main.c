@@ -5,11 +5,7 @@
 #include "include/decoding_functions.h"
 
 /* Defines the amount of steps that 't' will have, quasi how many little lines (RESOLUTION_OF_T - 1 number of little lines if I'm correct) will make up a curve */
-#define RESOLUTION_OF_T 20
-
-#define START_OF_SVG 39 // The first line of the file is not useful here therefore skipping over it
-#define WIDTH_POS 51 // This is where the value of the width of the picture is stored
-#define WH_DELTA 13 // The difference between the end of the width value and the beginning of the height
+#define RESOLUTION_OF_T 10
 
 /* Global variables to keep track of current position in the coordinate system and in the string  */
 unsigned int current_x = 0, current_y = 0, cursor = 0, prev_cursor;
@@ -46,33 +42,35 @@ int main() {
     svg[length] = 0;
     printf("%s\n", svg);
 
-    /* Debug operations */
-    /*
-    for(int i = 0; i <= length; i++) {
-        printf("Index: %d, Char: %d\n", i, svg[i]);
-    }
-    printf("\n");
-    */
 
-    // Todo: make str_find functions for these two aswell
-    // Filtering out the width and height info
+    cursor = str_find_width(svg, cursor, length);
     {
-        char str[4];
-        for(int i = 0; i < sizeof(str); i++) {
-            str[i] = svg[i + WIDTH_POS];
-            cursor = i + WIDTH_POS;
+        int count = 0;
+        while(svg[cursor + count] != 34) {
+            count++;
         }
-        width = atoi(str);
+        char* width_temp = malloc((count + 1) * sizeof(char));
+        for(int k = 0; k < count; k++) {
+            width_temp[k] = svg[cursor + k];
+        }
+        width_temp[count] = 0;
+        width = atoi(width_temp);
+        free(width_temp);
+    }
 
-        while(svg[cursor] != '=') {
-            cursor++;
+    cursor = str_find_height(svg, 0, length);
+    {
+        int count = 0;
+        while(svg[cursor + count] != 34) {
+            count++;
         }
-
-        cursor += 2;
-        for(int i = 0; i < sizeof(str); i++) {
-            str[i] = svg[i + cursor];
+        char* height_temp = malloc((count + 1) * sizeof(char));
+        for(int k = 0; k < count; k++) {
+            height_temp[k] = svg[cursor + k];
         }
-        height = atoi(str);
+        height_temp[count] = 0;
+        height = atoi(height_temp);
+        free(height_temp);
     }
     printf("Width: %d, Height: %d\n", width, height);
 
@@ -81,6 +79,7 @@ int main() {
     /* Temporary file for easier conversion */
     FILE* temp_d = fopen("temp_d.txt", "w");
 
+    cursor = 0;
     while(svg[cursor] != 0) {
         cursor = str_find_d(svg, cursor, length); // Will return cursor location where it finds " "=d " or if it doesn`t then the length that was passed in as an argument
         printf("Cursor: %d\n", cursor);
@@ -116,6 +115,16 @@ int main() {
     printf("%c%c\n", 219, 219);
     printf("%c%c\n", 220, 177);
     printf("%c%c\n", 192, 193);
+
+
+    printf("Bezier-curve coordinates using RESOLUTION_OF_T:\n");
+    double t = 0;
+    /* Usage of cubic bezier functions, if int i = 0 then start point will be included, if i = 1 first point omitted, if i < RESOLUTION_OF_t then end point omitted, if <= then endpoint included */
+    for(int i = 0; i <= RESOLUTION_OF_T; i++) {
+        t = ((double)1 / RESOLUTION_OF_T) * i;
+        //printf("T: %lf ", t);
+        printf(" %lf %lf\n", cubic_bezier_x((double)0, (double)0, (double)1, (double)1, t),cubic_bezier_y((double)0, (double)1, (double)1, (double)0, t));
+    }
 
 
 

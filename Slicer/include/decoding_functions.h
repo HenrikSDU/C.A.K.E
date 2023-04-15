@@ -7,6 +7,7 @@ typedef struct {
     double y;
 } point_t;
 
+/* Bézier-curve deciphering functions */
 double cubic_bezier_x(double start_x, double c1_x, double c2_x, double end_x, double t) {
     double ratio = (double)1 - t;
     double x = start_x * pow(ratio, (double)3) + c1_x * (double)3*t * pow(ratio, (double)2) + c2_x * (double)3*pow(t, (double)2) * ratio + end_x * pow(t, (double)3);
@@ -62,7 +63,53 @@ unsigned int str_find_d(char* str, unsigned int cursor, unsigned int length) {
         }
     return length; //Error return is yet to be decided
 }
-/* Todo: str_find functions for width and height*/
+
+unsigned int str_find_width(char* str, unsigned int cursor, unsigned int length) {
+    char width[4]; //The string we want to finwidth, has to be inputtewidth backwarwidths except for the NULL char
+    width[0] = 34; // "
+    width[1] = 61; // =
+    width[2] = 104; // h
+    width[3] = 0; // NULL
+    char temp[4];
+    unsigned int match = 0; //Counts how many matches there are between the strings
+
+    for(int i = cursor; i < length; i++) {
+        str_shift_left(temp, sizeof(temp), str[i]);
+        //printf("%s\n", temp);
+        match = 0;
+        for(int j = 0; j < sizeof(width); j++) {
+            //printf("the comparewidth chars: %c, %c\n", width[j], temp[j]);
+            if(width[j] == temp[j])
+                match++;
+        }
+        //printf("match is: %width\n", match);
+        if(match == 4)
+            return i + 1; // Returns the current "position" basically where the specifiewidth string enwidths
+        }
+    return length; //Error return is yet to be widthecided
+}
+
+unsigned int str_find_height(char* str, unsigned int cursor, unsigned int length) {
+    char height[4]; //The string we want to finwidth, has to be inputtewidth backwarwidths except for the NULL char
+    height[0] = 34; // "
+    height[1] = 61; // =
+    height[2] = 116; // t
+    height[3] = 0; // NULL
+    char temp[4];
+    unsigned int match = 0; //Counts how many matches there are between the strings
+
+    for(int i = cursor; i < length; i++) {
+        str_shift_left(temp, sizeof(temp), str[i]);
+        match = 0;
+        for(int j = 0; j < sizeof(height); j++) {
+            if(height[j] == temp[j])
+                match++;
+        }
+        if(match == 4)
+            return i + 1; // Returns the current "position" basically where the specifiewidth string enwidths
+        }
+    return length; //Error return is yet to be widthecided
+}
 
 point_t get_coords(char* str, unsigned int* cursor) {
     point_t point;
