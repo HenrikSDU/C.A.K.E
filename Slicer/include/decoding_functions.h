@@ -2,6 +2,8 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+#include "instructions.h"
+
 typedef struct {
     double x;
     double y;
@@ -140,4 +142,15 @@ point_t init_point(void) {
     point.x = 0.0;
     point.y = 0.0;
     return point;
+}
+
+void decode_bezier(FILE* file, unsigned int RESOLUTION_OF_T, double start_x, double c1_x, double c2_x, double end_x, double start_y, double c1_y, double c2_y, double end_y) {
+    double t = 0;
+    /* Usage of cubic bezier functions, if int i = 0 then start point will be included, if i = 1 first point omitted, if i < RESOLUTION_OF_t then end point omitted, if <= then endpoint included */
+    for(int i = 0; i <= RESOLUTION_OF_T; i++) {
+        t = ((double)1 / RESOLUTION_OF_T) * i;
+        double x = round(cubic_bezier_x(start_x, c1_x, c2_x, end_x, t));
+        double y = round(cubic_bezier_y(start_y, c1_y, c2_y, end_y, t));
+        move_to_point(file, x, y);
+    }
 }
