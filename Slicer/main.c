@@ -6,41 +6,22 @@
 //#include "include/instructions.h"
 
 /* Defines the amount of steps that 't' will have, quasi how many little lines (RESOLUTION_OF_T - 1 number of little lines if I'm correct) will make up a curve */
-#define RESOLUTION_OF_T 20
-
-typedef struct {
-    double start_x;
-    double start_y;
-    double c1_x;
-    double c1_y;
-    double c2_x;
-    double c2_y;
-    double end_x;
-    double end_y;
-} bezier_t;
-
-bezier_t init_bezier() {
-    bezier_t bezier;
-    bezier.start_x = 0;
-    bezier.start_y = 0;
-    bezier.c1_x = 0;
-    bezier.c1_y = 0;
-    bezier.c2_x = 0;
-    bezier.c2_y = 0;
-    bezier.end_x = 0;
-    bezier.end_y = 0;
-    return bezier;   
-}
+#define RESOLUTION_OF_T 30
 
 int main() {
     /* fp stands for file pointer, and is of type file(FILE) pointer(*) */
-    FILE* fp = fopen("test14.svg", "r"); // fopen will get the address of a file, and open it in a mode, here read
-    FILE* gcode = fopen("test14.gcode", "w");
+    FILE* fp = fopen("test16.svg", "r"); // fopen will get the address of a file, and open it in a mode, here read
+    FILE* gcode = fopen("test16.cake", "w");
 
     /* Variables to keep track of current position in the coordinate system and in the string  */
-    unsigned int current_x = 0, current_y = 0, prev_x = 0, prev_y = 0, cursor = 0;
+    unsigned int cursor = 0;
     unsigned int width, height;
     point_t current_pos = init_point();
+    point_t prev_pos = init_point();
+    point_t control1 = init_point();
+    point_t control2 = init_point();
+    point_t end_pos = init_point();
+    command_t  command;
 
     /* Determining the lenght of a file, not sure if this is the best way but it works */
     fseek(fp, 0, SEEK_END); // Putting cursor at the end
@@ -52,8 +33,10 @@ int main() {
     for(int i = 0; i < length; i++) {
         svg[i] = getc(fp);
     }
-        svg[length - 1] = 0;
-    printf("%s\n", svg);
+    svg[length - 1] = 0; // Setting the last char to 0 to terminate the string
+    
+    /* Printing the string */
+    //printf("%s\n", svg);
     fclose(fp);
 
 
@@ -96,7 +79,7 @@ int main() {
     cursor = 0;
     while(svg[cursor] != 0) {
         cursor = str_find_d(svg, cursor, length); // Will return cursor location where it finds " "=d " or if it doesn`t then the length that was passed in as an argument
-        printf("Cursor: %d\n", cursor);
+        //printf("Cursor: %d\n", cursor);
         if(cursor == length) // If cursor is at the end then terminate the loop
             break;
 
@@ -120,44 +103,112 @@ int main() {
             if(svg[i] == 34) // " is the terminating character for the d variable
                 break;
         }
-        fprintf(temp_d, "\n\n\n"); // Separation between objects
-    }
-
-    // I can do this but it`s quite pointless at this time
-    fprintf(stderr, "gddf\n");
-    fprintf(stdout, "gddf\n");
-    printf("%c%c\n", 219, 219);
-    printf("%c%c\n", 220, 177);
-    printf("%c%c\n", 192, 193);
-
-    printf("Bezier-curve coordinates using RESOLUTION_OF_T:\n");
-    double t = 0;
-    /* Usage of cubic bezier functions, if int i = 0 then start point will be included, if i = 1 first point omitted, if i < RESOLUTION_OF_t then end point omitted, if <= then endpoint included */
-    for(int i = 0; i <= RESOLUTION_OF_T; i++) {
-        t = ((double)1 / RESOLUTION_OF_T) * i;
-        //printf("T: %lf ", t);
-        printf(" %lf %lf\n", cubic_bezier_x((double)0, (double)0, (double)1, (double)1, t),cubic_bezier_y((double)0, (double)1, (double)1, (double)0, t));
+        fprintf(temp_d, "\n\n"); // Separation between objects
     }
     fclose(temp_d);
 
-    FILE* convert;
-    convert = fopen("temp_d.txt", "r");
-    printf("Convert: %p\n", convert);
+    /* Converting the temporary file to gcode */
+    FILE* convert = fopen("temp_d.txt", "r");
     if(convert == NULL) {
-        printf("Failed to open file");
-        exit;
+        fprintf(stderr, "Failed to open file");
+        return 1;
     }
 
-    char read_line[20];
-    for(int i = 0; i < 20; i++) {
+    unsigned int point_counter = 0;
+    char read_line[10];
+    for(int i = 0; i < 10; i++) {
         read_line[i] = 0;
     }
     do {
-        for(int i = 0; i < 20; i++) {
-            printf("%d\n", read_line[i]);
+        printf("%s", read_line);
+        if(read_line[0] == 'M') {
+            command = M;
+            point_counter = 0;
+            continue;
+        }
+        else if(read_line[0] == 'C') {
+            command = C;
+            point_counter = 0;
+            continue;
+        }
+        else if(read_line[0] == 'L') {
+            command = L;
+            point_counter = 0;
+            printf("Prevpos %f %f\n", prev_pos.x, prev_pos.y);
+            printf("Curpos %f %f\n", current_pos.x, current_pos.y);
+            prev_pos = current_pos;
+            continue;
+        }
+        else if(read_line[0] < 58 && read_line[0] > 47) {
+
+            if(command  == M) {
+                if(point_counter == 0) {
+                    current_pos.x = atof(read_line);
+                    printf("x: %f\n", current_pos.x);
+                    point_counter++;
+                    continue;
+                }
+                else if(point_counter == 1) {
+                    current_pos.y = atof(read_line);
+                    printf("y: %f\n", current_pos.y);
+                    point_counter++;
+                }
+                extruder_up(gcode);
+                move_to_point(gcode, current_pos.x, current_pos.y);
+                extruder_down(gcode);
+                prev_pos = current_pos;
+            }
+            else if(command == C) {
+                if(point_counter == 0) {
+                    control1.x = atof(read_line);
+                    point_counter++;
+                    continue;
+                }
+                else if(point_counter == 1) {
+                    control1.y = atof(read_line);
+                    point_counter++;
+                    continue;
+                }
+                else if(point_counter == 2) {
+                    control2.x = atof(read_line);
+                    point_counter++;
+                    continue;
+                }
+                else if(point_counter == 3) {
+                    control2.y = atof(read_line);
+                    point_counter++;
+                    continue;
+                }
+                else if(point_counter == 4) {
+                    end_pos.x = atof(read_line);
+                    point_counter++;
+                    continue;
+                }
+                else if(point_counter == 5) {
+                    end_pos.y = atof(read_line);
+                    point_counter++;
+                }
+                // now to use all this information to create a bezier curve
+                decode_bezier(gcode, RESOLUTION_OF_T, prev_pos.x, control1.x, control2.x, end_pos.x, prev_pos.y, control1.y, control2.y, end_pos.y);
+                prev_pos = end_pos;
+            }
+            else if(command == L) {
+                if(point_counter == 0) {
+                    current_pos.x = atof(read_line);
+                    point_counter++;
+                    continue;
+                }
+                else if(point_counter == 1) {
+                    current_pos.y = atof(read_line);
+                    point_counter++;
+                }
+                move_to_point(gcode, current_pos.x, current_pos.y);
+                prev_pos = current_pos;
+            }
         }
     } while(fgets(read_line, 20, convert) != NULL);
 
+    /*
     bezier_t curve = init_bezier();
     curve.start_x = 0;
     curve.c1_x = 0;
@@ -168,13 +219,6 @@ int main() {
     curve.c2_y = 10;
     curve.end_y = 0;
     decode_bezier(gcode, RESOLUTION_OF_T, curve.start_x, curve.c1_x, curve.c2_x, curve.end_x, curve.start_y, curve.c1_y, curve.c2_y, curve.end_y);
-
-    /*
-    printf("\nThe remaining characters\n");
-    while(cursor < length) {
-        printf("%c", svg[cursor]);
-        cursor++;
-    }
     */
 
     free(svg);

@@ -9,6 +9,43 @@ typedef struct {
     double y;
 } point_t;
 
+point_t init_point(void) {
+    point_t point;
+    point.x = 0.0;
+    point.y = 0.0;
+    return point;
+}
+
+typedef struct {
+    double start_x;
+    double start_y;
+    double c1_x;
+    double c1_y;
+    double c2_x;
+    double c2_y;
+    double end_x;
+    double end_y;
+} bezier_t;
+
+bezier_t init_bezier() {
+    bezier_t bezier;
+    bezier.start_x = 0;
+    bezier.start_y = 0;
+    bezier.c1_x = 0;
+    bezier.c1_y = 0;
+    bezier.c2_x = 0;
+    bezier.c2_y = 0;
+    bezier.end_x = 0;
+    bezier.end_y = 0;
+    return bezier;   
+}
+
+typedef enum {
+    M,
+    C,
+    L,
+} command_t;
+
 /* Bézier-curve deciphering functions */
 double cubic_bezier_x(double start_x, double c1_x, double c2_x, double end_x, double t) {
     double ratio = (double)1 - t;
@@ -137,17 +174,20 @@ point_t get_coords(char* str, unsigned int* cursor) {
     return point;
 }
 
-point_t init_point(void) {
-    point_t point;
-    point.x = 0.0;
-    point.y = 0.0;
-    return point;
-}
 
+
+/* Example
+    double t = 0;
+    Usage of cubic bezier functions, if int i = 0 then start point will be included, if i = 1 first point omitted, if i < RESOLUTION_OF_t then end point omitted, if <= then endpoint included 
+    for(int i = 0; i <= RESOLUTION_OF_T; i++) {
+        t = ((double)1 / RESOLUTION_OF_T) * i;
+        printf(" %lf %lf\n", cubic_bezier_x((double)0, (double)0, (double)1, (double)1, t),cubic_bezier_y((double)0, (double)1, (double)1, (double)0, t));
+    }
+*/
 void decode_bezier(FILE* file, unsigned int RESOLUTION_OF_T, double start_x, double c1_x, double c2_x, double end_x, double start_y, double c1_y, double c2_y, double end_y) {
     double t = 0;
     /* Usage of cubic bezier functions, if int i = 0 then start point will be included, if i = 1 first point omitted, if i < RESOLUTION_OF_t then end point omitted, if <= then endpoint included */
-    for(int i = 0; i <= RESOLUTION_OF_T; i++) {
+    for(int i = 1; i <= RESOLUTION_OF_T; i++) {
         t = ((double)1 / RESOLUTION_OF_T) * i;
         double x = round(cubic_bezier_x(start_x, c1_x, c2_x, end_x, t));
         double y = round(cubic_bezier_y(start_y, c1_y, c2_y, end_y, t));
