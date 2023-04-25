@@ -6,7 +6,7 @@
 //#include "include/instructions.h"
 
 /* Defines the amount of steps that 't' will have, quasi how many little lines (RESOLUTION_OF_T - 1 number of little lines if I'm correct) will make up a curve */
-#define RESOLUTION_OF_T 30
+#define RESOLUTION_OF_T 60
 
 int main() {
     /* fp stands for file pointer, and is of type file(FILE) pointer(*) */
@@ -208,18 +208,7 @@ int main() {
         }
     } while(fgets(read_line, 20, convert) != NULL);
 
-    /*
-    bezier_t curve = init_bezier();
-    curve.start_x = 0;
-    curve.c1_x = 0;
-    curve.c2_x = 10;
-    curve.end_x = 10;
-    curve.start_y = 0;
-    curve.c1_y = 10;
-    curve.c2_y = 10;
-    curve.end_y = 0;
-    decode_bezier(gcode, RESOLUTION_OF_T, curve.start_x, curve.c1_x, curve.c2_x, curve.end_x, curve.start_y, curve.c1_y, curve.c2_y, curve.end_y);
-    */
+    
 
     free(svg);
     fclose(gcode);
