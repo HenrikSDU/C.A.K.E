@@ -25,7 +25,7 @@ int main() {
 
     /* Determining the lenght of a file, not sure if this is the best way but it works */
     fseek(fp, 0, SEEK_END); // Putting cursor at the end
-    int length = ftell(fp); // Getting cursor location (distance from the start of the file)
+    unsigned length = ftell(fp); // Getting cursor location (distance from the start of the file)
     printf("Length of file in bytes: %d\n", length);
 
     fseek(fp, 0, SEEK_SET);
@@ -76,6 +76,7 @@ int main() {
     /* Temporary file for easier conversion */
     FILE* temp_d = fopen("temp_d.txt", "w");
 
+                char temp[12];
     cursor = 0;
     while(svg[cursor] != 0) {
         cursor = str_find_d(svg, cursor, length); // Will return cursor location where it finds " "=d " or if it doesn`t then the length that was passed in as an argument
@@ -93,6 +94,8 @@ int main() {
                 fprintf(temp_d, "\n");
                 fprintf(temp_d, "%c" , svg[i]);
                 fprintf(temp_d, "\n");
+                memset(temp, 0, 12);
+                find_num(svg, temp, cursor, length);
             }
             else if((svg[i] > 47 && svg[i] < 58) || svg[i] == 46) { // If number or . then write those in one line
                 fprintf(temp_d, "%c" , svg[i]);
@@ -120,7 +123,6 @@ int main() {
         read_line[i] = 0;
     }
     do {
-        printf("%s", read_line);
         if(read_line[0] == 'M') {
             command = M;
             point_counter = 0;
@@ -134,8 +136,6 @@ int main() {
         else if(read_line[0] == 'L') {
             command = L;
             point_counter = 0;
-            printf("Prevpos %f %f\n", prev_pos.x, prev_pos.y);
-            printf("Curpos %f %f\n", current_pos.x, current_pos.y);
             prev_pos = current_pos;
             continue;
         }
@@ -144,13 +144,11 @@ int main() {
             if(command  == M) {
                 if(point_counter == 0) {
                     current_pos.x = atof(read_line);
-                    printf("x: %f\n", current_pos.x);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 1) {
                     current_pos.y = atof(read_line);
-                    printf("y: %f\n", current_pos.y);
                     point_counter++;
                 }
                 extruder_up(gcode);
@@ -208,7 +206,39 @@ int main() {
         }
     } while(fgets(read_line, 20, convert) != NULL);
 
-    
+    //char temp[12];
+    memset(temp, 0, 12);
+    find_num(svg, temp, cursor, length);
+    cursor = 0;
+    printf("temp: %s", temp);
+    /*
+    while(svg[cursor] != 0) {
+        cursor = str_find_d(svg, cursor, length); // Will return cursor location where it finds " "=d " or if it doesn`t then the length that was passed in as an argument
+        //printf("Cursor: %d\n", cursor);
+        if(cursor == length) // If cursor is at the end then terminate the loop
+            break;
+
+        for(int i = cursor; i < length; i++) {
+            // Bad practice but many if statements to decide how to print the current char, new lines chars and numbers matter
+            if((svg[i] == 'M' || svg[i] == 'C' || svg[i] == 'L') && i == cursor) { // If letter and first char then no new line in the beginning
+                printf("%c\n" , svg[i]);
+            }
+            else if((svg[i] == 'M' || svg[i] == 'C' || svg[i] == 'L') && svg[i - 1] < 65) { // If previous character was a number start in new line
+                printf("\n%c\n" , svg[i]);
+            }
+            else if((svg[i] > 47 && svg[i] < 58) || svg[i] == 46) { // If number or . then write those in one line
+                printf("%c" , svg[i]);
+            }
+            else if(svg[i] == 32) { // Putting \n instead of space
+                printf("\n");
+            }
+            if(svg[i] == 34) // " is the terminating character for the d variable
+                break;
+        }
+        printf("\n\n"); // Separation between objects
+    }
+    */
+
 
     free(svg);
     fclose(gcode);

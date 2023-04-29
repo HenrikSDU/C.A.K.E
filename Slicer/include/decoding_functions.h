@@ -194,3 +194,12 @@ void decode_bezier(FILE* file, unsigned int RESOLUTION_OF_T, double start_x, dou
         move_to_point(file, x, y);
     }
 }
+
+// Num is defined in main and therefore might be too small for some applications
+void find_num(char* str, char* num, unsigned int cursor, unsigned int length) {
+    unsigned int i = 0;
+    while((str[cursor] > 47 && str[cursor] < 58) || str[cursor] == 46) {
+        num[i] = str[cursor];
+        i++;
+    }
+}
