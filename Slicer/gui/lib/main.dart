@@ -4,16 +4,32 @@ import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
 
 void main() {
-  runApp(Slicer());
+  runApp(const Slicer());
 }
 
-class Slicer extends StatefulWidget {
+class Slicer extends StatelessWidget {
+  const Slicer({super.key});
+
   @override
-  _SlicerState createState() => _SlicerState();
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: "slicer",
+      theme: ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: HomePage(),
+    );
+  }
 }
 
-class _SlicerState extends State<Slicer> {
-  String? filepath = " ";
+class HomePage extends StatefulWidget {
+  @override
+  State<HomePage> createState() => _HomePageState();
+  //State<MyHomePage> createState() => _MyHomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
+String? filepath = " ";
 
   Future<String?> getFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -36,12 +52,7 @@ class _SlicerState extends State<Slicer> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: "slicer",
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Scaffold(
+    return Scaffold(
         body: Center(
           child: Padding(
             padding: const EdgeInsets.all(10.0),
@@ -55,19 +66,25 @@ class _SlicerState extends State<Slicer> {
                 ElevatedButton(
                   onPressed: () async {
                     String? path = await getFile();
-                    print("path is $filepath");
                     setState(() {
                       filepath = path;
                     });
+                    print("path is $filepath");
                   },
                   child: const Text("Select file"),
                 ),
+                const SizedBox(height: 5),
                 Text('Selected file: $filepath'),
+                const SizedBox(height: 10),
+                ElevatedButton(
+                  onPressed: () {
+                    print("Slice button pressed");
+                  }, 
+                  child: const Text("Slice!"),)
               ]
             ),
           ),
         )
-      ),
-    );
+      );
   }
 }
