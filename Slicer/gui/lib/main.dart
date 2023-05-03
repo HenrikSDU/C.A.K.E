@@ -1,4 +1,5 @@
 import 'dart:ffi';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
@@ -17,19 +18,19 @@ class Slicer extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: HomePage(),
+      home: SlicePage(),
     );
   }
 }
 
-class HomePage extends StatefulWidget {
+class SlicePage extends StatefulWidget {
   @override
-  State<HomePage> createState() => _HomePageState();
-  //State<MyHomePage> createState() => _MyHomePageState();
+  State<SlicePage> createState() => _SlicePageState();
 }
 
-class _HomePageState extends State<HomePage> {
-String? filepath = " ";
+class _SlicePageState extends State<SlicePage> {
+  String? filepath;
+  final pathError = const SnackBar(content: Text("Error selecting the file."));
 
   Future<String?> getFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -37,23 +38,32 @@ String? filepath = " ";
     if(result != null) {
       String? path = result.files.single.path;
       if(path != null) {
-        print(path);
-        
+        debugPrint(path);
         return path;
       } else {
-        print("There was an error with the file selection!  path = null");
+        debugPrint("There was an error with the file selection!  path = null");
         return null;
       }
     } else {
-      print("User cancelled the process");
+      debugPrint("User cancelled the process");
       return null;
     }
   }
 
+
+  Future<dynamic> runAutotrace(String path) async {
+    String exe = 'lib\\autotrace.exe';
+    List<String> args = ['-centerline', path, '-o', '${path.replaceFirst(".bmp", "")}.svg'];
+    Process process = await Process.start(exe, args);
+    stdout.addStream(process.stdout);
+    stderr.addStream(process.stderr);
+    return await process.exitCode;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Center(
+    return Material(
+        child: Center(
           child: Padding(
             padding: const EdgeInsets.all(10.0),
             child: Column(
@@ -69,7 +79,7 @@ String? filepath = " ";
                     setState(() {
                       filepath = path;
                     });
-                    print("path is $filepath");
+                    debugPrint("path is $filepath");
                   },
                   child: const Text("Select file"),
                 ),
@@ -78,7 +88,28 @@ String? filepath = " ";
                 const SizedBox(height: 10),
                 ElevatedButton(
                   onPressed: () {
-                    print("Slice button pressed");
+                    if(filepath == null) {
+                      debugPrint("SliceButton but Path is null, error");
+                      showDialog(context: context, builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Error"),
+                          content: const Text("There was an error selecting the file"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: Text("Ok"),
+                            ),
+                          ],
+                        );
+                       });
+                    } else {
+                      setState(() {
+                          String temp = filepath as String;
+                          runAutotrace(temp);
+                      });
+                    }
                   }, 
                   child: const Text("Slice!"),)
               ]
