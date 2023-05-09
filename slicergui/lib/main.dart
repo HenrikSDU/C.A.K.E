@@ -76,9 +76,9 @@ class _HomePageState extends State<HomePage> {
             ),
             Expanded(
                 child:
-                    Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-              page,
-            ]))
+                  //Material( child:
+                    page,),
+            //))
           ],
         ),
       );
@@ -130,56 +130,68 @@ class _SlicePageState extends State<SlicePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Material(
-      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-        const Text('Image slicing'),
-        const SizedBox(height: 5),
-        const Text('Accepted format(s): *.bmp'),
-        const SizedBox(height: 5),
-        ElevatedButton(
-          onPressed: () async {
-            String? path = await getFile();
-            setState(() {
-              filepath = path;
-            });
-            debugPrint("path is $filepath");
-          },
-          child: const Text("Select file"),
-        ),
-        const SizedBox(height: 5),
-        Text('Selected file: $filepath'),
-        const SizedBox(height: 10),
-        ElevatedButton(
-          onPressed: () {
-            if (filepath == null) {
-              debugPrint("SliceButton but Path is null, error");
-              showDialog(
-                  context: context,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: const Text("Error"),
-                      content:
-                          const Text("There was an error selecting the file"),
-                      actions: [
-                        TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                          },
-                          child: const Text("Ok"),
-                        ),
-                      ],
-                    );
-                  });
-            } else {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+      Padding(
+        padding: const EdgeInsets.fromLTRB(20.0, 75.0, 0.0, 20.0),
+        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+          const Text('Image slicing'),
+          const SizedBox(height: 5),
+          const Text('Accepted format(s): *.bmp'),
+          const SizedBox(height: 5),
+          ElevatedButton(
+            onPressed: () async {
+              String? path = await getFile();
               setState(() {
-                String temp = filepath as String;
-                runAutotrace(temp);
+                filepath = path;
               });
-            }
-          },
-          child: const Text("Slice!"),
-        )
-      ]),
+              debugPrint("path is $filepath");
+            },
+            child: const Text("Select file"),
+          ),
+          const SizedBox(height: 5),
+          ConstrainedBox(constraints: const BoxConstraints(maxWidth: 175),child: Align(alignment: Alignment.center,child: Text('Selected file: $filepath', maxLines: null, overflow: TextOverflow.fade,))),
+          const SizedBox(height: 10),
+          Expanded(child: Container(),),
+          SizedBox(
+            width: 175,
+            height: 45,
+            child: ElevatedButton(
+              onPressed: () {
+                if (filepath == 'Not found') {
+                  debugPrint("SliceButton but Path is null, error");
+                  showDialog(
+                      context: context,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: const Text("Error"),
+                          content:
+                              const Text("There was an error selecting the file"),
+                          actions: [
+                            TextButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("Ok"),
+                            ),
+                          ],
+                        );
+                      });
+                } else {
+                  setState(() {
+                    runAutotrace(filepath ?? 'Not found');
+                  });
+                }
+              },
+              child: const Text("Slice!", textScaleFactor: 2,),
+            ),
+          ),
+        ]),
+      ),
+      Padding(padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0), child: Image.file(File(filepath ?? 'lib\\exampleBMP.bmp'),
+      width: 500, height: 500,),),
+      ], 
     );
   }
 }

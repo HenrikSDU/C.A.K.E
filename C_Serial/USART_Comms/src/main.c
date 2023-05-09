@@ -2,6 +2,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h>
 #include <avr/io.h>
 #include <util/delay.h>
 #include <avr/interrupt.h>
@@ -15,15 +16,34 @@
 #define BAUDRATE 9600      
 #define BAUD_PRESCALER (((F_CPU / (BAUDRATE * 16UL))) -1)
 
-volatile unsigned char data;
+typedef enum {
+    memory_bit,
+    message_bit,
+} message;
+
 void usart_init();
 void usart_out(unsigned char data);
 unsigned char usart_in(void);
 
+volatile unsigned char data = 0;
+volatile unsigned char length = 0;
+volatile unsigned char* str;
+volatile message msg = 0;
+volatile unsigned int counter = 0;
+
 ISR(USART_RX_vect) {
     data = UDR0;
-    PORTD = (8 << data);
-    usart_out(50);
+    if(msg == message_bit) {
+        printf("%d ", data);
+        str[counter] = data;
+    }
+    else if(msg == memory_bit) {
+        length = data * 10;
+        msg = message_bit;
+        str = malloc(length * sizeof(unsigned char));
+        for(int i = 0; i < length; i++)
+            str[i] = 0;
+    }
 }
 
 
@@ -43,15 +63,11 @@ int main(void) {
     PORTC = 0x3F; //Setting up pull-up resistors
     DDRD = 0xF0; //Setting (LED) ports to output
     //PORTD = 0xF0; //Setting LEDs on
-
-
     
     sei();
     usart_init();
 
     while(1) {
-        printf("%d", data);
-        _delay_ms(1000);
         
     }
 
