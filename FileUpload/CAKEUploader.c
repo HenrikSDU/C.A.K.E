@@ -41,8 +41,7 @@ int main(int argc, TCHAR *argv[]){
    BOOL fSuccess;
    TCHAR portname[] = TEXT("COM3"); //  Most systems have a COM1 port
    
-   //TCHAR *portname = argv; //  Most systems have a COM1 port
-   //  Open a handle to the specified com port.
+
    hCom = CreateFile( portname,
                       GENERIC_READ | GENERIC_WRITE,
                       0,      //  must be opened with exclusive-access
@@ -94,7 +93,7 @@ int main(int argc, TCHAR *argv[]){
 
    PrintCommState(dcb);       //  Output to console
 
-   _tprintf (TEXT("Serial port %s successfully reconfigured.\n"), portname);
+   //_tprintf (TEXT("Serial port %s successfully reconfigured.\n"), portname);
 
    //set timeouts
    timeouts.ReadIntervalTimeout = 50;
@@ -120,30 +119,30 @@ int main(int argc, TCHAR *argv[]){
 
    fseek(file, 0L, SEEK_END);
    filelength = ftell(file);
-   printf("\nFilelength: %d\n",filelength);
+   //printf("\nFilelength: %d\n",filelength);
    rewind(file);//reseting cursor
    //fclose(file); //close file
 
-   printf("\nSettingInitflags\n");
+   //printf("\nSettingInitflags\n");
 
    //filling the array
    for(int r=0;r<10;r++){
       memory_init_flags[r]=r;
-      printf("%d ", memory_init_flags[r]);
+      //printf("%d ", memory_init_flags[r]);
    }
 
    //putting filesize
    memory_init_flags[0]=(unsigned char)filelength;
-   printf("\nDetermined filelength: %d \n",filelength);
-   printf("Updated memoryinitflags:\n");
+   //printf("\nDetermined filelength: %d \n",filelength);
+   //printf("Updated memoryinitflags:\n");
    for(int r=0;r<10;r++){
       printf("%d ", memory_init_flags[r]);
    }
-      
+      input=1;
    do{
 
-      printf("\nInput: ");
-      scanf("%d",&input);
+      //printf("\nInput: ");
+      //scanf("%d",&input);
       
       if (input==0){
             CloseHandle(hCom);
@@ -151,7 +150,7 @@ int main(int argc, TCHAR *argv[]){
             printf("\nCancel Of Program");
          return 0;
       }
-      
+      input=0;
       
       comreistatus = SetCommMask(hCom, EV_RXCHAR);
       if(comreistatus == FALSE){
@@ -160,7 +159,7 @@ int main(int argc, TCHAR *argv[]){
          return 5;
       }
       else
-      printf("\nSuccessfully set Commask\n");
+      //printf("\nSuccessfully set Commask\n");
       
       //write to port
       printf("\nStart Writing to USB-Port\n");
@@ -177,15 +176,15 @@ int main(int argc, TCHAR *argv[]){
          return 4;
       }
 
-      printf("\nNumber of bytes written to the serial port = %d\n", BytesWritten);
+      //printf("\nNumber of bytes written to the serial port = %d\n", BytesWritten);
 
       
       comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
       if(!comreistatus){
          printf("Error setting WaitCommEvent");
       }
-      else
-         printf("waited");
+      //else
+        // printf("waited");
       
       i=0;
       
@@ -200,7 +199,7 @@ int main(int argc, TCHAR *argv[]){
          }while(NoBytesRead>0);
       
       
-      printf("\n Bytes returned by our microcontroller:  \n");
+      //printf("\n Bytes returned by our microcontroller:  \n");
 
       for(int q=0;q<10;q++){
          printf("%d ",memory_init_feedback[q]);
@@ -249,7 +248,7 @@ int main(int argc, TCHAR *argv[]){
                         &BytesWritten,  // No of bytes written to the port
                         NULL);
       if(writesuccess){
-         printf("Write Success - %d bytes written!\n", BytesWritten);
+         printf("Write Success\n");
       }
       else
          printf("Write Error!\n");

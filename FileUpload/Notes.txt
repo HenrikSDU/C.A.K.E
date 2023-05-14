@@ -1,0 +1,4 @@
+CAKECommunication includes a file for debugging - sending back and forth data.
+CAKEUploader is meant to be without prints etc. - this will be called from flutter.
+
+//This order is not completed yet.
