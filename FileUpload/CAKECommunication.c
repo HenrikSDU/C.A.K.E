@@ -124,7 +124,7 @@ int main(int argc, char *argv[]){
 
    fseek(file, 0L, SEEK_END);
    filelength = ftell(file);
-   printf("\nFilelength: %d\n",filelength);
+   printf("\nFilelength: %d\n", filelength);
    rewind(file);//reseting cursor
    //fclose(file); //close file
 

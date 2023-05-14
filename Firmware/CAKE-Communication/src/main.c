@@ -45,8 +45,8 @@ typedef union{
 
 typedef struct{
 
-    table_instruction path[300];
-    bool instruction_locations[300];
+    table_instruction path[300]; //array of instructions and coordinates
+    bool instruction_locations[300]; //array indicating whether element in path is a extruder_inst (1) or a coordinate (0)
 
 }CAKEFILE;
 
