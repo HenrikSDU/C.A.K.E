@@ -39,10 +39,10 @@ int _tmain( int argc, TCHAR *argv[] ){
    DCB dcb;
    HANDLE hCom;
    BOOL fSuccess;
-   TCHAR *pcCommPort = TEXT("COM3"); //  Most systems have a COM1 port
+   TCHAR *portname = TEXT("COM3"); //  Most systems have a COM1 port
 
    //  Open a handle to the specified com port.
-   hCom = CreateFile( pcCommPort,
+   hCom = CreateFile( portname,
                       GENERIC_READ | GENERIC_WRITE,
                       0,      //  must be opened with exclusive-access
                       NULL,   //  default security attributes
@@ -93,7 +93,7 @@ int _tmain( int argc, TCHAR *argv[] ){
 
    PrintCommState(dcb);       //  Output to console
 
-   _tprintf (TEXT("Serial port %s successfully reconfigured.\n"), pcCommPort);
+   _tprintf (TEXT("Serial port %s successfully reconfigured.\n"), portname);
 
    //set timeouts
    timeouts.ReadIntervalTimeout = 50;
