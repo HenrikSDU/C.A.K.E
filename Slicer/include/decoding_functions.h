@@ -131,12 +131,15 @@ unsigned int str_find_d(char* str, unsigned int cursor, unsigned int length) {
     return length; //Error
 }
 
+//maybe here we can write something like '"' , '=' etc. I think thats more comprehensible
+
 unsigned int str_find_width(char* str, unsigned int cursor, unsigned int length) { // Finds the width of the image
     char width[4]; //The string we want to finwidth, has to be inputtewidth backwarwidths except for the NULL char
     width[0] = 34; // "
     width[1] = 61; // =
     width[2] = 104; // h
     width[3] = 0; // NULL
+    
     char temp[4];
     unsigned int match = 0; //Counts how many matches there are between the strings
 
