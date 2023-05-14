@@ -16,8 +16,10 @@ void PrintCommState(DCB dcb)
 
 int main(int argc, char *argv[]){
 
-   printf("%d",argc);
-   printf("%s",argv[1]);
+   printf("%d",argc); //printing the argument count
+   printf("%s",argv[1]); //printing the arguments
+   printf("%s",argv[2]); 
+
    COMMTIMEOUTS timeouts = {0};
    DWORD BytesWritten = 0;          // No of bytes written to the port
    DWORD NoBytesRead;     // Bytes read by ReadFile()
@@ -42,14 +44,8 @@ int main(int argc, char *argv[]){
    DCB dcb;
    HANDLE hCom;
    BOOL fSuccess;
-   char portname[] = "COM3"; //  Most systems have a COM1 port
-   
-   TCHAR *portargument ="\\\\.\\";
-   //portargument = strcat(portargument,argv[1]);
-   //printf("%s",portargument);
-   //swprintf_s(portargument,20,L"\\\\.\\%s",argv[1]);
-   //TCHAR *portname = argv; //  Most systems have a COM1 port
-   //  Open a handle to the specified com port.
+   char portname[] = "COM3";  //for debugging
+
    hCom = CreateFile( argv[1],
                       GENERIC_READ | GENERIC_WRITE,
                       0,      //  must be opened with exclusive-access
@@ -118,9 +114,10 @@ int main(int argc, char *argv[]){
     }
 
   //open file
-  FILE *file = fopen("testfile.cake","r");
+  FILE *file = fopen(argv[2], "r");
   if(file == NULL){
       printf("\nfopen failed");
+      CloseHandle(hCom);
       return 7;
   } 
   //getting file length
