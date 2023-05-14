@@ -83,6 +83,9 @@ int main(int argc, char **argv) {
 
     // If more colors or layers are wanted on the same picture the stroke property could be useful and should be checked before the coordinates
 
+
+    //maybe explain the purpose of find_return here
+
     // Variable used for decoding the d property
     find_return find_ret = find_return_init(); // Custom struct defined in include/decoding_functions.h
     char temp[10]; // Temporary string used to store a letter or a number, fixed size due to the fact that the longest number is less than 10 digits long
@@ -102,6 +105,8 @@ int main(int argc, char **argv) {
         //printf("Result of find_*: %d\n", find_ret.result);
         cursor += find_ret.increment;
 
+
+        //why no switch statement xD?
         if(temp[0] == 'M') { // Checking if the command is a move command
             command = M; // Setting the command to move
             point_counter = 0;
