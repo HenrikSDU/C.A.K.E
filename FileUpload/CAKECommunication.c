@@ -14,8 +14,10 @@ void PrintCommState(DCB dcb)
 }
 
 
-int main(int argc, TCHAR *argv[]){
-   
+int main(int argc, char *argv[]){
+
+   printf("%d",argc);
+   printf("%s",argv[1]);
    COMMTIMEOUTS timeouts = {0};
    DWORD BytesWritten = 0;          // No of bytes written to the port
    DWORD NoBytesRead;     // Bytes read by ReadFile()
@@ -27,6 +29,7 @@ int main(int argc, TCHAR *argv[]){
    unsigned char memory_init_feedback[10];
    char data_to_read[20];
    char* filebuffer;
+
    
    char input;
    
@@ -39,11 +42,15 @@ int main(int argc, TCHAR *argv[]){
    DCB dcb;
    HANDLE hCom;
    BOOL fSuccess;
-   TCHAR portname[] = TEXT("COM3"); //  Most systems have a COM1 port
+   char portname[] = "COM3"; //  Most systems have a COM1 port
    
+   TCHAR *portargument ="\\\\.\\";
+   //portargument = strcat(portargument,argv[1]);
+   //printf("%s",portargument);
+   //swprintf_s(portargument,20,L"\\\\.\\%s",argv[1]);
    //TCHAR *portname = argv; //  Most systems have a COM1 port
    //  Open a handle to the specified com port.
-   hCom = CreateFile( portname,
+   hCom = CreateFile( argv[1],
                       GENERIC_READ | GENERIC_WRITE,
                       0,      //  must be opened with exclusive-access
                       NULL,   //  default security attributes
