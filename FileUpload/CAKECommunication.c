@@ -39,8 +39,8 @@ int _tmain( int argc, TCHAR *argv[] ){
    DCB dcb;
    HANDLE hCom;
    BOOL fSuccess;
-   TCHAR *portname = TEXT("COM3"); //  Most systems have a COM1 port
-
+   //TCHAR *portname = TEXT("COM3"); //  Most systems have a COM1 port
+   TCHAR *portname = argv; //  Most systems have a COM1 port
    //  Open a handle to the specified com port.
    hCom = CreateFile( portname,
                       GENERIC_READ | GENERIC_WRITE,
@@ -176,7 +176,7 @@ int _tmain( int argc, TCHAR *argv[] ){
 
       printf("\nNumber of bytes written to the serial port = %d\n", BytesWritten);
 
-      await_file:
+      
       comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
       if(!comreistatus){
          printf("Error setting WaitCommEvent");
@@ -260,13 +260,12 @@ int _tmain( int argc, TCHAR *argv[] ){
       else
          printf("waited\n");
 
-      while(!(dwEventMask&EV_RXCHAR)) printf("debug");
+      
       //scanf("%d",&input);
       i=0;
-      if(dwEventMask & EV_RXCHAR){
-         printf("\nCharacter in recieve buffer!!!");
+      
          do{
-               //printf(" (LoIter: %u) ",i);
+               printf(" (LoIter: %u) ",i);
                comreistatus = ReadFile(hCom, &ReadData, sizeof(ReadData),&NoBytesRead, NULL);
                if(NoBytesRead!=0){
                   filereceivebuffer[i] = ReadData;
@@ -275,11 +274,8 @@ int _tmain( int argc, TCHAR *argv[] ){
                }
                i++;
          }while(NoBytesRead>0);
-      }
-      else{
-         printf("\nNothing waited for!!!");
-         goto await_file;
-      }
+      
+      
       free(filesendbuffer);
       free(filereceivebuffer);
    }while(input != 0);
