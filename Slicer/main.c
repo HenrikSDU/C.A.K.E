@@ -44,6 +44,9 @@ int main(int argc, char **argv) {
     // Closing the file to free up memory
     fclose(fp);
 
+
+    //maybe we can give here an example of an svg-file
+
     // Finding the width of the picture
     cursor = str_find_width(svg, cursor, length);
     {
