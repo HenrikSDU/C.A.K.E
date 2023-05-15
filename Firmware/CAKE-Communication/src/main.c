@@ -17,18 +17,25 @@
 #include "i2cmaster.h"
 #include "lm75.h"
 
+/* Macros for GPIO pins */
+#define FORWARD_PIN PORTD2
+#define BACKWARD_PIN PORTD3
+
+
+//#include "file_proccessing.h"
+
 
 
 typedef struct{
     uint8_t x;//x coordinate
     uint8_t y;//y coordinate
-}coordinate;
+} coordinate;
 
 typedef enum{
     G1,
     G2, 
     G3 
-}extruder_instruction;
+} extruder_instruction;
 
 /*a union is a kind of structure. However, a union, unlike a structure, has always only one of its variables at the same time.
  For example, for the union here: If you define exampletableinstruction.extruder_inst = G1; than
@@ -66,11 +73,17 @@ void reset_reciever(void); //function to reset variables associated with the com
 void file_processing(void);//function extracting information like coordinates and extruder instructions and storing it in the CAKEFILE structure
 
 
+//moving function
+
+void PWM_T0_init(void);
+void PWM_T0_set(unsigned char ocr0a_val);
+void PWM_T0_direction_change(int);
+
 volatile unsigned char memory_init_flags[10]; //array to store information about incoming file send by PC
 volatile unsigned int filesize = 0; //variable to keep track of the number of bytes that will be send by the PC
-volatile unsigned int i = 0, file_index = 0;
+volatile unsigned int interrupt_count = 0, file_index = 0;
 volatile programstate_e phase = memory_init; //phase indicating operation phase: memory_init, upload or main_operation
-volatile bool rcy_complete = false; //read cycle complete
+volatile bool readcycle_complete = false; //read cycle complete
 
 volatile char* file; //saves the incoming bytes from the computer 
 
@@ -86,16 +99,16 @@ ISR(USART_RX_vect){
 
         break;
         case memory_init:
-            memory_init_flags[i] = UDR0;
-            if(i >= 9){//on 10th recieved byte indicate rcy_complete
-                i = 0; 
-                rcy_complete = true;
+            memory_init_flags[interrupt_count] = UDR0;
+            if(interrupt_count >= 9){//on 10th recieved byte indicate rcy_complete
+                interrupt_count = 0; 
+                readcycle_complete = true;
             }
         break;
 
 
     }    
-    i++;//increment index
+    interrupt_count++;//increment number of interrupts
     
 }
 
@@ -141,7 +154,7 @@ int main(void) {
             reset_reciever();
             _delay_ms(250);
         }
-        if(rcy_complete){//handle memoryinitflags if recievecycle is complete
+        if(readcycle_complete){//handle memoryinitflags if recievecycle is complete
             
             PORTD |= (1 << PD7); //indicate that recievecycle is complete
 
@@ -150,7 +163,7 @@ int main(void) {
                 file = (char*)malloc((unsigned char)filesize*sizeof(unsigned char)); //allocate memory for incoming CAKE-file
                 
                 if(file != NULL){
-                    PORTD |= (1 << PD6); //indicate successful memory allocation
+                    //PORTD |= (1 << PD6); //indicate successful memory allocation
                 }
                 
             }
@@ -160,7 +173,9 @@ int main(void) {
                 usart_send(memory_init_flags[j]);
 
             //resetting readcycle complete flag
-            rcy_complete = false;
+            readcycle_complete = false;
+
+            interrupt_count = 0;
 
             //going over to next phase
             phase = upload;
@@ -175,15 +190,30 @@ int main(void) {
         if(filesize == 245)
         PORTD |= (1 << PD5);
 
-        if((i) >= filesize){//checking for successful upload
+        if((interrupt_count) >= filesize){//checking for successful upload
 
             UCSR0B &= ~(1 << RXCIE0);//disable rx-interrupt
-            i = 0; //resetting i
+            interrupt_count = 0; //resetting i
             PORTD |= (1 << PD4);
             for(k = 0; k < filesize; k++)//send file back for feedback
             usart_send(file[k]);
 
             file_processing();//proccessing the recieved array
+
+            PWM_T0_init();
+            PWM_T0_set(128);
+            PORTD |= 0b00000100;
+            /*
+            uint8_t direction = 0;
+            while(1) {
+                direction++;
+                direction &= 0b00000001;
+                PWM_T0_direction_change(direction);
+                _delay_ms(500);
+            }
+            */
+
+            phase = main_operation;
 
 
         }
@@ -192,7 +222,7 @@ int main(void) {
             //usart_send(file[k]);
         }
         if(PINC == 0b00111101){
-            usart_send(i);
+            usart_send(interrupt_count);
             _delay_ms(500);
             
         }
@@ -240,7 +270,8 @@ int main(void) {
     }
 
     while(phase == main_operation){
-
+        PORTD = 0x0F; //indicate that main operation has been reached
+        
 
     }
     
@@ -264,8 +295,8 @@ unsigned char usart_receive(void){
 }
 
 void reset_reciever(void){
-
-    i = 0;
+    
+    interrupt_count = 0;
     phase = memory_init;
 
 }
@@ -351,4 +382,30 @@ void file_processing(void){
 
     uart_init();
     io_redirect();
+}
+
+
+
+
+void PWM_T0_init(void){
+    TCCR0A |= ((1<<COM0A1)|(1<<WGM01)|(1<<WGM00)); //configuring fast PWM, clear OC0A pin on compare match set it at BOTTOM
+    TCCR0B |= ((1<<CS02)|(1<<CS00)); //setting prescaler to 1024
+    OCR0A = 0;
+    DDRD |= 0b00001100;
+}
+void PWM_T0_set(unsigned char PWM_val){
+
+    OCR0A = PWM_val;
+    
+}
+
+void PWM_T0_direction_change(int direction) { // direction = 1 => forwards, direction = 0 => backwards
+    if(direction == 1) {
+        PORTD &= ~(1 << BACKWARD_PIN);
+        PORTD |= (1 << FORWARD_PIN);
+    }
+    if(direction == 0) {
+        PORTD &= ~(1 << FORWARD_PIN);
+        PORTD |= (1 << BACKWARD_PIN);
+    }
 }

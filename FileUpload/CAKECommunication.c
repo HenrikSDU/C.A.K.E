@@ -272,7 +272,7 @@ int main(int argc, char *argv[]){
       i=0;
       
          do{
-               printf(" (LoIter: %u) ",i);
+               //printf(" (LoIter: %u) ",i);
                comreistatus = ReadFile(hCom, &ReadData, sizeof(ReadData),&NoBytesRead, NULL);
                if(NoBytesRead!=0){
                   filereceivebuffer[i] = ReadData;
