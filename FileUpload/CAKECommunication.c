@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <stdio.h>
+#include <math.h>
 
 
 void PrintCommState(DCB dcb)
@@ -132,12 +133,35 @@ int main(int argc, char *argv[]){
 
    //filling the array
    for(int r=0;r<10;r++){
-      memory_init_flags[r]=r;
+      memory_init_flags[r]=0;
       printf("%d ", memory_init_flags[r]);
    }
 
    //putting filesize
-   memory_init_flags[0]=(unsigned char)filelength;
+   double required_capacity;
+   unsigned char remaining_bytes;
+   required_capacity = (double)filelength/(double)255; //determining how many bytes are needed to transmit filelength
+   
+   //calculating required capacity
+   required_capacity = floor(required_capacity); //round up to the next full integer
+   remaining_bytes = filelength - (required_capacity*255);
+
+   //determine how many instructions are saved
+   int instruction_count = 1;
+   char temp;
+   while((temp = fgetc(file)) != EOF){
+
+      if(temp == '\n') //if new-line character gets recognized increment the instruction counter
+         instruction_count++;
+
+   }
+   rewind(file);
+   printf("\n%d instructions found!", instruction_count);
+
+   memory_init_flags[0] = (unsigned char)required_capacity;
+   memory_init_flags[1] = remaining_bytes;
+   memory_init_flags[2] = instruction_count;
+   
    printf("\nDetermined filelength: %d \n",filelength);
    printf("Updated memoryinitflags:\n");
    for(int r=0;r<10;r++){
@@ -214,7 +238,7 @@ int main(int argc, char *argv[]){
       }
 
       printf("\nReturned filelength: %u\n",memory_init_feedback[0]);
-      if(memory_init_feedback[0]==filelength){
+      if((memory_init_feedback[0]==required_capacity) && (memory_init_feedback[1]==remaining_bytes)){
          printf("\nSuccessfull filelength transmit\n");
       }
       else{
@@ -272,7 +296,7 @@ int main(int argc, char *argv[]){
       i=0;
       
          do{
-               printf(" (LoIter: %u) ",i);
+               //printf(" (LoIter: %u) ",i);
                comreistatus = ReadFile(hCom, &ReadData, sizeof(ReadData),&NoBytesRead, NULL);
                if(NoBytesRead!=0){
                   filereceivebuffer[i] = ReadData;
