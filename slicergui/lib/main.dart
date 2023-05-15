@@ -128,6 +128,19 @@ class _SlicePageState extends State<SlicePage> {
     return await process.exitCode;
   }
 
+  Future<dynamic> runSlicer(String path) async {
+    String exe = 'lib\\Slicer.exe';
+    List<String> args = [
+      '${path.replaceFirst("bmp", "")}svg',
+      '${path.replaceFirst("bmp", "")}cake'
+    ];
+    debugPrint("running slicer with args $args");
+    Process process2 = await Process.start(exe, args);
+    stdout.addStream(process2.stdout);
+    stderr.addStream(process2.stderr);
+    return await process2.exitCode;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -180,7 +193,17 @@ class _SlicePageState extends State<SlicePage> {
                       });
                 } else {
                   setState(() {
-                    runAutotrace(filepath ?? 'Not found');
+                    runAutotrace(filepath ?? 'Not found').then((value) {
+                      //if(value != null) {
+                        debugPrint("autotrace finished with exit code $value,    $filepath");
+                        runSlicer(filepath ?? 'Not found');
+                      //}
+                    });
+                    /*
+                    while(runAutotrace(filepath ?? 'Not found') != 0) {
+                      debugPrint("waiting for autotrace to finish");
+                    }
+                    runSlicer(filepath ?? 'Not found');*/
                   });
                 }
               },
