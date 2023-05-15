@@ -194,16 +194,11 @@ class _SlicePageState extends State<SlicePage> {
                 } else {
                   setState(() {
                     runAutotrace(filepath ?? 'Not found').then((value) {
-                      //if(value != null) {
-                        debugPrint("autotrace finished with exit code $value,    $filepath");
-                        runSlicer(filepath ?? 'Not found');
-                      //}
+                        debugPrint("autotrace finished with exit code $value, $filepath");
+                        runSlicer(filepath ?? 'Not found').then((value) {
+                          debugPrint("Slicer finished with exit code $value, size of output file is ${File(filepath!.replaceFirst("bmp", "cake")).lengthSync()} bytes}");
+                        });
                     });
-                    /*
-                    while(runAutotrace(filepath ?? 'Not found') != 0) {
-                      debugPrint("waiting for autotrace to finish");
-                    }
-                    runSlicer(filepath ?? 'Not found');*/
                   });
                 }
               },

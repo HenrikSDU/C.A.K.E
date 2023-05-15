@@ -5,7 +5,7 @@
 #include "include/decoding_functions.h"
 
 /* Defines the amount of steps that 't' will have, quasi how many little lines (RESOLUTION_OF_T - 1 number of little lines if I'm correct) will make up a curve */
-#define RESOLUTION_OF_T 25
+#define RESOLUTION_OF_T 6
 
 int main(int argc, char **argv) {
 
