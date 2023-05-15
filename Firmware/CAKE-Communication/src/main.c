@@ -33,11 +33,12 @@ unsigned char usart_receive(void);
 void reset_reciever(void); //function to reset variables associated with the communication 
 
 
-//moving function
+//moving functions
 
 
 volatile unsigned char memory_init_flags[10]; //array to store information about incoming file send by PC
 volatile unsigned int filesize = 0; //variable to keep track of the number of bytes that will be send by the PC
+volatile unsigned int instruction_count = 0;
 volatile unsigned int interrupt_count = 0, file_index = 0;
 volatile programstate_e phase = memory_init; //phase indicating operation phase: memory_init, upload or main_operation
 volatile bool readcycle_complete = false; //read cycle complete
@@ -116,8 +117,9 @@ int main(void) {
             PORTD |= (1 << PD7); //indicate that recievecycle is complete
 
             filesize = memory_init_flags[0] * 255 + memory_init_flags[1]; //compute filesize
+
             if(filesize > 0){ //here size constraint possible
-                file = (char*)malloc((unsigned char)filesize*sizeof(unsigned char)); //allocate memory for incoming CAKE-file
+                file = (char*)malloc(filesize*sizeof(unsigned char)); //allocate memory for incoming CAKE-file
                 
                 if(file != NULL){
                     PORTD |= (1 << PD6); //indicate successful memory allocation
@@ -125,6 +127,9 @@ int main(void) {
                 
             }
 
+            instruction_count = memory_init_flags[2]; //getting the amount of instructions
+
+                cakefile.path = (table_instruction*)calloc(instruction_count * sizeof(table_instruction), sizeof(table_instruction));
             //sending feedback 
             for(unsigned char j = 0; j < 10; j++)
                 usart_send(memory_init_flags[j]);
@@ -197,12 +202,14 @@ int main(void) {
             LCD_init();
             LCD_set_cursor(0,0);
             printf("FS:%d", filesize);
-            for(k = 0; k < filesize; k++){
+            for(k = 0; k < instruction_count; k++){
+
+                LCD_set_cursor(0, (k%4));
                 if(cakefile.instruction_locations[k] == 1){
                     printf("G%d", cakefile.path[k].extruder_inst+1);
                 }
                 else{
-                    printf("X:%d Y:%d;", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
+                    printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
                 }
                 _delay_ms(1500);
             }

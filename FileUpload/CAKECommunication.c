@@ -146,8 +146,21 @@ int main(int argc, char *argv[]){
    required_capacity = floor(required_capacity); //round up to the next full integer
    remaining_bytes = filelength - (required_capacity*255);
 
+   //determine how many instructions are saved
+   int instruction_count = 1;
+   char temp;
+   while((temp = fgetc(file)) != EOF){
+
+      if(temp == '\n') //if new-line character gets recognized increment the instruction counter
+         instruction_count++;
+
+   }
+   rewind(file);
+   printf("\n%d instructions found!", instruction_count);
+
    memory_init_flags[0] = (unsigned char)required_capacity;
    memory_init_flags[1] = remaining_bytes;
+   memory_init_flags[2] = instruction_count;
    
    printf("\nDetermined filelength: %d \n",filelength);
    printf("Updated memoryinitflags:\n");
