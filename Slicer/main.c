@@ -44,7 +44,6 @@ int main(int argc, char **argv) {
     // Closing the file to free up memory
     fclose(fp);
 
-
     //maybe we can give here an example of an svg-file
 
     // Finding the width of the picture
@@ -81,10 +80,11 @@ int main(int argc, char **argv) {
     }
     printf("Width: %d, Height: %d\n", width, height);
 
+    /* Scaling variables, since our canvas is only 200x200 if a picture is bigger it has to be scaled down */
+    float scale_x = 200 / (float)width;
+    float scale_y = 200 / (float)height;
+
     // If more colors or layers are wanted on the same picture the stroke property could be useful and should be checked before the coordinates
-
-
-    //maybe explain the purpose of find_return here
 
     // Variable used for decoding the d property
     find_return find_ret = find_return_init(); // Custom struct defined in include/decoding_functions.h
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
         cursor += find_ret.increment;
 
 
-        //why no switch statement xD?
+        //why no switch statement xD? i like my if statemnts
         if(temp[0] == 'M') { // Checking if the command is a move command
             command = M; // Setting the command to move
             point_counter = 0;
@@ -127,12 +127,12 @@ int main(int argc, char **argv) {
 
             if(command  == M) { // If the command is a move command
                 if(point_counter == 0) { // These if statements are used to determine which coordinate is being read ( x or y )
-                    current_pos.x = atof(temp); // atof converts a string to a float
+                    current_pos.x = round(scale_x * atof(temp)); // atof converts a string to a float
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 1) {
-                    current_pos.y = atof(temp); // atof converts a string to a float
+                    current_pos.y = round(scale_y * atof(temp)); // atof converts a string to a float
                     point_counter++;
                 }
                 extruder_up(cake); // Lifting the extruder
@@ -142,32 +142,32 @@ int main(int argc, char **argv) {
             }
             else if(command == C) { // If the command is a bezier curve command
                 if(point_counter == 0) {
-                    control1.x = atof(temp);
+                    control1.x = round(scale_x * atof(temp));
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 1) {
-                    control1.y = atof(temp);
+                    control1.y = round(scale_y * atof(temp));
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 2) {
-                    control2.x = atof(temp);
+                    control2.x = round(scale_x * atof(temp));
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 3) {
-                    control2.y = atof(temp);
+                    control2.y = round(scale_y * atof(temp));
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 4) {
-                    end_pos.x = atof(temp);
+                    end_pos.x = round(scale_x * atof(temp));
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 5) {
-                    end_pos.y = atof(temp);
+                    end_pos.y = round(scale_y * atof(temp));
                     point_counter++;
                 }
                 // Now to use all this information to create a bezier curve
@@ -176,12 +176,12 @@ int main(int argc, char **argv) {
             }
             else if(command == L) { // If the command is a "line to" command
                 if(point_counter == 0) {
-                    current_pos.x = atof(temp);
+                    current_pos.x = round(scale_x * atof(temp));
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 1) {
-                    current_pos.y = atof(temp);
+                    current_pos.y = round(scale_y * atof(temp));
                     point_counter++;
                 }
                 move_to_point(cake, current_pos.x, current_pos.y); // Moving to the point
@@ -200,6 +200,12 @@ int main(int argc, char **argv) {
     // Freeing up memory by closing files and freeing malloce-d memory (dynamically(at runtime) allocated memory)
     free(svg);
     fclose(cake);
+
+    FILE* length_print = fopen(argv[2], "r");
+    fseek(length_print, 0, SEEK_END);
+    int length_of_output = ftell(length_print);
+    printf("Length of output: %d\n", length_of_output);
+    fclose(length_print);
 
     return 0;
 }
