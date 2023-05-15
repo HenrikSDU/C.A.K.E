@@ -7,8 +7,8 @@
 
 // Point struct
 typedef struct {
-    double x;
-    double y;
+    int x;
+    int y;
 } point_t;
 
 // This function is used to initialize a point_t struct by setting all values to 0
