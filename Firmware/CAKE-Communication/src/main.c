@@ -115,12 +115,12 @@ int main(void) {
             
             PORTD |= (1 << PD7); //indicate that recievecycle is complete
 
-            filesize = memory_init_flags[0];
-            if(filesize < 255){
+            filesize = memory_init_flags[0] * 255 + memory_init_flags[1]; //compute filesize
+            if(filesize > 0){ //here size constraint possible
                 file = (char*)malloc((unsigned char)filesize*sizeof(unsigned char)); //allocate memory for incoming CAKE-file
                 
                 if(file != NULL){
-                    //PORTD |= (1 << PD6); //indicate successful memory allocation
+                    PORTD |= (1 << PD6); //indicate successful memory allocation
                 }
                 
             }
@@ -159,7 +159,7 @@ int main(void) {
 
         
 
-            phase = main_operation;
+            //phase = main_operation;
 
 
         }
@@ -180,7 +180,6 @@ int main(void) {
             printf("E2:%c E3:%c", file[1], file[filesize - 1]);
             printf("afs:%d", k);
             LCD_set_cursor(0, 3);
-            printf("FS:%d", filesize);
             _delay_ms(5000);
             LCD_clear();
             for(k = 0; k < filesize; k++){
@@ -194,9 +193,10 @@ int main(void) {
 
         if(PINC == 0b00110111){
 
-            file_processing(&cakefile, file, filesize);
+            //file_processing(&cakefile, file, filesize);
             LCD_init();
             LCD_set_cursor(0,0);
+            printf("FS:%d", filesize);
             for(k = 0; k < filesize; k++){
                 if(cakefile.instruction_locations[k] == 1){
                     printf("G%d", cakefile.path[k].extruder_inst+1);
