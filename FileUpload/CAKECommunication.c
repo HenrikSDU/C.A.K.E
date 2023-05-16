@@ -2,6 +2,7 @@
 #include <tchar.h>
 #include <stdio.h>
 #include <math.h>
+#include<time.h>
 
 
 void PrintCommState(DCB dcb)
@@ -270,6 +271,12 @@ int main(int argc, char *argv[]){
          filesendbuffer_index++;
       }
       printf("\n");
+
+      printf("Purging Com");
+      BOOL purgesuccess = PurgeComm(hCom, PURGE_RXCLEAR);
+      if(purgesuccess)
+      printf("Surccessfully purged comm");
+
       printf("\nStart Transmit of File\n");
       writesuccess = WriteFile(hCom,// Handle to the Serialport
                         filesendbuffer,            // Data to be written to the port
@@ -284,6 +291,7 @@ int main(int argc, char *argv[]){
       
       //Reading Feedback
       //scanf("%d",&input);
+      Sleep(500);
       comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
       if(!comreistatus){
          printf("Error setting WaitCommEvent");

@@ -17,19 +17,38 @@
 #include "lm75.h"
 
 
-void PWM_T0_init(void){
-    DDRD |=0x60;
-//PWM Setup, see page 84 and following in datasheet for register description
-TCCR0A |= ((1<<COM0A1)|(1<<WGM01)|(1<<WGM00)); //configuring fast PWM, clear OC0A pin on compare match set it at BOTTOM
-TCCR0B |= ((1<<CS02)|(1<<CS00)); //setting prescaler to 1024
+void PWM_T0A_init(void){
+
+    DDRD |= (1<<PD6); //configuring OC0A pin to be output
+    //PWM Setup, see page 84 and following in datasheet for register description
+    TCCR0A |= ((1<<COM0A1)|(1<<WGM01)|(1<<WGM00)); //configuring fast PWM, clear OC0A pin on compare match set it at BOTTOM
+    TCCR0B |= ((1<<CS02)|(1<<CS00)); //setting prescaler to 1024
+
 }
-void PWM_T0_set(unsigned char PWM_val){
+
+void PWM_T0B_init(void){
+
+    DDRD |= (1<<PD5); //configuring OC0B pin to be output
+    //PWM Setup, see page 84 and following in datasheet for register description
+    TCCR0A |= ((1<<COM0B1)|(1<<WGM01)|(1<<WGM00)); //configuring fast PWM, clear OC0A pin on compare match set it at BOTTOM
+    TCCR0B |= ((1<<CS02)|(1<<CS00)); //setting prescaler to 1024
+
+}
+
+void PWM_T0A_set(unsigned char PWM_val){
 
     OCR0A = PWM_val;
     
 }
 
-void PWM_T0_direction_change(int direction) { // direction = 1 => forwards, direction = 0 => backwards
+void PWM_T0B_set(unsigned char PWM_val){
+
+    OCR0B = PWM_val;
+    
+}
+
+
+void PWM_T0A_direction_change(int direction) { // direction = 1 => forwards, direction = 0 => backwards
     if(direction == 1) {
         PORTD &= ~(1 << BACKWARD_PIN);
         PORTD |= (1 << FORWARD_PIN);
@@ -58,8 +77,8 @@ int main(void) {
     PORTC = 0x3F;
     DDRB |= (1<<PB5);
 
-    PWM_T0_init();
-    PWM_T0_set(255);
+    PWM_T0A_init();
+    PWM_T0A_set(255);
 
     PORTD |= (1<<PD2);
     PORTD |= (1<<PD6);
@@ -69,7 +88,7 @@ int main(void) {
 
     while(1){
 
-        PWM_T0_direction_change(0b00000001 & direction);
+        PWM_T0A_direction_change(0b00000001 & direction);
         _delay_ms(1000);
         direction++;
 

@@ -72,15 +72,6 @@ ISR(USART_RX_vect){
 
 int main(void) { 
 
-
-    /*
-    char ramtest[500];
-    memset(ramtest, 0, 500); // Initialize memory to a certain value
-    for(int u = 0; u < 500; u++){
-        ramtest[u] = 5;
-        printf("%d",ramtest[u]+4);
-    }
-    */
     i2c_init();//initialize I2C communication
     
     //LCD_init();//initialize the LCD
@@ -114,7 +105,7 @@ int main(void) {
         }
         if(readcycle_complete){//handle memoryinitflags if recievecycle is complete
             
-            PORTD |= (1 << PD7); //indicate that recievecycle is complete
+            //PORTD |= (1 << PD7); //indicate that recievecycle is complete
 
             filesize = memory_init_flags[0] * 255 + memory_init_flags[1]; //compute filesize
 
@@ -122,7 +113,7 @@ int main(void) {
                 file = (char*)malloc(filesize*sizeof(unsigned char)); //allocate memory for incoming CAKE-file
                 
                 if(file != NULL){
-                    PORTD |= (1 << PD6); //indicate successful memory allocation
+                    //PORTD |= (1 << PD6); //indicate successful memory allocation
                 }
                 
             }
@@ -149,18 +140,38 @@ int main(void) {
     while(phase == upload){
         int k;
         //_delay_ms(5000);
-        if(filesize == 245)
-        PORTD |= (1 << PD5);
+        //if(filesize == 245)
+        //PORTD |= (1 << PD5);
 
         if((interrupt_count) >= filesize){//checking for successful upload
 
-            UCSR0B &= ~(1 << RXCIE0);//disable rx-interrupt
             interrupt_count = 0; //resetting i
-            PORTD |= (1 << PD4);
+            //PORTD |= (1 << PD4);
+            
             for(k = 0; k < filesize; k++)//send file back for feedback
-            usart_send(file[k]);
+                usart_send(file[k]);
+
+            UCSR0B &= ~(1 << RXCIE0);//disable rx-interrupt
 
             file_processing(&cakefile, file, filesize);//proccessing the recieved array
+
+            LCD_init();
+            LCD_set_cursor(0,0);
+            printf("FS:%d", filesize);
+            for(k = 0; k < instruction_count; k++){
+
+                LCD_set_cursor(0, (k%4));
+                if(cakefile.instruction_locations[k] == 1){
+                    printf("G%d", cakefile.path[k].extruder_inst+1);
+                }
+                else{
+                    printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
+                }
+                _delay_ms(1500);
+            }
+
+            uart_init();
+            io_redirect();
 
         
 
