@@ -2,6 +2,16 @@
 #define FORWARD_PIN PORTD2
 #define BACKWARD_PIN PORTD3
 
+#define BUTTON0 PD2
+#define BUTTON1 PD3
+#define BUTTON2 PD7
+#define BUTTON3 PC0
+#define BUTTON4 PC1
+#define BUTTON5 PC2
+#define BUTTON6 PC3
+
+
+
 //The SDU CAKE program
 #include <stdio.h>
 #include <stdlib.h>
@@ -16,6 +26,13 @@
 #include "i2cmaster.h"
 #include "lm75.h"
 
+ISR(PCINT1_vect){
+
+    if((PINC & (1 << BUTTON4)) == 0)
+        PORTB ^= (1<<PB5);
+        //printf("hey");
+
+}
 
 void PWM_T0A_init(void){
 
@@ -59,6 +76,32 @@ void PWM_T0A_direction_change(int direction) { // direction = 1 => forwards, dir
     }
 }
 
+void button_init(void){
+
+
+    //configuring IOPins
+    DDRC &= ~((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //configuring them as input
+    PORTC |= ((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //enabling Pull-Ups
+    DDRD &= ~((1 << BUTTON0) | (1 << BUTTON1));
+    PORTD |= (1 << BUTTON0) | (1 << BUTTON1);
+
+
+    //initializing the external interrupts - see page 54
+    EICRA &= ~((1 << ISC01) | (1 << ISC00) | (1 << ISC11) | (1 << ISC10)); //when 0 0 any logical change generates interrupt request
+    
+    //enabling interrupts for both INT1 and INT0
+    EIMSK |= ((1<<INT1)|(1<<INT0));
+
+    //initializing the PinChange Interrupts
+    PCICR |= ((1<<PCIE2)|(1<<PCIE1)); //enabeling pin interrupts of pin group 1 and 2 
+    PCMSK2 |= (1<<BUTTON2);
+    PCMSK1 |= ((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //subscribing to changes on PCINT9
+    sei();
+    
+
+
+}
+
 
 int main(void) { 
 
@@ -66,31 +109,30 @@ int main(void) {
     
     i2c_init();//initialize I2C communication
     
-    //LCD_init();//initialize the LCD
-    lm75_init();//initialize the temperature sensor
+    LCD_init();//initialize the LCD
+    printf("LCDinitSUCCESS");
 
+    
     //configuration of the IO pins
 
-    DDRD = 0xFF;
-    PORTD= 0x00;
-    DDRC = 0xF0;
-    PORTC = 0x3F;
+    DDRC |= 0x30; //for I2C
+    PORTC |= 0x30;
     DDRB |= (1<<PB5);
 
-    PWM_T0A_init();
-    PWM_T0A_set(255);
+    //PWM_T0A_init();
+    //PWM_T0A_set(255);
 
-    PORTD |= (1<<PD2);
-    PORTD |= (1<<PD6);
-    PORTB |= (1<<PB5);
-    
-    uint8_t direction=0;
+    //PORTD |= (1<<PD2);
+    //PORTD |= (1<<PD6);
+    //uint8_t direction=0;
+
+    button_init();
 
     while(1){
 
-        PWM_T0A_direction_change(0b00000001 & direction);
-        _delay_ms(1000);
-        direction++;
+        //PWM_T0A_direction_change(0b00000001 & direction);
+        //_delay_ms(1000);
+        //direction++;
 
     }
     
