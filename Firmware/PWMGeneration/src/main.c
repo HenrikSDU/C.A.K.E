@@ -118,15 +118,16 @@ void button_init(void){
     sei();
 }
 
+// PWM and linear actuator speed graph needed to tune this function properly
 void PWM_control(uint8_t base_PWM, uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y2) {
     int x_mod;
     if((x2 - x1) >= 0) {
         PWM_T0A_direction_change(1); // Setting x direction to forwards
-        x_mod = 1;
+        x_mod = 1; // Setting x_mod to 1 to multiply the slope by
     }
     else if((x2 - x1) < 0) {
         PWM_T0A_direction_change(0); // Setting x direction to backwards
-        x_mod = -1;
+        x_mod = -1; // Setting x_mod to -1 to multiply the slope by
     }
 
     if((y2 - y1) >= 0) {
@@ -138,66 +139,54 @@ void PWM_control(uint8_t base_PWM, uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y
 
     float slope = x_mod * ((y2 - y1) / (x2 - x1));
 
-    PWM_T0A_set(base_PWM);
-    PWM_T0B_set(slope * base_PWM);
+    // First try at logic controlling overflows and underflows
+    if(slope > 1) {
+        while((slope * (float)base_PWM) < 255) { // The idea here is to find the maximum value of base_PWM that will not overflow the OCR0A register, the limit can be decreased as needed
+            base_PWM--;
+        }
+        PWM_T0A_set(base_PWM);
+        PWM_T0B_set((int)(slope * (float)base_PWM));
+    }
+    else if(slope < 1) {
+        while(!((slope * (float)base_PWM) > 20)) { // The idea here is to find the minimum value of base_PWM that will not be too small to to make the motors run, while roughly achieving the target speed
+            base_PWM++;
+        }
+        PWM_T0A_set(base_PWM);
+        PWM_T0B_set((int)(slope * (float)base_PWM));
+    }
+    else if(slope == 1) { // Setting PWM so the motors run at roughly desired speed / sqrt(2)
+        base_PWM = 127; // Some predefined value to roughly get the desired speed
+        PWM_T0A_set(base_PWM);
+        PWM_T0B_set(base_PWM);
+    }
 }
 
 
 int main(void) { 
-
   
-    
-    i2c_init(); //initialize I2C communication
-    
-    LCD_init(); //initialize the LCD
-    printf("LCDinitSUCCESS");
+    i2c_init(); //  Initialization of the I2C communication    
+    LCD_init(); // Initialization of the LCD display
+    //printf("LCDinitSUCCESS"); // Proof that the LCD display is working
 
-    
-    //configuration of the IO pins
+    // Configuration of the IO pins
     DDRC |= 0x30; //for I2C
     PORTC |= 0x30;
-    DDRB |= (1<<PB5);
+    DDRB |= (1 << PB5); // Onboard LED
 
     PWM_T0A_init();
     PWM_T0A_set(255);
 
-    uint8_t direction=0;
+    uint8_t direction = 0;
 
     button_init();
 
-    while(1){
+    while(1) {
 
         PWM_T0A_direction_change(0b00000001 & direction);
         _delay_ms(1000);
         direction++;
 
     }
-    
-
-       
-
-    
         
     return 0;
 }
-
-
-/*
-
-point1.x = 100
-point1.y = 100
-
-point2.x = 150
-point2.y = 150
-
-slope = (point2.y - point1.y) / (point2.x - point1.x)
-PWM_X = 100
-PWM_Y = PWM_X * slope
-
-
-
-
-
-
-
-*/
