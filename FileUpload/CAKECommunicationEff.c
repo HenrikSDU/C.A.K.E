@@ -28,10 +28,8 @@ int main(int argc, char *argv[]){
    DWORD dwEventMask;     // Event mask to trigger
    
    BOOL writesuccess, readsuccess, comreistatus;
-   char data_to_send[20];
    unsigned char memory_init_flags[10];
    unsigned char memory_init_feedback[10];
-   char data_to_read[20];
    char* filebuffer;
 
    
@@ -248,19 +246,30 @@ int main(int argc, char *argv[]){
 
       
       printf("\nStart of File Transmission");
-      int filesendbuffer_index=0, arraysize;
+
+
+      int filesendbuffer_index = 0, arraysize;
+      
       unsigned char* filesendbuffer;
+
       filesendbuffer = (char*)malloc(filelength*sizeof(unsigned char));
       if(filesendbuffer!=NULL){
+
          arraysize=sizeof(filesendbuffer)/sizeof(unsigned char);
          printf("\nSuccessfully allocated memory for sendbuffer, %d bytes\n", sizeof(filesendbuffer));
+
       }
+
       int filereceivebuffer_index=0;
+
       unsigned char* filereceivebuffer;
       filereceivebuffer = (char*)malloc(filelength*sizeof(unsigned char));
+
       if(filereceivebuffer!=NULL){
+
          arraysize=sizeof(filereceivebuffer)/sizeof(unsigned char);
          printf("\nSuccessfully allocated memory for receivebuffer, %d bytes\n", sizeof(filereceivebuffer));
+
       }
 
       unsigned char character;
@@ -272,6 +281,70 @@ int main(int argc, char *argv[]){
       }
       printf("\n");
 
+      /////////////////////////////////////////////////////////
+      char instructions_to_send[32];
+      int instruction_load_counter = 0;
+      int instruction_count = 0;
+      int file_reader = 0;
+      int instruction_load_index = 0;
+      rewind(file);
+      while(file_reader < filelength){
+
+         instruction_load_index = 0;
+         SecureZeroMemory(instructions_to_send, sizeof(char)*32);
+
+         for(instruction_load_counter = 0; instruction_load_counter < 4; file_reader++){
+
+            instructions_to_send[instruction_load_index] = fgetc(file); 
+
+            printf("%c", instructions_to_send[instruction_load_index]);
+            instruction_load_index++;
+
+
+            if(instructions_to_send[instruction_load_index] == '\n'){
+               instruction_load_counter++;
+            }
+
+         }
+
+         writesuccess = WriteFile(hCom,// Handle to the Serialport
+                        instructions_to_send,            // Data to be written to the port
+                        sizeof(char)*32,   // No of bytes to write into the port
+                        &BytesWritten,  // No of bytes written to the port
+                        NULL);
+         
+         if(writesuccess){
+            printf("\nWritesuccess");
+         }               
+
+         Sleep(100);
+
+      comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
+      if(!comreistatus){
+         printf("Error setting WaitCommEvent");
+      }
+      else
+         printf("waited\n");
+
+      
+      //scanf("%d",&input);
+      i=0;
+      
+         do{
+               //printf(" (LoIter: %u) ",i);
+               comreistatus = ReadFile(hCom, &ReadData, sizeof(ReadData),&NoBytesRead, NULL);
+               if(NoBytesRead!=0){
+                  filereceivebuffer[i] = ReadData;
+                  printf("%c", filereceivebuffer[i]);
+                  //printf("\nNumber of bytes read:%d\n",NoBytesRead);
+               }
+               i++;
+         }while(NoBytesRead>0);
+
+         
+
+      }
+      /*
       printf("Purging Com");
       BOOL purgesuccess = PurgeComm(hCom, PURGE_RXCLEAR);
       if(purgesuccess)
@@ -313,7 +386,7 @@ int main(int argc, char *argv[]){
                }
                i++;
          }while(NoBytesRead>0);
-      
+      */
       
       free(filesendbuffer);
       free(filereceivebuffer);

@@ -31,13 +31,7 @@
 #include "i2cmaster.h"
 #include "lm75.h"
 
-ISR(PCINT1_vect){
 
-    if((PINC & (1 << BUTTON4)) == 0)
-        PORTB ^= (1<<PB5);
-        //printf("hey");
-
-}
 
 void PWM_T0A_init(void){
     // PWM signal output pin setup
@@ -123,61 +117,3 @@ void button_init(void){
 
 
 }
-
-
-int main(void) { 
-
-  
-    
-    i2c_init(); //initialize I2C communication
-    
-    LCD_init(); //initialize the LCD
-    printf("LCDinitSUCCESS");
-
-    
-    //configuration of the IO pins
-    DDRC |= 0x30; //for I2C
-    PORTC |= 0x30;
-    DDRB |= (1<<PB5);
-
-    PWM_T0A_init();
-    PWM_T0A_set(255);
-
-    uint8_t direction=0;
-
-    button_init();
-
-    while(1){
-
-        PWM_T0A_direction_change(0b00000001 & direction);
-        _delay_ms(1000);
-        direction++;
-
-    }
-    
-
-       
-
-    
-        
-    return 0;
-}
-
-
-/*
-
-point1.x = 100
-point1.y = 100
-
-point2.x = 150
-point2.y = 150
-
-slope = (point2.y - point1.y) / (point2.x - point1.x)
-PWM_X = 100
-PWM_Y = PWM_X * slope
-
-
-
-
-
-*/

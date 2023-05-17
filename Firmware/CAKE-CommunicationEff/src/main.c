@@ -23,7 +23,7 @@
 
 
 #include "file_proccessing.h"
-#include "motorandgpio.h"
+
 
 
 
@@ -44,7 +44,10 @@ volatile programstate_e phase = memory_init; //phase indicating operation phase:
 volatile bool readcycle_complete = false; //read cycle complete
 
 volatile char* file; //saves the incoming bytes from the computer 
+volatile char instructionblock[32];
+unsigned int receiveblock_count = 0, received_blocks = 0;
 
+int savelocation = 0;
 CAKEFILE cakefile; //contains an array of instructions and points (table_instruction(s)) and an array that indicates whether the data saved at a specific index is a coordinate or an extruder instruction
 
 ISR(USART_RX_vect){
@@ -52,8 +55,8 @@ ISR(USART_RX_vect){
     switch(phase){
 
         case upload://in the upload phase the incoming bytes are stored in the file array (a simple array of chars)
-            file[file_index] = UDR0;
-            file_index++;//can maybe be replaced by i - pretty sure
+            instructionblock[interrupt_count] = UDR0;
+           
 
         break;
         case memory_init:
@@ -70,14 +73,6 @@ ISR(USART_RX_vect){
     
 }
 
-ISR(PCINT1_vect){
-
-    if((PINC & (1 << BUTTON4)) == 0)
-        PORTB ^= (1<<PB5);
-        //printf("hey");
-
-}
-
 int main(void) { 
 
     i2c_init();//initialize I2C communication
@@ -90,8 +85,10 @@ int main(void) {
 
     //configuration of the IO pins
 
-    DDRC |= 0x30; //for I2C
-    PORTC |= 0x30;
+    DDRD = 0xFF;
+    PORTD = 0x00;
+    DDRC = 0xF0;
+    PORTC = 0x3F;
     DDRB |= (1<<PB5);
 
    
@@ -105,7 +102,9 @@ int main(void) {
             
             //PORTD |= (1 << PD7); //indicate that recievecycle is complete
 
-            filesize = memory_init_flags[0] * 255 + memory_init_flags[1]; //compute filesize
+
+            //determine amount of blocks expected
+            receiveblock_count = memory_init_flags[2] / 4;
 
             if(filesize > 0){ //here size constraint possible
                 file = (char*)malloc(filesize*sizeof(unsigned char)); //allocate memory for incoming CAKE-file
@@ -139,39 +138,25 @@ int main(void) {
 
     while(phase == upload){
         int k;
+        
 
-        if((interrupt_count) >= filesize){//checking for successful upload
+        if((interrupt_count) >= 32){//checking for successful upload of block
 
             interrupt_count = 0; //resetting i
             //PORTD |= (1 << PD4);
             
-            for(k = 0; k < filesize; k++)//send file back for feedback
-                usart_send(file[k]);
+            savelocation = file_processing(&cakefile, instructionblock, savelocation);
+            
+            for(k = 0; k < 32; k++)//send file back for feedback
+                usart_send(instructionblock[k]);
 
-            UCSR0B &= ~(1 << RXCIE0);//disable rx-interrupt
+            
+            if(received_blocks >= receiveblock_count){
+                
+                UCSR0B &= ~(1 << RXCIE0);//disable rx-interrupt
+                phase = main_operation;
 
-            file_processing(&cakefile, file, filesize);//proccessing the recieved array
-
-            LCD_init();
-            LCD_set_cursor(0,0);
-            printf("FS:%d", filesize);
-            for(k = 0; k < instruction_count; k++){
-
-                LCD_set_cursor(0, (k%4));
-                if(cakefile.instruction_locations[k] == 1){
-                    printf("G%d", cakefile.path[k].extruder_inst+1);
-                }
-                else{
-                    printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
-                }
-                _delay_ms(500);
             }
-
-            uart_init();
-            io_redirect();
-
-        
-            phase = main_operation;
 
 
         }
@@ -180,8 +165,28 @@ int main(void) {
     }
 
     while(phase == main_operation){
+        //PORTD = 0x0F; //indicate that main operation has been reached
+            
+
+            LCD_init();
+            LCD_set_cursor(0,0);
+            printf("FS:%d", filesize);
+            for(int k = 0; k < instruction_count; k++){
+
+                LCD_set_cursor(0, (k%4));
+                if(cakefile.instruction_locations[k] == 1){
+                    printf("G%d", cakefile.path[k].extruder_inst+1);
+                }
+                else{
+                    printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
+                }
+                _delay_ms(1500);
+            }
+
+            uart_init();
+            io_redirect();
+            
         
-        button_init();
 
     }
     
