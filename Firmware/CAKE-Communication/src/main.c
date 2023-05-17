@@ -214,8 +214,8 @@ int main(void) {
                 _delay_ms(200);
             }
             if((PINC & (1 << BUTTON6)) == 0){
-                
-                PWM_T0A_direction_change(0b00000001 & direction);
+                direction = 0b00000001 & direction;
+                PWM_T0A_direction_change(direction);
                 LCD_set_cursor(0,3);
                 printf("dir:%d",direction);
                 direction++;
