@@ -99,14 +99,11 @@ void PWM_T0B_direction_change(int direction) { // direction = 1 => forwards, dir
 }
 
 void button_init(void){
-
-
     //configuring IOPins
     DDRC &= ~((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //configuring them as input
     PORTC |= ((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //enabling Pull-Ups
     DDRD &= ~((1 << BUTTON0) | (1 << BUTTON1));
     PORTD |= (1 << BUTTON0) | (1 << BUTTON1);
-
 
     //initializing the external interrupts - see page 54
     EICRA &= ~((1 << ISC01) | (1 << ISC00) | (1 << ISC11) | (1 << ISC10)); //when 0 0 any logical change generates interrupt request
@@ -119,9 +116,29 @@ void button_init(void){
     PCMSK2 |= (1<<BUTTON2);
     PCMSK1 |= ((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //subscribing to changes on PCINT9
     sei();
-    
+}
 
+void PWM_control(uint8_t base_PWM, uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y2) {
+    int x_mod;
+    if((x2 - x1) >= 0) {
+        PWM_T0A_direction_change(1); // Setting x direction to forwards
+    }
+    else if((x2 - x1) < 0) {
+        PWM_T0A_direction_change(0); // Setting x direction to backwards
+        x_mod = -1;
+    }
 
+    if((y2 - y1) >= 0) {
+        PWM_T0B_direction_change(1);
+    }
+    else if((y2 - y1) < 0) {
+        PWM_T0B_direction_change(0);
+    }
+
+    float slope = x_mod * ((y2 - y1) / (x2 - x1));
+
+    PWM_T0A_set(base_PWM);
+    PWM_T0B_set(slope * base_PWM);
 }
 
 
@@ -175,6 +192,8 @@ point2.y = 150
 slope = (point2.y - point1.y) / (point2.x - point1.x)
 PWM_X = 100
 PWM_Y = PWM_X * slope
+
+
 
 
 

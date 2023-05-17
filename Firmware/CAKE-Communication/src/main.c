@@ -29,11 +29,6 @@
 
 
 void usart_send(unsigned char); //function to send bytes via usart
-unsigned char usart_receive(void);
-void reset_reciever(void); //function to reset variables associated with the communication 
-
-
-//moving functions
 
 
 volatile unsigned char memory_init_flags[10]; //array to store information about incoming file send by PC
@@ -164,13 +159,10 @@ int main(void) {
                 else{
                     printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
                 }
-                _delay_ms(500);
+                _delay_ms(10);
             }
 
-            uart_init();
-            io_redirect();
-
-        
+            
             phase = main_operation;
 
 
@@ -182,6 +174,58 @@ int main(void) {
     while(phase == main_operation){
         
         button_init();
+        LCD_init();
+        LCD_set_cursor(0,0);
+
+
+        //Init for IOBoard - speed measurement
+        
+        DDRB |= (1<<PB5);
+
+        PWM_T0A_init();
+        char desired_PWM = 0;
+
+        ////////////////////////
+        cli();
+        ///////////////////////
+
+        printf("B3:setB4:incB5:decB6:dich");
+        char direction;
+        while(1){
+
+            if((PINC & (1 << BUTTON3)) == 0){
+
+                PWM_T0A_set(desired_PWM);
+                
+                _delay_ms(200);
+            }
+
+            if((PINC & (1 << BUTTON4)) == 0){
+                desired_PWM += 10;
+                LCD_set_cursor(0,2);
+                printf("desPWM: %u ", desired_PWM);
+                _delay_ms(200);
+            }
+            if((PINC & (1 << BUTTON5)) == 0){
+
+                desired_PWM -= 10;
+                LCD_set_cursor(0,2);
+                printf("desPWM: %u ", desired_PWM);
+                _delay_ms(200);
+            }
+            if((PINC & (1 << BUTTON6)) == 0){
+                
+                PWM_T0A_direction_change(0b00000001 & direction);
+                LCD_set_cursor(0,3);
+                printf("dir:%d",direction);
+                direction++;
+                _delay_ms(200);
+            }
+
+
+
+        }
+
 
     }
     
@@ -196,17 +240,4 @@ void usart_send(unsigned char data){
 
 }
 
-unsigned char usart_receive(void){
-  
-    //check whether there is something newly received
-    while(!(UCSR0A & (1 << RXC0)));
-    
-    return UDR0;//return received data
-}
 
-void reset_reciever(void){
-    
-    interrupt_count = 0;
-    phase = memory_init;
-
-}

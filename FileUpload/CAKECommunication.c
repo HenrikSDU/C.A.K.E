@@ -168,11 +168,11 @@ int main(int argc, char *argv[]){
    for(int r=0;r<10;r++){
       printf("%d ", memory_init_flags[r]);
    }
-      
+      input = 1;
    do{
 
       printf("\nInput: ");
-      scanf("%d",&input);
+      //scanf("%d",&input);
       
       if (input==0){
             CloseHandle(hCom);
@@ -180,7 +180,7 @@ int main(int argc, char *argv[]){
             printf("\nCancel Of Program");
          return 0;
       }
-      
+      input = 0;
       
       comreistatus = SetCommMask(hCom, EV_RXCHAR);
       if(comreistatus == FALSE){
