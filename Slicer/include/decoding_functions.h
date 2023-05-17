@@ -7,8 +7,8 @@
 
 // Point struct
 typedef struct {
-    int x;
-    int y;
+    double x;
+    double y;
 } point_t;
 
 // This function is used to initialize a point_t struct by setting all values to 0
@@ -75,14 +75,16 @@ find_return find_return_init() {
 
 /* Bézier-curve deciphering functions */
 double cubic_bezier_x(double start_x, double c1_x, double c2_x, double end_x, double t) {
-    double ratio = (double)1 - t;
-    double x = start_x * pow(ratio, (double)3) + c1_x * (double)3*t * pow(ratio, (double)2) + c2_x * (double)3*pow(t, (double)2) * ratio + end_x * pow(t, (double)3);
+    double ratio = 1.0 - t;
+    double x = start_x * pow(ratio, 3.0) + c1_x * 3.0*t * pow(ratio, 2.0) + c2_x * 3.0*pow(t, 2.0) * ratio + end_x * pow(t, 3.0);
+    //printf("Ration: %f, x: %f\n", ratio, x);
     return x;
 }
 
 double cubic_bezier_y(double start_y, double c1_y, double c2_y, double end_y, double t) {
-    double ratio = (double)1 - t;
-    double y = start_y * pow(ratio, (double)3) + c1_y * (double)3*t * pow(ratio, (double)2) + c2_y * (double)3*pow(t, (double)2) * ratio + end_y * pow(t, (double)3);
+    double ratio = 1.0 - t;
+    double y = start_y * pow(ratio, 3.0) + c1_y * 3.0*t * pow(ratio, 2.0) + c2_y * 3.0 *pow(t, 2.0) * ratio + end_y * pow(t, 3.0);
+    //printf("Ration: %f, y: %f\n", ratio, y);
     return y;
 }
 
@@ -186,13 +188,14 @@ unsigned int str_find_height(char* str, unsigned int cursor, unsigned int length
         printf(" %lf %lf\n", cubic_bezier_x((double)0, (double)0, (double)1, (double)1, t),cubic_bezier_y((double)0, (double)1, (double)1, (double)0, t));
     }
 */
-void decode_bezier(FILE* file, unsigned int RESOLUTION_OF_T, double start_x, double c1_x, double c2_x, double end_x, double start_y, double c1_y, double c2_y, double end_y) {
-    double t = 0;
+void decode_bezier(FILE* file, double RESOLUTION_OF_T, double start_x, double c1_x, double c2_x, double end_x, double start_y, double c1_y, double c2_y, double end_y) {
+    double t = 0.0;
     /* Usage of cubic bezier functions, if int i = 0 then start point will be included, if i = 1 first point omitted, if i < RESOLUTION_OF_t then end point omitted, if <= then endpoint included */
-    for(int i = 1; i <= RESOLUTION_OF_T; i++) { // Substitue the t value into the bezier function and print the result to a file
-        t = ((double)1 / RESOLUTION_OF_T) * i;
-        double x = round(cubic_bezier_x(start_x, c1_x, c2_x, end_x, t)); // Rounds the results to the nearest integer
-        double y = round(cubic_bezier_y(start_y, c1_y, c2_y, end_y, t)); // Rounds the results to the nearest integer
+    for(double i = 1.0; i <= RESOLUTION_OF_T; i = i + 1) { // Substitue the t value into the bezier function and print the result to a file
+        t = (1.0 / RESOLUTION_OF_T) * i;
+        double x = cubic_bezier_x(start_x, c1_x, c2_x, end_x, t); // Rounds the results to the nearest integer
+        double y = cubic_bezier_y(start_y, c1_y, c2_y, end_y, t); // Rounds the results to the nearest integer
+        //printf("X %lf Y %lf\n", x, y);
         move_to_point(file, x, y);
     }
 }
