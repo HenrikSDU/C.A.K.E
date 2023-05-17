@@ -113,6 +113,8 @@ int main(void) {
             instruction_count = memory_init_flags[2]; //getting the amount of instructions
 
                 cakefile.path = (table_instruction*)calloc(instruction_count * sizeof(table_instruction), sizeof(table_instruction));
+                cakefile.instruction_locations = (bool*)calloc(instruction_count * sizeof(bool), sizeof(bool));
+
             //sending feedback 
             for(unsigned char j = 0; j < 10; j++)
                 usart_send(memory_init_flags[j]);
