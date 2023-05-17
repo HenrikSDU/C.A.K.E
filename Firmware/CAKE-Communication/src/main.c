@@ -28,32 +28,32 @@
 
 
 
-void usart_send(unsigned char); //function to send bytes via usart
+void usart_send(unsigned char); // Function to send bytes via usart
 
 
-volatile unsigned char memory_init_flags[10]; //array to store information about incoming file send by PC
-volatile unsigned int filesize = 0; //variable to keep track of the number of bytes that will be send by the PC
+volatile unsigned char memory_init_flags[10]; // Array to store information about incoming file send by PC
+volatile unsigned int filesize = 0; // Variable to keep track of the number of bytes that will be send by the PC
 volatile unsigned int instruction_count = 0;
 volatile unsigned int interrupt_count = 0, file_index = 0;
-volatile programstate_e phase = memory_init; //phase indicating operation phase: memory_init, upload or main_operation
-volatile bool readcycle_complete = false; //read cycle complete
+volatile programstate_e phase = memory_init; // Phase indicating operation phase: memory_init, upload or main_operation
+volatile bool readcycle_complete = false; // Read cycle complete
 
-volatile char* file; //saves the incoming bytes from the computer 
+volatile char* file; // Saves the incoming bytes from the computer 
 
-CAKEFILE cakefile; //contains an array of instructions and points (table_instruction(s)) and an array that indicates whether the data saved at a specific index is a coordinate or an extruder instruction
+CAKEFILE cakefile; // Contains an array of instructions and points (table_instruction(s)) and an array that indicates whether the data saved at a specific index is a coordinate or an extruder instruction
 
 ISR(USART_RX_vect) {
     
     switch(phase) {
 
-        case upload://in the upload phase the incoming bytes are stored in the file array (a simple array of chars)
+        case upload: // In the upload phase the incoming bytes are stored in the file array (a simple array of chars)
             file[file_index] = UDR0;
-            file_index++;//can maybe be replaced by i - pretty sure
+            file_index++; // Can maybe be replaced by i - pretty sure
 
         break;
         case memory_init:
             memory_init_flags[interrupt_count] = UDR0;
-            if(interrupt_count >= 9){//on 10th recieved byte indicate rcy_complete
+            if(interrupt_count >= 9){ // On 10th recieved byte indicate rcy_complete
                 interrupt_count = 0; 
                 readcycle_complete = true;
             }
@@ -61,7 +61,7 @@ ISR(USART_RX_vect) {
 
 
     }    
-    interrupt_count++;//increment number of interrupts
+    interrupt_count++; // Increment number of interrupts
     
 }
 
@@ -233,10 +233,9 @@ int main(void) {
 
 
 void usart_send(unsigned char data) { 
-    //check whether there is space in the sending buffer
-    while(!(UCSR0A & (1 << UDRE0)));//wait for transmit buffer
+    // Check whether there is space in the sending buffer
+    while(!(UCSR0A & (1 << UDRE0))); // Wait for transmit buffer
     UDR0 = data;
-
 }
 
 
