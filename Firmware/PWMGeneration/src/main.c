@@ -122,6 +122,7 @@ void PWM_control(uint8_t base_PWM, uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y
     int x_mod;
     if((x2 - x1) >= 0) {
         PWM_T0A_direction_change(1); // Setting x direction to forwards
+        x_mod = 1;
     }
     else if((x2 - x1) < 0) {
         PWM_T0A_direction_change(0); // Setting x direction to backwards
