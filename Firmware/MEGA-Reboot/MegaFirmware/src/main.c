@@ -1,5 +1,6 @@
 #define BAUDRATE 9600
 #define BAUD_PRESCALER (((F_CPU/(BAUDRATE*16UL)))-1)
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -46,7 +47,7 @@ volatile unsigned int interrupt_count = 0, file_index = 0;
 volatile programstate_e phase = memory_init; // Phase indicating operation phase: memory_init, upload or main_operation
 volatile bool readcycle_complete = false; // Read cycle complete
 
-volatile char* file; // Saves the incoming bytes from the computer 
+volatile char file[SUPPORTEDFILESIZE]; // Saves the incoming bytes from the computer 
 
 CAKEFILE cakefile; // Contains an array of instructions and points (table_instruction(s)) and an array that indicates whether the data saved at a specific index is a coordinate or an extruder instruction
 
@@ -131,7 +132,7 @@ int main(void) {
                 //PORTD |= (1 << PD7); //indicate that recievecycle is complete
 
                 filesize = memory_init_flags[0] * 255 + memory_init_flags[1]; // Compute filesize
-
+                /*
                 if(filesize > 0) { // Here size constraint possible
                     file = (char*)malloc(filesize * sizeof(unsigned char)); // Allocate memory for incoming CAKE-file
                     
@@ -140,11 +141,12 @@ int main(void) {
                     }
                     
                 }
+                */
 
                 instruction_count = memory_init_flags[2]; // Getting the amount of instructions
 
-                    cakefile.path = (table_instruction*)calloc(instruction_count * sizeof(table_instruction), sizeof(table_instruction));
-                    cakefile.instruction_locations = (bool*)calloc(instruction_count * sizeof(bool), sizeof(bool));
+                    //cakefile.path = (table_instruction*)calloc(instruction_count * sizeof(table_instruction), sizeof(table_instruction));
+                    //cakefile.instruction_locations = (bool*)calloc(instruction_count * sizeof(bool), sizeof(bool));
 
                 // Sending feedback 
                 for(unsigned char j = 0; j < 10; j++)
@@ -179,7 +181,7 @@ int main(void) {
                 
                 //LCD_init();
                 //LCD_set_cursor(0,0);
-                
+                while(1) {
                 printf("FS:%d", filesize);
                 for(k = 0; k < instruction_count; k++) {
 
@@ -193,7 +195,7 @@ int main(void) {
                     //_delay_ms(500);
                 }
                 
-                
+                }
                 phase = main_operation;
 
 

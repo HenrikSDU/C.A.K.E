@@ -1,6 +1,10 @@
 //C.A.K.E File proscessing header file
-#define BAUDRATE 9600
-#define BAUD_PRESCALER (((F_CPU/(BAUDRATE*16UL)))-1)
+
+//refer to MATLAB SCRIPT
+#define SUPPORTEDFILESIZE 4496
+#define MAXIMUMINSTRUCTIONCOUNT 899
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -44,8 +48,8 @@ typedef union{
 
 typedef struct{
 
-    table_instruction* path; //array of instructions and coordinates
-    bool* instruction_locations; //array indicating whether element in path is a extruder_inst (1) or a coordinate (0)
+    table_instruction path[MAXIMUMINSTRUCTIONCOUNT]; //array of instructions and coordinates
+    bool instruction_locations[MAXIMUMINSTRUCTIONCOUNT]; //array indicating whether element in path is a extruder_inst (1) or a coordinate (0)
 
 }CAKEFILE;
 
