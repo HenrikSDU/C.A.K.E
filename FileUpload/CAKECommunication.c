@@ -169,7 +169,7 @@ int main(int argc, char *argv[]){
       printf("%d ", memory_init_flags[r]);
    }
       input = 1;
-   do{
+   do {
 
       printf("\nInput: ");
       //scanf("%d",&input);
@@ -291,7 +291,7 @@ int main(int argc, char *argv[]){
       
       //Reading Feedback
       //scanf("%d",&input);
-      Sleep(500);
+      Sleep(10000);
       comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
       if(!comreistatus){
          printf("Error setting WaitCommEvent");
