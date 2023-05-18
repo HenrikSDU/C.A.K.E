@@ -2,18 +2,23 @@
 #define FORWARD_PIN PORTD2
 #define BACKWARD_PIN PORTD3
 
-#define BUTTON0 PD2
-#define BUTTON1 PD3
-#define BUTTON2 PD7
-#define BUTTON3 PC0
-#define BUTTON4 PC1
-#define BUTTON5 PC2
-#define BUTTON6 PC3
+#define BUTTON0 PK0
+#define BUTTON1 PK1
+#define BUTTON2 PK2
+#define BUTTON3 PK3
+#define BUTTON4 PK4
+#define BUTTON5 PK5
+#define BUTTON6 PK6
+#define BUTTON6 PK6
+#define BUTTON7 PK7
 
 #define DIRECTION_F_B PB1
 #define DIRECTION_B_B PB2
 #define DIRECTION_F_A PB3
 #define DIRECTION_B_A PB4
+
+/* Very fancy custom macro for easy debugging command */
+#define TOGGLE_ONBOARD_LED DDRB |= 0b10000000; PORTB ^= (1 << PORTB7);
 
 
 
@@ -93,16 +98,14 @@ void PWM_T0B_direction_change(int direction) { // direction = 1 => forwards, dir
 }
 
 void button_init(void){
+    // Mega buttons
+    DDRK &= ~((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON2) | (1 << BUTTON3) | (1 << BUTTON4) | (1 << BUTTON5) | (1 << BUTTON6) | (1 << BUTTON7));
+    PORTK |= ((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON2) | (1 << BUTTON3) | (1 << BUTTON4) | (1 << BUTTON5) | (1 << BUTTON6) | (1 << BUTTON7));
+    
+    PCICR |= ((1 << PCIE2)); // Pin change interrupt control register, enabled the bit where out buttons are
+    PCMSK2 |= ((1 << BUTTON7)); // Enabling the interrupt for BUTTON7, so only when that is pressed will the interrupt be executed
 
-
-    //configuring IOPins
-    DDRC &= ~((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //configuring them as input
-    PORTC |= ((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //enabling Pull-Ups
-    DDRD &= ~((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON2));
-    PORTD |= ((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON2));
-
-
-
+    /*
     //initializing the external interrupts - see page 54
     EICRA &= ~((1 << ISC01) | (1 << ISC00) | (1 << ISC11) | (1 << ISC10)); //when 0 0 any logical change generates interrupt request
     
@@ -110,10 +113,11 @@ void button_init(void){
     EIMSK |= ((1<<INT1)|(1<<INT0));
 
     //initializing the PinChange Interrupts
-    PCICR |= ((1<<PCIE2)/*|(1<<PCIE1)*/); //enabeling pin interrupts of pin group 1 and 2 
+    PCICR |= ((1<<PCIE2)|(1<<PCIE1)); //enabeling pin interrupts of pin group 1 and 2 
     PCMSK2 |= (1<<BUTTON2);
     PCMSK1 |= ((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //subscribing to changes on PCINT9
     sei();
+    */
     
 
 

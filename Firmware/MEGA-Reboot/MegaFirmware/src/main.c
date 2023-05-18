@@ -1,4 +1,3 @@
-//The CAKE communication
 #define BAUDRATE 9600
 #define BAUD_PRESCALER (((F_CPU/(BAUDRATE*16UL)))-1)
 #include <stdio.h>
@@ -23,7 +22,7 @@
 
 
 #include "file_proccessing.h"
-#include "motorandgpio.h"
+//#include "motorandgpio.h"
 
 typedef enum{
 
@@ -51,7 +50,7 @@ volatile char* file; // Saves the incoming bytes from the computer
 
 CAKEFILE cakefile; // Contains an array of instructions and points (table_instruction(s)) and an array that indicates whether the data saved at a specific index is a coordinate or an extruder instruction
 
-ISR(USART_RX_vect) {
+ISR(USART0_RX_vect) {
     
     switch(phase) {
 
@@ -73,7 +72,7 @@ ISR(USART_RX_vect) {
     interrupt_count++; // Increment number of interrupts
     
 }
-
+/*
 ISR(PCINT1_vect) {
 
     if((PINC & (1 << BUTTON4)) == 0)
@@ -97,6 +96,7 @@ ISR(PCINT2_vect) {
 
 }
 
+*/
 int main(void) { 
 
     i2c_init();// Initialization of the I2C communication
@@ -108,7 +108,7 @@ int main(void) {
     io_redirect();
 
     // Custom function initialization
-    button_init();
+    //button_init();
 
     // Configuration of the IO pins
 
@@ -164,7 +164,7 @@ int main(void) {
 
         while(phase == upload) {
             int k;
-            PORTB |= (1 << PB5);
+            //PORTB |= (1 << PB5);
 
             if((interrupt_count) >= filesize) { // Checking for successful upload
 
@@ -176,9 +176,10 @@ int main(void) {
 
                 UCSR0B &= ~(1 << RXCIE0); // Disable rx-interrupt
                 file_processing(&cakefile, file, filesize); // Proccessing the recieved array
-                /*
-                LCD_init();
-                LCD_set_cursor(0,0);
+                
+                //LCD_init();
+                //LCD_set_cursor(0,0);
+                
                 printf("FS:%d", filesize);
                 for(k = 0; k < instruction_count; k++) {
 
@@ -189,9 +190,9 @@ int main(void) {
                     else {
                         printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
                     }
-                    _delay_ms(10);
+                    //_delay_ms(500);
                 }
-                */
+                
                 
                 phase = main_operation;
 
@@ -201,9 +202,10 @@ int main(void) {
 
         }
 
+
         while(phase == main_operation) {
-            
-            PORTB &= ~(1 << PB5);
+            /*
+            //PORTB &= ~(1 << PB5);
             
             //LCD_init();
             //LCD_set_cursor(0,0);
@@ -255,10 +257,12 @@ int main(void) {
                 }
 
             }
+            */
         }
 
         while(phase == paused){
             // Button pressed
+            /*
             if((PINC & (1 << BUTTON3)) == 0) {
                 PORTB |= (1 << PB5);
             }
@@ -276,6 +280,8 @@ int main(void) {
                 }
 
              
+            
+            */
         }
     
     }
@@ -288,5 +294,3 @@ void usart_send(unsigned char data) {
     while(!(UCSR0A & (1 << UDRE0))); // Wait for transmit buffer
     UDR0 = data;
 }
-
-
