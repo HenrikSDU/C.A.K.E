@@ -50,7 +50,7 @@ volatile char* file; // Saves the incoming bytes from the computer
 
 CAKEFILE cakefile; // Contains an array of instructions and points (table_instruction(s)) and an array that indicates whether the data saved at a specific index is a coordinate or an extruder instruction
 
-ISR(USART_RX_vect) {
+ISR(USART0_RX_vect) {
     
     switch(phase) {
 
@@ -176,9 +176,10 @@ int main(void) {
 
                 UCSR0B &= ~(1 << RXCIE0); // Disable rx-interrupt
                 file_processing(&cakefile, file, filesize); // Proccessing the recieved array
-                /*
-                LCD_init();
-                LCD_set_cursor(0,0);
+                
+                //LCD_init();
+                //LCD_set_cursor(0,0);
+                
                 printf("FS:%d", filesize);
                 for(k = 0; k < instruction_count; k++) {
 
@@ -189,9 +190,9 @@ int main(void) {
                     else {
                         printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
                     }
-                    _delay_ms(10);
+                    //_delay_ms(500);
                 }
-                */
+                
                 
                 phase = main_operation;
 
@@ -200,6 +201,7 @@ int main(void) {
             
 
         }
+
 
         while(phase == main_operation) {
             /*
@@ -255,10 +257,12 @@ int main(void) {
                 }
 
             }
+            */
         }
 
         while(phase == paused){
             // Button pressed
+            /*
             if((PINC & (1 << BUTTON3)) == 0) {
                 PORTB |= (1 << PB5);
             }
@@ -276,6 +280,7 @@ int main(void) {
                 }
 
              
+            
             */
         }
     
