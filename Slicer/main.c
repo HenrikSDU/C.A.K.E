@@ -4,20 +4,18 @@
 
 #include "include/decoding_functions.h"
 
-/* Defines the amount of steps that 't' will have, quasi how many little lines (RESOLUTION_OF_T - 1 number of little lines if I'm correct) will make up a curve */
-#define RESOLUTION_OF_T 6
 
 int main(int argc, char **argv) {
 
     /* Error message and program termination if the user doesn't input the correct amount of arguments i.e. the executable and the path of the file to be sliced */
-    if(argc != 3) {
-        printf("Usage: .%cSlicer.exe <input file> <output file>\n", 92);
+    if(argc != 4) {
+        printf("Usage: .%cSlicer.exe <how many lines should make up a curve> <input file> <output file>\n", 92);
         return 1;
     }
 
     // fp stands for file pointer, and is of type file(FILE) pointer(*)
-    FILE* fp = fopen(argv[1], "r"); // fopen will get the address of a file, and open it in a mode, here read
-    FILE* cake = fopen(argv[2], "w"); // Opening the output file in write mode (overwrites the file if it already exists)
+    FILE* fp = fopen(argv[2], "r"); // fopen will get the address of a file, and open it in a mode, here read
+    FILE* cake = fopen(argv[3], "w"); // Opening the output file in write mode (overwrites the file if it already exists)
 
     /* Variables to keep track of current position in the coordinate system and in the string  */
     unsigned int cursor = 0;
@@ -28,6 +26,9 @@ int main(int argc, char **argv) {
     point_t control2 = init_point();
     point_t end_pos = init_point();
     command_t  command;
+
+    /* Defines the amount of steps that 't' will have, quasi how many little lines (RESOLUTION_OF_T - 1 number of little lines if I'm correct) will make up a curve */
+    unsigned char resolution_of_t = atoi(argv[1]);
 
     /* Determining the lenght of a file, not sure if this is the best way but it works */
     fseek(fp, 0, SEEK_END); // Putting cursor at the end
@@ -191,7 +192,7 @@ int main(int argc, char **argv) {
                     point_counter++;
                 }
                 // Now to use all this information to create a bezier curve
-                decode_bezier(cake, RESOLUTION_OF_T, prev_pos.x, control1.x, control2.x, end_pos.x, prev_pos.y, control1.y, control2.y, end_pos.y);
+                decode_bezier(cake, resolution_of_t, prev_pos.x, control1.x, control2.x, end_pos.x, prev_pos.y, control1.y, control2.y, end_pos.y);
                 prev_pos = end_pos;
             }
             else if(command == L) { // If the command is a "line to" command
@@ -215,7 +216,7 @@ int main(int argc, char **argv) {
     free(svg);
     fclose(cake);
 
-    FILE* length_print = fopen(argv[2], "r");
+    FILE* length_print = fopen(argv[3], "r");
     fseek(length_print, 0, SEEK_END);
     int length_of_output = ftell(length_print);
     printf("Length of output: %d\n", length_of_output);
