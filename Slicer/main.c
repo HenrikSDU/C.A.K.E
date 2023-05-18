@@ -102,7 +102,7 @@ int main(int argc, char **argv) {
         //printf("cursor + length_of_d %d\n", cursor + length_of_d);
         length_of_d++;
     }
-    printf("Length of d: %d and the char there %c Cursor %d\n", length_of_d, svg[cursor + length_of_d], cursor);
+    //printf("Length of d: %d and the char there %c Cursor %d\n", length_of_d, svg[cursor + length_of_d], cursor);
 
     do {
         //Resetting variables that are used in the loop
@@ -116,7 +116,7 @@ int main(int argc, char **argv) {
         //printf("Result of find_*: %d\n", find_ret.result);
         cursor += find_ret.increment;
 
-        printf("Temp: %s | Inside d %d\n", temp, inside_d);
+        //printf("Temp: %s | Inside d %d\n", temp, inside_d);
 
 
         //why no switch statement xD? i like my if statemnts
@@ -141,13 +141,13 @@ int main(int argc, char **argv) {
             if(command  == M) { // If the command is a move command
                 if(point_counter == 0) { // These if statements are used to determine which coordinate is being read ( x or y )
                     current_pos.x = scale_x * atof(temp); // atof converts a string to a float
-                    printf("Current_pos.x: %f\n", current_pos.x);
+                    //printf("Current_pos.x: %f\n", current_pos.x);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 1) {
                     current_pos.y = scale_y * atof(temp); // atof converts a string to a float
-                    printf("Current_pos.y: %f\n", current_pos.y);
+                    //printf("Current_pos.y: %f\n", current_pos.y);
                     point_counter++;
                 }
                 extruder_up(cake); // Lifting the extruder
@@ -158,37 +158,37 @@ int main(int argc, char **argv) {
             else if(command == C) { // If the command is a bezier curve command
                 if(point_counter == 0) {
                     control1.x = scale_x * atof(temp);
-                    printf("Control1.x: %f\n", control1.x);
+                    //printf("Control1.x: %f\n", control1.x);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 1) {
                     control1.y = scale_y * atof(temp);
-                    printf("Control1.y: %f\n", control1.y);
+                    //printf("Control1.y: %f\n", control1.y);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 2) {
                     control2.x = scale_x * atof(temp);
-                    printf("Control2.x: %f\n", control2.x);
+                    //printf("Control2.x: %f\n", control2.x);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 3) {
                     control2.y = scale_y * atof(temp);
-                    printf("Control2.y: %f\n", control2.y);
+                    //printf("Control2.y: %f\n", control2.y);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 4) {
                     end_pos.x = scale_x * atof(temp);
-                    printf("End_pos.x: %f\n", end_pos.x);
+                    //printf("End_pos.x: %f\n", end_pos.x);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 5) {
                     end_pos.y = scale_y * atof(temp);
-                    printf("End_pos.y: %f\n", end_pos.y);
+                    //printf("End_pos.y: %f\n", end_pos.y);
                     point_counter++;
                 }
                 // Now to use all this information to create a bezier curve
