@@ -25,6 +25,15 @@
 #include "file_proccessing.h"
 #include "motorandgpio.h"
 
+typedef enum{
+
+    memory_init, //preparing for incoming file
+    upload, //upload of file
+    main_operation, //creation of icing
+    paused //paused from main
+
+}programstate_e;
+
 
 
 
@@ -71,6 +80,22 @@ ISR(PCINT1_vect) {
         PORTB ^= (1 << PB5);
 
 }
+ 
+ISR(PCINT2_vect) {
+
+    if((PIND & (1 << BUTTON2)) == 0) {
+        //PORTB ^= (1 << PB5);
+
+        if(phase == paused) {
+            phase = main_operation;
+        } else if(phase == main_operation) {
+            phase = paused;
+        }
+        _delay_ms(100);
+    }
+   
+
+}
 
 int main(void) { 
 
@@ -81,6 +106,9 @@ int main(void) {
     
     uart_init();
     io_redirect();
+
+    // Custom function initialization
+    button_init();
 
     // Configuration of the IO pins
 
@@ -93,141 +121,164 @@ int main(void) {
     UCSR0B |= (1 << RXCIE0);
     sei(); // Enable interrupts globaly
 
-    while(phase == memory_init) {
-       
-        if(readcycle_complete) { // Handle memoryinitflags if recievecycle is complete
-            
-            //PORTD |= (1 << PD7); //indicate that recievecycle is complete
-
-            filesize = memory_init_flags[0] * 255 + memory_init_flags[1]; // Compute filesize
-
-            if(filesize > 0) { // Here size constraint possible
-                file = (char*)malloc(filesize * sizeof(unsigned char)); // Allocate memory for incoming CAKE-file
-                
-                if(file != NULL) {
-                    //PORTD |= (1 << PD6); // Indicate successful memory allocation
-                }
-                
-            }
-
-            instruction_count = memory_init_flags[2]; // Getting the amount of instructions
-
-                cakefile.path = (table_instruction*)calloc(instruction_count * sizeof(table_instruction), sizeof(table_instruction));
-                cakefile.instruction_locations = (bool*)calloc(instruction_count * sizeof(bool), sizeof(bool));
-
-            // Sending feedback 
-            for(unsigned char j = 0; j < 10; j++)
-                usart_send(memory_init_flags[j]);
-
-            // Resetting readcycle complete flag
-            readcycle_complete = false;
-
-            interrupt_count = 0;
-
-            // Going over to next phase
-            phase = upload;
-        }
+    while(1) {
         
-    }
     
+        while(phase == memory_init) {
+        
+            if(readcycle_complete) { // Handle memoryinitflags if recievecycle is complete
+                
+                //PORTD |= (1 << PD7); //indicate that recievecycle is complete
 
-    while(phase == upload) {
-        int k;
+                filesize = memory_init_flags[0] * 255 + memory_init_flags[1]; // Compute filesize
 
-        if((interrupt_count) >= filesize) { // Checking for successful upload
-
-            interrupt_count = 0; // Resetting interrupt count
-            //PORTD |= (1 << PD4);
-            
-            for(k = 0; k < filesize; k++) // Send file back for feedback
-                usart_send(file[k]);
-
-            UCSR0B &= ~(1 << RXCIE0); // Disable rx-interrupt
-
-            file_processing(&cakefile, file, filesize); // Proccessing the recieved array
-
-            LCD_init();
-            LCD_set_cursor(0,0);
-            printf("FS:%d", filesize);
-            for(k = 0; k < instruction_count; k++) {
-
-                LCD_set_cursor(0, (k%4));
-                if(cakefile.instruction_locations[k] == 1) {
-                    printf("G%d", cakefile.path[k].extruder_inst + 1);
+                if(filesize > 0) { // Here size constraint possible
+                    file = (char*)malloc(filesize * sizeof(unsigned char)); // Allocate memory for incoming CAKE-file
+                    
+                    if(file != NULL) {
+                        //PORTD |= (1 << PD6); // Indicate successful memory allocation
+                    }
+                    
                 }
-                else {
-                    printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
-                }
-                _delay_ms(10);
+
+                instruction_count = memory_init_flags[2]; // Getting the amount of instructions
+
+                    cakefile.path = (table_instruction*)calloc(instruction_count * sizeof(table_instruction), sizeof(table_instruction));
+                    cakefile.instruction_locations = (bool*)calloc(instruction_count * sizeof(bool), sizeof(bool));
+
+                // Sending feedback 
+                for(unsigned char j = 0; j < 10; j++)
+                    usart_send(memory_init_flags[j]);
+
+                // Resetting readcycle complete flag
+                readcycle_complete = false;
+
+                interrupt_count = 0;
+
+                // Going over to next phase
+                phase = upload;
             }
-
             
-            phase = main_operation;
-
-
         }
         
 
-    }
+        while(phase == upload) {
+            int k;
+            PORTB |= (1 << PB5);
 
-    while(phase == main_operation) {
-        
-        button_init();
-        LCD_init();
-        LCD_set_cursor(0,0);
+            if((interrupt_count) >= filesize) { // Checking for successful upload
+
+                interrupt_count = 0; // Resetting interrupt count
+                //PORTD |= (1 << PD4);
+                
+                for(k = 0; k < filesize; k++) // Send file back for feedback
+                    usart_send(file[k]);
+
+                UCSR0B &= ~(1 << RXCIE0); // Disable rx-interrupt
+                file_processing(&cakefile, file, filesize); // Proccessing the recieved array
+                /*
+                LCD_init();
+                LCD_set_cursor(0,0);
+                printf("FS:%d", filesize);
+                for(k = 0; k < instruction_count; k++) {
+
+                // LCD_set_cursor(0, (k%4));
+                    if(cakefile.instruction_locations[k] == 1) {
+                        printf("G%d", cakefile.path[k].extruder_inst + 1);
+                    }
+                    else {
+                        printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
+                    }
+                    _delay_ms(10);
+                }
+                */
+                
+                phase = main_operation;
 
 
-        // Initialization for IOBoard - speed measurement
-        
-        DDRB |= (1<<PB5);
+            }
+            
 
-        PWM_T0A_init();
-        char desired_PWM = 0;
+        }
 
-        ////////////////////////
-        cli();
-        ///////////////////////
+        while(phase == main_operation) {
+            
+            PORTB &= ~(1 << PB5);
+            
+            //LCD_init();
+            //LCD_set_cursor(0,0);
 
-        printf("B3:setB4:incB5:decB6:dich");
-        char direction;
-        while(1) {
 
+            // Initialization for IOBoard - speed measurement
+            
+
+            PWM_T0A_init();
+            char desired_PWM = 0;
+
+            ////////////////////////
+            //cli();
+            ///////////////////////
+
+            printf("B3:setB4:incB5:decB6:dich");
+            char direction;
+            while(phase != paused) {
+
+                if((PINC & (1 << BUTTON3)) == 0) {
+
+                    PWM_T0A_set(desired_PWM);
+                    PORTB ^= (1<<PB5);
+                    
+                    
+                    _delay_ms(200);
+                }
+
+                if((PINC & (1 << BUTTON4)) == 0) {
+                    desired_PWM += 10;
+                    //LCD_set_cursor(0,2);
+                    //printf("desPWM: %u ", desired_PWM);
+                    _delay_ms(200);
+                }
+                if((PINC & (1 << BUTTON5)) == 0) {
+
+                    desired_PWM -= 10;
+                    //LCD_set_cursor(0,2);
+                    printf("desPWM: %u ", desired_PWM);
+                    _delay_ms(200);
+                }
+                if((PINC & (1 << BUTTON6)) == 0) {
+                    direction = 0b00000001 & direction;
+                    PWM_T0A_direction_change(direction);
+                    //LCD_set_cursor(0,3);
+                    //printf("dir:%d",direction);
+                    direction++;
+                    _delay_ms(2000);
+                }
+
+            }
+        }
+
+        while(phase == paused){
+            // Button pressed
             if((PINC & (1 << BUTTON3)) == 0) {
-
-                PWM_T0A_set(desired_PWM);
-                
-                _delay_ms(200);
+                PORTB |= (1 << PB5);
             }
-
-            if((PINC & (1 << BUTTON4)) == 0) {
-                desired_PWM += 10;
-                LCD_set_cursor(0,2);
-                printf("desPWM: %u ", desired_PWM);
-                _delay_ms(200);
+             else if((PINC & (1 << BUTTON4)) == 0) {
+                PORTB |= (1 << PB5);
             }
-            if((PINC & (1 << BUTTON5)) == 0) {
-
-                desired_PWM -= 10;
-                LCD_set_cursor(0,2);
-                printf("desPWM: %u ", desired_PWM);
-                _delay_ms(200);
+             else if((PINC & (1 << BUTTON5)) == 0) {
+                PORTB |= (1 << PB5);
             }
-            if((PINC & (1 << BUTTON6)) == 0) {
-                direction = 0b00000001 & direction;
-                PWM_T0A_direction_change(direction);
-                LCD_set_cursor(0,3);
-                printf("dir:%d",direction);
-                direction++;
-                _delay_ms(200);
+             else if((PINC & (1 << BUTTON6)) == 0){
+                PORTB |= (1 << PB5);
             }
+                else {
+                    PORTB &= ~(1 << PB5);
+                }
 
-
-
+             
         }
-
-
-    }
     
+    }
     return 0;
 }
 

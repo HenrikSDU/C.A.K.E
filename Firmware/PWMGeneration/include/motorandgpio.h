@@ -98,9 +98,8 @@ void button_init(void){
     //configuring IOPins
     DDRC &= ~((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //configuring them as input
     PORTC |= ((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //enabling Pull-Ups
-    DDRD &= ~((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON2));
-    PORTD |= ((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON2));
-
+    DDRD &= ~((1 << BUTTON0) | (1 << BUTTON1));
+    PORTD |= (1 << BUTTON0) | (1 << BUTTON1);
 
 
     //initializing the external interrupts - see page 54
@@ -110,7 +109,7 @@ void button_init(void){
     EIMSK |= ((1<<INT1)|(1<<INT0));
 
     //initializing the PinChange Interrupts
-    PCICR |= ((1<<PCIE2)/*|(1<<PCIE1)*/); //enabeling pin interrupts of pin group 1 and 2 
+    PCICR |= ((1<<PCIE2)|(1<<PCIE1)); //enabeling pin interrupts of pin group 1 and 2 
     PCMSK2 |= (1<<BUTTON2);
     PCMSK1 |= ((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //subscribing to changes on PCINT9
     sei();

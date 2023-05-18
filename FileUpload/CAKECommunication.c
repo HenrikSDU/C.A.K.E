@@ -313,6 +313,15 @@ int main(int argc, char *argv[]){
                }
                i++;
          }while(NoBytesRead>0);
+
+         printf("WAITING FOR RXPIN:\n");
+
+         comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
+         if(!comreistatus){
+            printf("Error setting WaitCommEvent");
+         }
+         else
+            printf("waited\n");
       
       
       free(filesendbuffer);

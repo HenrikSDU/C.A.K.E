@@ -33,9 +33,41 @@
 
 ISR(PCINT1_vect){
 
-    if((PINC & (1 << BUTTON4)) == 0)
+    // Button pressed
+    if((PINC & (1 << BUTTON3)) == 0) {
+        PORTB |= (1 << PB5);
+    }
+    if((PINC & (1 << BUTTON4)) == 0) {
+        PORTB |= (1 << PB5);
+    }
+    if((PINC & (1 << BUTTON5)) == 0) {
+        PORTB |= (1 << PB5);
+    }
+    if((PINC & (1 << BUTTON6)) == 0){
+        PORTB |= (1 << PB5);
+    }
+
+    // Button unpressed
+    if(!(PINC & (1 << BUTTON3)) == 0) {
+        PORTB &= ~(1 << PB5);
+    }
+    if(!(PINC & (1 << BUTTON4)) == 0) {
+        PORTB &= ~(1 << PB5);
+    }
+    if(!(PINC & (1 << BUTTON5)) == 0) {
+        PORTB &= ~(1 << PB5);
+    }
+    if(!(PINC & (1 << BUTTON6)) == 0){
+        PORTB &= ~(1 << PB5);
+    }
+
+}
+ISR(PCINT2_vect){
+
+    if((PIND & (1 << BUTTON2)) == 0) {
         PORTB ^= (1<<PB5);
-        //printf("hey");
+    }
+   
 
 }
 
@@ -162,10 +194,10 @@ void PWM_control(uint8_t base_PWM, uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y
 }
 
 
-int main(void) { 
+int main(void){ 
   
     i2c_init(); //  Initialization of the I2C communication    
-    LCD_init(); // Initialization of the LCD display
+    //LCD_init(); // Initialization of the LCD display
     //printf("LCDinitSUCCESS"); // Proof that the LCD display is working
 
     // Configuration of the IO pins
@@ -173,20 +205,85 @@ int main(void) {
     PORTC |= 0x30;
     DDRB |= (1 << PB5); // Onboard LED
 
-    PWM_T0A_init();
-    PWM_T0A_set(255);
+        button_init();
+        //LCD_init();
+        //LCD_set_cursor(0,0);
 
-    uint8_t direction = 0;
 
-    button_init();
+        // Initialization for IOBoard - speed measurement
+        
+        DDRB |= (1<<PB5);
 
-    while(1) {
+        PWM_T0A_init();
+        char desired_PWM = 0;
 
-        PWM_T0A_direction_change(0b00000001 & direction);
-        _delay_ms(1000);
-        direction++;
+        ////////////////////////
+        cli();
+        ///////////////////////
 
+        printf("B3:setB4:incB5:decB6:dich");
+        char direction;
+        while(1){
+    // Button pressed
+    if((PINC & (1 << BUTTON3)) == 0) {
+        PORTB |= (1 << PB5);
     }
+    if((PINC & (1 << BUTTON4)) == 0) {
+        PORTB |= (1 << PB5);
+    }
+    if((PINC & (1 << BUTTON5)) == 0) {
+        PORTB |= (1 << PB5);
+    }
+    if((PINC & (1 << BUTTON6)) == 0){
+        PORTB |= (1 << PB5);
+    }
+
+    // Button unpressed
+    if(!(PINC & (1 << BUTTON3)) == 0) {
+        PORTB &= ~(1 << PB5);
+    }
+    if(!(PINC & (1 << BUTTON4)) == 0) {
+        PORTB &= ~(1 << PB5);
+    }
+    if(!(PINC & (1 << BUTTON5)) == 0) {
+        PORTB &= ~(1 << PB5);
+    }
+    if(!(PINC & (1 << BUTTON6)) == 0){
+        PORTB &= ~(1 << PB5);
+    }
+
+        /*
+            if((PINC & (1 << BUTTON3)) == 0) {
+                PWM_T0A_set(desired_PWM);
+                //PORTB ^= (1<<PB5);
+                
+                
+                _delay_ms(200);
+            }
+            if((PINC & (1 << BUTTON4)) == 0) {
+                desired_PWM += 10;
+                //LCD_set_cursor(0,2);
+                //printf("desPWM: %u ", desired_PWM);
+                _delay_ms(200);
+            }
+            if((PINC & (1 << BUTTON5)) == 0) {
+
+                desired_PWM -= 10;
+                //LCD_set_cursor(0,2);
+                printf("desPWM: %u ", desired_PWM);
+                _delay_ms(200);
+            }
+            if((PINC & (1 << BUTTON6)) == 0) {
+                direction = 0b00000001 & direction;
+                PWM_T0A_direction_change(direction);
+                //LCD_set_cursor(0,3);
+                //printf("dir:%d",direction);
+                direction++;
+                _delay_ms(2000);
+            }
+        */
+
+        }
         
     return 0;
 }

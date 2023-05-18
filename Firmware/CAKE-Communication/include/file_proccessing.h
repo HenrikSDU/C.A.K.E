@@ -49,12 +49,6 @@ typedef struct{
 
 }CAKEFILE;
 
-typedef enum{
 
-    memory_init, //preparing for incoming file
-    upload, //upload of file
-    main_operation //creation of icing
-
-}programstate_e;
 
 void file_processing(CAKEFILE* cakefile, volatile char* file, int filesize);
