@@ -181,7 +181,7 @@ int main(void) {
                 
                 //LCD_init();
                 //LCD_set_cursor(0,0);
-                while(1) {
+                
                 printf("FS:%d", filesize);
                 for(k = 0; k < instruction_count; k++) {
 
@@ -195,7 +195,7 @@ int main(void) {
                     //_delay_ms(500);
                 }
                 
-                }
+                
                 phase = main_operation;
 
 
