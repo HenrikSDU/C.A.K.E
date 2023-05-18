@@ -4,20 +4,18 @@
 
 #include "include/decoding_functions.h"
 
-/* Defines the amount of steps that 't' will have, quasi how many little lines (RESOLUTION_OF_T - 1 number of little lines if I'm correct) will make up a curve */
-#define RESOLUTION_OF_T 6
 
 int main(int argc, char **argv) {
 
     /* Error message and program termination if the user doesn't input the correct amount of arguments i.e. the executable and the path of the file to be sliced */
-    if(argc != 3) {
-        printf("Usage: .%cSlicer.exe <input file> <output file>\n", 92);
+    if(argc != 4) {
+        printf("Usage: .%cSlicer.exe <how many lines should make up a curve> <input file> <output file>\n", 92);
         return 1;
     }
 
     // fp stands for file pointer, and is of type file(FILE) pointer(*)
-    FILE* fp = fopen(argv[1], "r"); // fopen will get the address of a file, and open it in a mode, here read
-    FILE* cake = fopen(argv[2], "w"); // Opening the output file in write mode (overwrites the file if it already exists)
+    FILE* fp = fopen(argv[2], "r"); // fopen will get the address of a file, and open it in a mode, here read
+    FILE* cake = fopen(argv[3], "w"); // Opening the output file in write mode (overwrites the file if it already exists)
 
     /* Variables to keep track of current position in the coordinate system and in the string  */
     unsigned int cursor = 0;
@@ -28,6 +26,9 @@ int main(int argc, char **argv) {
     point_t control2 = init_point();
     point_t end_pos = init_point();
     command_t  command;
+
+    /* Defines the amount of steps that 't' will have, quasi how many little lines (RESOLUTION_OF_T - 1 number of little lines if I'm correct) will make up a curve */
+    unsigned char resolution_of_t = atoi(argv[1]);
 
     /* Determining the lenght of a file, not sure if this is the best way but it works */
     fseek(fp, 0, SEEK_END); // Putting cursor at the end
@@ -101,7 +102,7 @@ int main(int argc, char **argv) {
         //printf("cursor + length_of_d %d\n", cursor + length_of_d);
         length_of_d++;
     }
-    printf("Length of d: %d and the char there %c Cursor %d\n", length_of_d, svg[cursor + length_of_d], cursor);
+    //printf("Length of d: %d and the char there %c Cursor %d\n", length_of_d, svg[cursor + length_of_d], cursor);
 
     do {
         //Resetting variables that are used in the loop
@@ -115,7 +116,7 @@ int main(int argc, char **argv) {
         //printf("Result of find_*: %d\n", find_ret.result);
         cursor += find_ret.increment;
 
-        printf("Temp: %s | Inside d %d\n", temp, inside_d);
+        //printf("Temp: %s | Inside d %d\n", temp, inside_d);
 
 
         //why no switch statement xD? i like my if statemnts
@@ -140,13 +141,13 @@ int main(int argc, char **argv) {
             if(command  == M) { // If the command is a move command
                 if(point_counter == 0) { // These if statements are used to determine which coordinate is being read ( x or y )
                     current_pos.x = scale_x * atof(temp); // atof converts a string to a float
-                    printf("Current_pos.x: %f\n", current_pos.x);
+                    //printf("Current_pos.x: %f\n", current_pos.x);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 1) {
                     current_pos.y = scale_y * atof(temp); // atof converts a string to a float
-                    printf("Current_pos.y: %f\n", current_pos.y);
+                    //printf("Current_pos.y: %f\n", current_pos.y);
                     point_counter++;
                 }
                 extruder_up(cake); // Lifting the extruder
@@ -157,41 +158,41 @@ int main(int argc, char **argv) {
             else if(command == C) { // If the command is a bezier curve command
                 if(point_counter == 0) {
                     control1.x = scale_x * atof(temp);
-                    printf("Control1.x: %f\n", control1.x);
+                    //printf("Control1.x: %f\n", control1.x);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 1) {
                     control1.y = scale_y * atof(temp);
-                    printf("Control1.y: %f\n", control1.y);
+                    //printf("Control1.y: %f\n", control1.y);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 2) {
                     control2.x = scale_x * atof(temp);
-                    printf("Control2.x: %f\n", control2.x);
+                    //printf("Control2.x: %f\n", control2.x);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 3) {
                     control2.y = scale_y * atof(temp);
-                    printf("Control2.y: %f\n", control2.y);
+                    //printf("Control2.y: %f\n", control2.y);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 4) {
                     end_pos.x = scale_x * atof(temp);
-                    printf("End_pos.x: %f\n", end_pos.x);
+                    //printf("End_pos.x: %f\n", end_pos.x);
                     point_counter++;
                     continue;
                 }
                 else if(point_counter == 5) {
                     end_pos.y = scale_y * atof(temp);
-                    printf("End_pos.y: %f\n", end_pos.y);
+                    //printf("End_pos.y: %f\n", end_pos.y);
                     point_counter++;
                 }
                 // Now to use all this information to create a bezier curve
-                decode_bezier(cake, RESOLUTION_OF_T, prev_pos.x, control1.x, control2.x, end_pos.x, prev_pos.y, control1.y, control2.y, end_pos.y);
+                decode_bezier(cake, resolution_of_t, prev_pos.x, control1.x, control2.x, end_pos.x, prev_pos.y, control1.y, control2.y, end_pos.y);
                 prev_pos = end_pos;
             }
             else if(command == L) { // If the command is a "line to" command
@@ -215,7 +216,7 @@ int main(int argc, char **argv) {
     free(svg);
     fclose(cake);
 
-    FILE* length_print = fopen(argv[2], "r");
+    FILE* length_print = fopen(argv[3], "r");
     fseek(length_print, 0, SEEK_END);
     int length_of_output = ftell(length_print);
     printf("Length of output: %d\n", length_of_output);
