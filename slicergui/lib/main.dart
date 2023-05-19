@@ -292,9 +292,39 @@ class UploadPage extends StatefulWidget {
 
 class _UploadPageState extends State<UploadPage> {
   @override
+
+  String? uploadfilepath;
+  final pathError = const SnackBar(content: Text("Error selecting the file."));
+
+  Future<String?> getUploadFile() async {
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+
+    if (result != null) {
+      String? path = result.files.single.path;
+      if (path != null) {
+        debugPrint(path);
+        return path;
+      } else {
+        debugPrint("There was an error with the file selection!  path = null");
+        return null;
+      }
+    } else {
+      debugPrint("User cancelled the process");
+      return null;
+    }
+  }
+
   Widget build(BuildContext context) {
-    return const Material(
-      child: Text('uninplemented'),
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        ElevatedButton(
+          onPressed: () {
+            // Do nothing
+          },
+          child: Text('Select File'),
+        ),
+      ],
     );
   }
 }

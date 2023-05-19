@@ -158,10 +158,14 @@ int main(int argc, char *argv[]){
    }
    rewind(file);
    printf("\n%d instructions found!", instruction_count);
+   double required_instruction_capacity = (double)instruction_count/(double)255;
+   required_instruction_capacity = floor(required_instruction_capacity);
+   unsigned char remaining_instructions = instruction_count - (255 * required_instruction_capacity);
 
    memory_init_flags[0] = (unsigned char)required_capacity;
    memory_init_flags[1] = remaining_bytes;
-   memory_init_flags[2] = instruction_count;
+   memory_init_flags[2] = (unsigned char)required_instruction_capacity;
+   memory_init_flags[3] = remaining_instructions;
    
    printf("\nDetermined filelength: %d \n",filelength);
    printf("Updated memoryinitflags:\n");

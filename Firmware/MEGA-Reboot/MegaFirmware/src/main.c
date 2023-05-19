@@ -143,7 +143,7 @@ int main(void) {
                 }
                 */
 
-                instruction_count = memory_init_flags[2]; // Getting the amount of instructions
+                instruction_count = memory_init_flags[2] * 255 + memory_init_flags[3]; // Getting the amount of instructions
 
                     //cakefile.path = (table_instruction*)calloc(instruction_count * sizeof(table_instruction), sizeof(table_instruction));
                     //cakefile.instruction_locations = (bool*)calloc(instruction_count * sizeof(bool), sizeof(bool));
