@@ -192,22 +192,44 @@ int main(void) {
             
             
             PWM_T4AB_init();
+            PWM_T4A_set(200);
+            _delay_ms(5000);
+            PWM_T4A_direction_change();
+            PWM_T4A_set(0);
+            _delay_ms(3000);
             
             //LCD_init();
             //LCD_set_cursor(0,0);
 
+            uint8_t desired_PWM = 40;
 
-            // Initialization for IOBoard - speed measurement
-            
+            int array[] = {2, 20, 50, 50, 60, 20};
 
-            unsigned char desired_PWM = 0;
+            for(int print_index = 0; print_index < 5; print_index++) {
+                if(array[print_index] == 0) {
+                    PWM_control(desired_PWM, array[print_index], array[print_index + 1], 100, 150);
+                    _delay_ms(1000);
+                }
+            }
 
             ////////////////////////
             //cli();
             ///////////////////////
 
             //printf("B3:setB4:incB5:decB6:dich");
-            char direction;
+            
+           
+            
+        }
+
+        while(phase == paused){
+
+            TOGGLE_ONBOARD_LED
+            _delay_ms(1000);
+            PWM_T4A_set(0); 
+
+            uint8_t direction = 0;
+            uint8_t desired_PWM = 100;
             while(phase != paused) {
 
                 if((PINK & (1 << BUTTON3)) == 0) {
@@ -245,35 +267,6 @@ int main(void) {
                 }
 
             }
-            
-        }
-
-        while(phase == paused){
-
-            TOGGLE_ONBOARD_LED
-            _delay_ms(1000);
-            PWM_T4A_set(0);
-            // Button pressed
-            /*
-            if((PINC & (1 << BUTTON3)) == 0) {
-                PORTB |= (1 << PB5);
-            }
-             else if((PINC & (1 << BUTTON4)) == 0) {
-                PORTB |= (1 << PB5);
-            }
-             else if((PINC & (1 << BUTTON5)) == 0) {
-                PORTB |= (1 << PB5);
-            }
-             else if((PINC & (1 << BUTTON6)) == 0){
-                PORTB |= (1 << PB5);
-            }
-                else {
-                    PORTB &= ~(1 << PB5);
-                }
-
-             
-            
-            */
         }
     
     }

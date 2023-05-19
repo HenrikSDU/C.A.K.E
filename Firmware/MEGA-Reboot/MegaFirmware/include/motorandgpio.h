@@ -143,3 +143,46 @@ void button_init(void){
 
 
 }
+
+void PWM_control(uint8_t base_PWM, uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y2) {
+    int x_mod;
+    if((x2 - x1) >= 0) {
+        PWM_T4A_direction_change(1); // Setting x direction to forwards
+        x_mod = 1; // Setting x_mod to 1 to multiply the slope by
+    }
+    else if((x2 - x1) < 0) {
+        PWM_T4A_direction_change(0); // Setting x direction to backwards
+        x_mod = -1; // Setting x_mod to -1 to multiply the slope by
+    }
+
+    if((y2 - y1) >= 0) {
+        PWM_T4B_direction_change(1);
+    }
+    else if((y2 - y1) < 0) {
+        PWM_T4B_direction_change(0);
+    }
+
+    float slope = x_mod * ((y2 - y1) / (x2 - x1));
+
+    // First try at logic controlling overflows and underflows
+    if(slope > 1) {
+        while((slope * (float)base_PWM) < 255) { // The idea here is to find the maximum value of base_PWM that will not overflow the OCR0A register, the limit can be decreased as needed
+            base_PWM--;
+        }
+        PWM_T4A_set(base_PWM);
+        PWM_T4B_set((int)(slope * (float)base_PWM));
+    }
+    else if(slope < 1) {
+        while(!((slope * (float)base_PWM) > 30)) { // The idea here is to find the minimum value of base_PWM that will not be too small to to make the motors run, while roughly achieving the target speed
+            base_PWM++;
+        }
+        PWM_T4A_set(base_PWM);
+        PWM_T4B_set((int)(slope * (float)base_PWM));
+    }
+    else if(slope == 1) { // Setting PWM so the motors run at roughly desired speed / sqrt(2)
+        base_PWM = 127; // Some predefined value to roughly get the desired speed
+        PWM_T4A_set(base_PWM);
+        PWM_T4B_set(base_PWM);
+    }
+}
+
