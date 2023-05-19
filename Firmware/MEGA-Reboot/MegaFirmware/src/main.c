@@ -194,7 +194,7 @@ int main(void) {
             PWM_T4AB_init();
             PWM_T4A_set(200);
             _delay_ms(5000);
-            PWM_T4A_direction_change();
+            PWM_T4A_direction_change(1);
             PWM_T4A_set(0);
             _delay_ms(3000);
             
@@ -206,10 +206,30 @@ int main(void) {
             int array[] = {2, 20, 50, 50, 60, 20};
 
             for(int print_index = 0; print_index < 5; print_index++) {
-                if(array[print_index] == 0) {
+
+            reentrypoint: // If we paused the print we can use this goto to continue in the print - maybe
+
+                if((array[print_index] == 0) && (array[print_index + 1] == 0)) {
                     PWM_control(desired_PWM, array[print_index], array[print_index + 1], 100, 150);
                     _delay_ms(1000);
                 }
+                else {
+                    
+                    if(cakefile.path[print_index].extruder_inst== G1) {
+
+                        // Execute G1
+
+                    }
+                    else                    
+                    if(cakefile.path[print_index].extruder_inst == G2) {
+
+                        // Execute G2
+
+                    }
+
+                }
+                
+
             }
 
             ////////////////////////
