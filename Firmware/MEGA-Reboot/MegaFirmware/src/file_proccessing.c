@@ -98,7 +98,7 @@ void file_processing(CAKEFILE* cakefile, volatile char* file, int filesize){
 
 
     }
-    free(file);
+    
 
     uart_init();
     io_redirect();

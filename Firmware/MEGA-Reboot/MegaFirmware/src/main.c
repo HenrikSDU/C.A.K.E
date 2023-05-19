@@ -17,13 +17,8 @@
 #include "i2cmaster.h"
 #include "lm75.h"
 
-/* Macros for GPIO pins */
-#define FORWARD_PIN PORTD2
-#define BACKWARD_PIN PORTD3
-
-
 #include "file_proccessing.h"
-//#include "motorandgpio.h"
+#include "motorandgpio.h"
 
 typedef enum{
 
@@ -73,18 +68,11 @@ ISR(USART0_RX_vect) {
     interrupt_count++; // Increment number of interrupts
     
 }
-/*
-ISR(PCINT1_vect) {
 
-    if((PINC & (1 << BUTTON4)) == 0)
-        PORTB ^= (1 << PB5);
-
-}
- 
 ISR(PCINT2_vect) {
 
-    if((PIND & (1 << BUTTON2)) == 0) {
-        //PORTB ^= (1 << PB5);
+    if((PINK & (1 << BUTTON7)) == 0) {
+        TOGGLE_ONBOARD_LED
 
         if(phase == paused) {
             phase = main_operation;
@@ -97,7 +85,6 @@ ISR(PCINT2_vect) {
 
 }
 
-*/
 int main(void) { 
 
     i2c_init();// Initialization of the I2C communication
@@ -109,13 +96,9 @@ int main(void) {
     io_redirect();
 
     // Custom function initialization
-    //button_init();
+    button_init();
 
     // Configuration of the IO pins
-
-    DDRC |= 0x30; // For I2C
-    PORTC |= 0x30;
-    DDRB |= (1 << PB5);
 
    
     // Enabling RX interrupt
@@ -206,8 +189,9 @@ int main(void) {
 
 
         while(phase == main_operation) {
-            /*
-            //PORTB &= ~(1 << PB5);
+            
+            
+            PWM_T4AB_init();
             
             //LCD_init();
             //LCD_set_cursor(0,0);
@@ -216,8 +200,7 @@ int main(void) {
             // Initialization for IOBoard - speed measurement
             
 
-            PWM_T0A_init();
-            char desired_PWM = 0;
+            unsigned char desired_PWM = 0;
 
             ////////////////////////
             //cli();
@@ -227,42 +210,49 @@ int main(void) {
             char direction;
             while(phase != paused) {
 
-                if((PINC & (1 << BUTTON3)) == 0) {
+                if((PINK & (1 << BUTTON3)) == 0) {
 
-                    PWM_T0A_set(desired_PWM);
-                    PORTB ^= (1<<PB5);
+                    PWM_T4A_set(desired_PWM);
+                    TOGGLE_ONBOARD_LED
                     
                     
                     _delay_ms(200);
                 }
 
-                if((PINC & (1 << BUTTON4)) == 0) {
-                    desired_PWM += 10;
+                if((PINK & (1 << BUTTON4)) == 0) {
+                    desired_PWM += 50;
                     //LCD_set_cursor(0,2);
                     //printf("desPWM: %u ", desired_PWM);
+                    TOGGLE_ONBOARD_LED
                     _delay_ms(200);
                 }
-                if((PINC & (1 << BUTTON5)) == 0) {
+                if((PINK & (1 << BUTTON5)) == 0) {
 
-                    desired_PWM -= 10;
+                    desired_PWM -= 50;
+                    TOGGLE_ONBOARD_LED
                     //LCD_set_cursor(0,2);
                     //printf("desPWM: %u ", desired_PWM);
                     _delay_ms(200);
                 }
-                if((PINC & (1 << BUTTON6)) == 0) {
+                if((PINK & (1 << BUTTON6)) == 0) {
                     direction = 0b00000001 & direction;
-                    PWM_T0A_direction_change(direction);
+                    PWM_T4A_direction_change(direction);
                     //LCD_set_cursor(0,3);
                     //printf("dir:%d",direction);
+                    TOGGLE_ONBOARD_LED
                     direction++;
                     _delay_ms(2000);
                 }
 
             }
-            */
+            
         }
 
         while(phase == paused){
+
+            TOGGLE_ONBOARD_LED
+            _delay_ms(1000);
+            PWM_T4A_set(0);
             // Button pressed
             /*
             if((PINC & (1 << BUTTON3)) == 0) {
