@@ -207,14 +207,21 @@ int main(void) {
 
             for(int print_index = 0; print_index < 5; print_index++) {
 
+                /* From the internet:     also half of this file is empty lines
+                Disadvantages of Using goto Statement
+                The use of the goto statement is highly discouraged as it makes the program logic very complex.
+                The use of goto makes tracing the flow of the program very difficult.
+                The use of goto makes the task of analyzing and verifying the correctness of programs (particularly those involving loops) very difficult.
+                */
+
             reentrypoint: // If we paused the print we can use this goto to continue in the print - maybe
 
+                //also the reason this didnt work was because the if condition wasnt applicable to a normal array, only cakefile
                 if((array[print_index] == 0) && (array[print_index + 1] == 0)) {
                     PWM_control(desired_PWM, array[print_index], array[print_index + 1], 100, 150);
                     _delay_ms(1000);
                 }
                 else {
-                    
                     if(cakefile.path[print_index].extruder_inst== G1) {
 
                         // Execute G1
