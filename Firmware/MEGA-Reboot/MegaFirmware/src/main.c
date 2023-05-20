@@ -218,9 +218,15 @@ int main(void) {
                 The use of goto makes tracing the flow of the program very difficult.
                 The use of goto makes the task of analyzing and verifying the correctness of programs (particularly those involving loops) very difficult.
                 */
+               // Here the goto would not be a main component of the program logic as it would only be called if desired so by the user
+               // It would just serve as a reentry point when jumping back from paused - we could implement a same functionality with global variables of course
+               // But I think in this case that would be more complex then a goto
 
             reentrypoint: // If we paused the print we can use this goto to continue in the print - maybe
                 // also also i think that having this seprarate instruction for the g commands is going to be bad here, bc more execptions will need to be handled
+
+                // But how do we want to handle the g commands else? Also due to the elses the conditions only get checked occacionally thus not slowing down the process much
+
                 //also the reason this didnt work was because the if condition wasnt applicable to a normal array, only cakefile
                 if((array[print_index] == 0) && (array[print_index + 1] == 0)) {
                     PWM_control(desired_PWM, array[print_index], array[print_index + 1], 100, 150);
