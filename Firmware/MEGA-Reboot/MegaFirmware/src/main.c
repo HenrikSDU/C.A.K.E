@@ -201,11 +201,16 @@ int main(void) {
             //LCD_init();
             //LCD_set_cursor(0,0);
 
-            uint8_t desired_PWM = 40;
+            unsigned char desired_PWM = 100;
+            unsigned char x_array[] = {2, 2, 50, 100, 60, 50, 0, 1};
+            unsigned char y_array[] = {2, 2, 50, 120, 140, 10, 0, 200};
 
-            int array[] = {2, 20, 50, 50, 60, 20};
+            for(int i = 0; i < 7; i++) {
+                PWM_control(desired_PWM, x_array[i], x_array[i + 1], y_array[i], y_array[i + 1]);
+                _delay_ms(1000);
+            }
 
-            for(int print_index = 0; print_index < 5; print_index++) {
+            for(int print_index = 0; print_index < 7; print_index++) {
 
                 /* From the internet:     also half of this file is empty lines
                 Disadvantages of Using goto Statement
@@ -215,7 +220,7 @@ int main(void) {
                 */
 
             reentrypoint: // If we paused the print we can use this goto to continue in the print - maybe
-
+                // also also i think that having this seprarate instruction for the g commands is going to be bad here, bc more execptions will need to be handled
                 //also the reason this didnt work was because the if condition wasnt applicable to a normal array, only cakefile
                 if((array[print_index] == 0) && (array[print_index + 1] == 0)) {
                     PWM_control(desired_PWM, array[print_index], array[print_index + 1], 100, 150);

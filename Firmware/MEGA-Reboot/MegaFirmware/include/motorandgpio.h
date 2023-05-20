@@ -144,45 +144,90 @@ void button_init(void){
 
 }
 
-void PWM_control(uint8_t base_PWM, uint8_t x1, uint8_t x2, uint8_t y1, uint8_t y2) {
+void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
     int x_mod;
-    if((x2 - x1) >= 0) {
-        PWM_T4A_direction_change(1); // Setting x direction to forwards
+    int y_mod;
+
+    //Sim variables
+    unsigned char x_dir[1];
+    unsigned char y_dir[1];
+    unsigned char x_speed = 0;
+    unsigned char y_speed = 0;
+    float dx = (float)x2 - (float)x1; // Unsigned chars are not good for division
+    float dy = (float)y2 - (float)y1;
+
+    float slope = 0.0;
+
+    if(dx > 0) {
+        PWM_T4A_direction_change(1); // Forward
+        x_dir[0] = 'F'; // Forward
         x_mod = 1; // Setting x_mod to 1 to multiply the slope by
     }
-    else if((x2 - x1) < 0) {
-        PWM_T4A_direction_change(0); // Setting x direction to backwards
+    else if(dx < 0) {
+        PWM_T4A_direction_change(0); // Backward
+        x_dir[0] = 'B'; // Backward
         x_mod = -1; // Setting x_mod to -1 to multiply the slope by
     }
-
-    if((y2 - y1) >= 0) {
-        PWM_T4B_direction_change(1);
-    }
-    else if((y2 - y1) < 0) {
-        PWM_T4B_direction_change(0);
+    else if(dx == 0) {
+        x_dir[0] = 'S'; // Stop
+        x_mod = 0; // Setting x_mod to 0 to multiply the slope by
     }
 
-    float slope = x_mod * ((y2 - y1) / (x2 - x1));
+    if(dy > 0) {
+        PWM_T4B_direction_change(1); // Forward
+        y_dir[0] = 'F';
+        y_mod = 1;
+    }
+    else if(dy < 0) {
+        PWM_T4B_direction_change(0); // Backward
+        y_dir[0] = 'B';
+        y_mod = -1;
+    }
+    else if(dy == 0) {
+        y_dir[0] = 'S';
+        y_mod = 0;
+    }
+
+    
+    if(x_dir[0] == 'S') {
+        PWM_T4A_set(0);
+        x_speed = 0;
+    }
+    if(y_dir[0] == 'S') {
+        PWM_T4B_set(0);
+        y_speed = 0;
+    }
+    if(x_mod != 0) {
+        slope = x_mod * y_mod * (dy / dx); // Had problems with unsigned chars being divided so I used floats
+    }
 
     // First try at logic controlling overflows and underflows
-    if(slope > 1) {
-        while((slope * (float)base_PWM) < 255) { // The idea here is to find the maximum value of base_PWM that will not overflow the OCR0A register, the limit can be decreased as needed
-            base_PWM--;
+    if(slope > 1 && x_mod != 0 && y_mod != 0) {
+        if((slope * (float)base_PWM) > 255.0) { // The idea here is to find the maximum value of base_PWM that will not overflow the OCR0A register, the limit can be decreased as needed
+            while((slope * (float)base_PWM) > 255.0) {
+                base_PWM--;
+            }
         }
-        PWM_T4A_set(base_PWM);
-        PWM_T4B_set((int)(slope * (float)base_PWM));
+        x_speed = base_PWM;
+        y_speed = (int)(slope * (float)base_PWM);
     }
-    else if(slope < 1) {
-        while(!((slope * (float)base_PWM) > 30)) { // The idea here is to find the minimum value of base_PWM that will not be too small to to make the motors run, while roughly achieving the target speed
-            base_PWM++;
+    else if(slope < 1 && x_mod != 0 && y_mod != 0) {
+        if((slope * (float)base_PWM) > 50.0) { // The idea here is to find the minimum value of base_PWM that will not be too small to to make the motors run, while roughly achieving the target speed
+            while((slope * (float)base_PWM) > 50.0) {
+                base_PWM++;
+            }
         }
-        PWM_T4A_set(base_PWM);
-        PWM_T4B_set((int)(slope * (float)base_PWM));
+        x_speed = base_PWM;
+        y_speed = (int)(slope * (float)base_PWM);
     }
-    else if(slope == 1) { // Setting PWM so the motors run at roughly desired speed / sqrt(2)
-        base_PWM = 127; // Some predefined value to roughly get the desired speed
-        PWM_T4A_set(base_PWM);
-        PWM_T4B_set(base_PWM);
+    else if(slope == 1.0 && x_mod != 0 && y_mod != 0) { // Setting PWM so the motors run at roughly desired speed / sqrt(2)
+        base_PWM = 100; // Some predefined value to roughly get the desired speed
+        x_speed = base_PWM;
+        y_speed = base_PWM;
     }
+
+    // Setting the PWM
+    PWM_T4A_set(x_speed);
+    PWM_T4B_set(y_speed);
 }
 
