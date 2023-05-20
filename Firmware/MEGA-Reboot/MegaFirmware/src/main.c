@@ -226,8 +226,10 @@ int main(void) {
                 // also also i think that having this seprarate instruction for the g commands is going to be bad here, bc more execptions will need to be handled
 
                 // But how do we want to handle the g commands else? Also due to the elses the conditions only get checked occacionally thus not slowing down the process much
+                // it isnt about slowing down the process, I just don't like the way i made the gcode file, i dont like the fact that the g commands are separate
+                // i would sacrifice some of the avalible ram for a better command structure
+                // Still not much time left and the current method works so lets not change it
 
-                //also the reason this didnt work was because the if condition wasnt applicable to a normal array, only cakefile
                 if((array[print_index] == 0) && (array[print_index + 1] == 0)) {
                     PWM_control(desired_PWM, array[print_index], array[print_index + 1], 100, 150);
                     _delay_ms(1000);
