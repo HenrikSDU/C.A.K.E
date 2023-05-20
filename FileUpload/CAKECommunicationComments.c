@@ -18,9 +18,10 @@ void PrintCommState(DCB dcb)
 
 int main(int argc, char *argv[]){
 
-   printf("%d",argc); //printing the argument count
-   printf("%s",argv[1]); //printing the arguments
-   printf("%s",argv[2]); 
+   printf("%d\n",argc); // Printing the argument count
+   // Printing the arguments
+   printf("%s\n",argv[1]); // COM name
+   printf("%s\n",argv[2]); // Filepath
 
    COMMTIMEOUTS timeouts = {0};
    DWORD BytesWritten = 0;          // No of bytes written to the port
