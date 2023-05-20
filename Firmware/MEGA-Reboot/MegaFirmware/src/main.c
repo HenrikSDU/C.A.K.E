@@ -222,6 +222,9 @@ int main(void) {
                // It would just serve as a reentry point when jumping back from paused - we could implement a same functionality with global variables of course
                // But I think in this case that would be more complex then a goto
 
+               // I think main just being a polling loop is the optimal way, if so no need for goto, one global variable which is the index of where we are at
+               // potentially calling blocking functions or interrupts that wait for enough optocoupler interrupts to happen or something
+
             reentrypoint: // If we paused the print we can use this goto to continue in the print - maybe
                 // also also i think that having this seprarate instruction for the g commands is going to be bad here, bc more execptions will need to be handled
 
