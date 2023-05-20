@@ -212,21 +212,13 @@ int main(int argc, char *argv[]){
    for(int r=0;r<10;r++){
       printf("%d ", memory_init_flags[r]);
    }
-      input = 1;
-   do {
-
-      printf("\nInput: ");
-      //scanf("%d",&input);
+     
+   // Specifing for which events the program shall look out in the future
+   // In this case the program shall be notefied by the OS when the port
+   // associated with hCom recieves a byte. 
+   // For this the SetCommMask function provided by windows is used.
+   comreistatus = SetCommMask(hCom, EV_RXCHAR);
       
-      if (input==0){
-            CloseHandle(hCom);
-            fclose(file);
-            printf("\nCancel Of Program");
-         return 0;
-      }
-      input = 0;
-      
-      comreistatus = SetCommMask(hCom, EV_RXCHAR);
       if(comreistatus == FALSE){
             CloseHandle(hCom);
             printf("Error in setting commask");
@@ -235,8 +227,10 @@ int main(int argc, char *argv[]){
       else
       printf("\nSuccessfully set Commask\n");
       
-      //write to port
+      // Write the memory init flags to the port:
       printf("\nStart Writing to USB-Port\n");
+
+      // For writing to the port the WriteFile function is used - which is also provided by microsoft in the windows.h headerfile
       writesuccess = WriteFile(hCom,// Handle to the Serialport
                         memory_init_flags,            // Data to be written to the port
                         sizeof(memory_init_flags),   // No of bytes to write into the port
@@ -253,28 +247,29 @@ int main(int argc, char *argv[]){
       printf("\nNumber of bytes written to the serial port = %d\n", BytesWritten);
 
       
-      comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
+      comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); // Wait for a byte to be received - program is paused/stopped in the meantime
       if(!comreistatus){
          printf("Error setting WaitCommEvent");
       }
       else
          printf("waited");
-      
-      i=0;
-      
+   
+         // The next step is to read from the USB-port 
+         i=0;
          do{
                comreistatus = ReadFile(hCom, &ReadData, sizeof(ReadData),&NoBytesRead, NULL);
-               if(NoBytesRead!=0){//as long as byte
+               if(NoBytesRead!=0){ // As long as a byte has been received
                   memory_init_feedback[i] = ReadData;
-                  printf("\nfeddval%d:%d\n", i, memory_init_feedback[i]);
-                  //printf("\nNumber of bytes read:%d\n",NoBytesRead);
+                  printf("\nFeedbackValue %d:%d\n", i, memory_init_feedback[i]); // Printing what has been recieved
+                  
                }
                i++;
          }while(NoBytesRead>0);
       
       
-      printf("\n Bytes returned by our microcontroller:  \n");
+      printf("\n Bytes returned by the microcontroller:\n");
 
+      // Printing the result of reading:
       for(int q=0;q<10;q++){
          printf("%d ",memory_init_feedback[q]);
          if(memory_init_feedback[q]!=memory_init_flags[q]){
@@ -290,23 +285,27 @@ int main(int argc, char *argv[]){
          printf("\nError in filelength transmission\n");
       }
 
-      
+      // Starting the transmission of the actual file:
       printf("\nStart of File Transmission");
-      int filesendbuffer_index=0, arraysize;
+
+      // Allocating memory for sending the the file:
+      
+      int filesendbuffer_index=0;
       unsigned char* filesendbuffer;
       filesendbuffer = (char*)malloc(filelength*sizeof(unsigned char));
       if(filesendbuffer!=NULL){
-         arraysize=sizeof(filesendbuffer)/sizeof(unsigned char);
-         printf("\nSuccessfully allocated memory for sendbuffer, %d bytes\n", sizeof(filesendbuffer));
+         printf("\nSuccessfully allocated memory for sendbuffer, %d bytes\n", strlen(filesendbuffer));
       }
+
+      // Allocating memory for recieving the the file:
       int filereceivebuffer_index=0;
       unsigned char* filereceivebuffer;
       filereceivebuffer = (char*)malloc(filelength*sizeof(unsigned char));
       if(filereceivebuffer!=NULL){
-         arraysize=sizeof(filereceivebuffer)/sizeof(unsigned char);
-         printf("\nSuccessfully allocated memory for receivebuffer, %d bytes\n", sizeof(filereceivebuffer));
+         printf("\nSuccessfully allocated memory for receivebuffer, %d bytes\n", strlen(filereceivebuffer));
       }
 
+      // Loading the file into the sendbuffer
       unsigned char character;
       while (filesendbuffer_index < filelength){ // Read the file byte by byte 
          character = fgetc(file);
@@ -317,25 +316,25 @@ int main(int argc, char *argv[]){
       printf("\n");
 
       printf("Purging Com");
-      BOOL purgesuccess = PurgeComm(hCom, PURGE_RXCLEAR);
+      BOOL purgesuccess = PurgeComm(hCom, PURGE_RXCLEAR); // Clears any unread data in the recieve buffer - also provided by microsoft
       if(purgesuccess)
       printf("Surccessfully purged comm");
 
+      // Sending all the bytes in the same way as the memory init flags before 
       printf("\nStart Transmit of File\n");
       writesuccess = WriteFile(hCom,// Handle to the Serialport
                         filesendbuffer,            // Data to be written to the port
                         filelength,   // No of bytes to write into the port
                         &BytesWritten,  // No of bytes written to the port
                         NULL);
-      if(writesuccess){
+      if(writesuccess) {
          printf("Write Success - %d bytes written!\n", BytesWritten);
       }
       else
          printf("Write Error!\n");
       
-      //Reading Feedback
-      //scanf("%d",&input);
-      Sleep(10000);
+      
+      Sleep(1000); //waiting for the microcontrollers response
       comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
       if(!comreistatus){
          printf("Error setting WaitCommEvent");
@@ -343,8 +342,8 @@ int main(int argc, char *argv[]){
       else
          printf("waited\n");
 
+      // Reading Feedback in the same way as before
       
-      //scanf("%d",&input);
       i=0;
       
          do{
@@ -357,22 +356,13 @@ int main(int argc, char *argv[]){
                }
                i++;
          }while(NoBytesRead>0);
-
-         printf("WAITING FOR RXPIN:\n");
-
-         comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
-         if(!comreistatus){
-            printf("Error setting WaitCommEvent");
-         }
-         else
-            printf("waited\n");
       
       
-      free(filesendbuffer);
-      free(filereceivebuffer);
-   }while(input != 0);
-   
-   fclose(file); //closing file again
+      free(filesendbuffer); // Free allocated memory
+      free(filereceivebuffer); // Free allocated memory
+      CloseHandle(hCom); // Closing port again
+      fclose(file); // Closing file again
+
    printf("End of Program");
    return 0;
    }
