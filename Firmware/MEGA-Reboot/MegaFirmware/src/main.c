@@ -193,8 +193,10 @@ int main(void) {
             
             PWM_T4AB_init();
             PWM_T4A_set(200);
-            _delay_ms(5000);
-            PWM_T4A_direction_change(1);
+            _delay_ms(500);
+            PWM_T4A_set(0);
+            PWM_T4A_set(200);
+            _delay_ms(500);
             PWM_T4A_set(0);
             _delay_ms(3000);
             
