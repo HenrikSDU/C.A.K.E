@@ -185,7 +185,8 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
     }
     else if(dy == 0) {
         y_dir[0] = 'S';
-        y_mod = 0;
+        y_mod = 1;
+        dy = 1.0;
     }
 
     
@@ -211,7 +212,7 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
         x_speed = base_PWM;
         y_speed = (int)(slope * (float)base_PWM);
     }
-    else if(slope < 1 && x_mod != 0 && y_mod != 0) {
+    else if(slope < 1 && slope != 0 && x_mod != 0 && y_mod != 0) {
         if((slope * (float)base_PWM) > 50.0) { // The idea here is to find the minimum value of base_PWM that will not be too small to to make the motors run, while roughly achieving the target speed
             while((slope * (float)base_PWM) > 50.0) {
                 base_PWM++;
@@ -225,6 +226,11 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
         x_speed = base_PWM;
         y_speed = base_PWM;
     }
+    else if(slope == 0.0) {
+        base_PWM = 100;
+        y_speed = base_PWM;
+    }
+    
 
     // Setting the PWM
     printf("\nX-Speed: %d", x_speed);
