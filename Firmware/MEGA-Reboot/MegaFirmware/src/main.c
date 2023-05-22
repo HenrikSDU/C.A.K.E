@@ -40,7 +40,13 @@ volatile unsigned int filesize = 0; // Variable to keep track of the number of b
 volatile unsigned int instruction_count = 0;
 volatile unsigned int interrupt_count = 0, file_index = 0;
 volatile programstate_e phase = memory_init; // Phase indicating operation phase: memory_init, upload or main_operation
+
+
 volatile bool readcycle_complete = false; // Read cycle complete
+volatile int timer4overflow_count = 0;
+volatile int timer5overflow_count = 0;
+volatile double axisspeed_motor_A = 0;
+volatile double axisspeed_motor_B = 0;
 
 volatile char file[SUPPORTEDFILESIZE]; // Saves the incoming bytes from the computer 
 
@@ -84,7 +90,31 @@ ISR(PCINT2_vect) {
    
 }
 
+ISR(TIMER5_OVF_vect) {
 
+    timer5overflow_count++;
+    TOGGLE_ONBOARD_LED
+}
+
+ISR(TIMER5_CAPT_vect) { // heeey
+    axisspeed_motor_A = ACTEXTENSIONPERROT / (double)(ICR1 + 0xFFFF * timer5overflow_count);
+    timer5overflow_count = 0;
+
+}
+
+ISR(TIMER4_OVF_vect) {
+
+    timer4overflow_count++;
+
+}
+
+ISR(TIMER4_CAPT_vect) {
+
+    axisspeed_motor_B = ACTEXTENSIONPERROT / (double)(ICR3 + 0xFFFF * timer4overflow_count);
+    timer4overflow_count = 0;
+    
+
+}
 
 
 int main(void) { 
@@ -191,12 +221,12 @@ int main(void) {
 
 
         while(phase == main_operation) {
-            
-            
-            PWM_T4AB_init();
-            PWM_T4A_set(200);
+            //alternative_PWM_control_init();
+            button_init();
+            PWM_T3AB_init();
+            PWM_T3A_set(200);
             _delay_ms(1000);
-            PWM_T4A_set(0);
+            PWM_T3A_set(0);
             _delay_ms(3000);
             
             //LCD_init();
@@ -204,12 +234,16 @@ int main(void) {
 
             // This new and improved version needs to be tested
             unsigned char desired_PWM = 100;
-           /* unsigned char x_array[] = {2, 2, 50, 100, 60, 50, 0, 1};
-            unsigned char y_array[] = {2, 2, 50, 120, 140, 10, 0, 200};
+            /*
+            unsigned char x_array[] = {187, 191, 191, 44, 47, 49, 52, 55, 57, 60, 62, 65, 67, 70, 81, 92, 103, 114, 125, 135, 146, 156, 167, 177 };
+            unsigned char y_array[] = {36, 126, 171, 50, 52, 54, 56, 58, 60, 62, 65, 67, 69, 71, 80, 89, 98, 107, 116, 126, 135, 145, 154, 164};
+            int counter = 0;
 
-            for(int i = 0; i < 7; i++) {
-                PWM_control(desired_PWM, x_array[i], x_array[i + 1], y_array[i], y_array[i + 1]);
+            while(x_array[counter] != 0) {
+                printf("While loop #%d\n", counter);
+                PWM_control(desired_PWM, x_array[counter], x_array[counter + 1], y_array[counter], y_array[counter + 1]);
                 _delay_ms(1000);
+                counter++;
             }
             */
             for(int print_index = 0; print_index < instruction_count; print_index++) {
@@ -254,7 +288,7 @@ int main(void) {
 
             TOGGLE_ONBOARD_LED
             _delay_ms(1000);
-            PWM_T4A_set(0); 
+            PWM_T3A_set(0); 
 
             uint8_t direction = 0;
             uint8_t desired_PWM = 100;
@@ -262,7 +296,7 @@ int main(void) {
 
                 if((PINK & (1 << BUTTON3)) == 0) {
 
-                    PWM_T4A_set(desired_PWM);
+                    PWM_T3A_set(desired_PWM);
                     TOGGLE_ONBOARD_LED
                     
                     
@@ -286,7 +320,7 @@ int main(void) {
                 }
                 if((PINK & (1 << BUTTON6)) == 0) {
                     direction = 0b00000001 & direction;
-                    PWM_T4A_direction_change(direction);
+                    PWM_T3A_direction_change(direction);
                     //LCD_set_cursor(0,3);
                     //printf("dir:%d",direction);
                     TOGGLE_ONBOARD_LED
