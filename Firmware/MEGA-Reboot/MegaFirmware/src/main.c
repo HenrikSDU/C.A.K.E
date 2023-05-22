@@ -201,6 +201,7 @@ int main(void) {
             //LCD_init();
             //LCD_set_cursor(0,0);
 
+            // This new and improved version needs to be tested
             unsigned char desired_PWM = 100;
             unsigned char x_array[] = {2, 2, 50, 100, 60, 50, 0, 1};
             unsigned char y_array[] = {2, 2, 50, 120, 140, 10, 0, 200};
@@ -233,24 +234,21 @@ int main(void) {
                 // i would sacrifice some of the avalible ram for a better command structure
                 // Still not much time left and the current method works so lets not change it
 
+                /* This is completely bad for the moment 
                 if((array[print_index] == 0) && (array[print_index + 1] == 0)) {
                     PWM_control(desired_PWM, array[print_index], array[print_index + 1], 100, 150);
                     _delay_ms(1000);
                 }
                 else {
                     if(cakefile.path[print_index].extruder_inst== G1) {
-
                         // Execute G1
-
                     }
                     else                    
                     if(cakefile.path[print_index].extruder_inst == G2) {
-
                         // Execute G2
-
                     }
-
                 }
+                */
                 
 
             }
