@@ -1,0 +1,676 @@
+G1
+X187Y36
+G2
+X191Y126
+X191Y171
+G1
+X44Y50
+G2
+X47Y52
+X49Y54
+X52Y56
+X55Y58
+X57Y60
+X60Y62
+X62Y65
+X65Y67
+X67Y69
+X70Y71
+X81Y80
+X92Y89
+X103Y98
+X114Y107
+X125Y116
+X135Y126
+X146Y135
+X156Y145
+X167Y154
+X177Y164
+G1
+X11Y187
+G2
+X22Y187
+X32Y187
+X43Y187
+X54Y187
+X64Y187
+X75Y187
+X86Y187
+X97Y187
+X107Y187
+X118Y187
+X125Y187
+X131Y187
+X138Y188
+X145Y188
+X152Y188
+X158Y188
+X165Y188
+X172Y188
+X178Y187
+X185Y186
+                                                   
+Purging ComSurccessfully purged comm
+Start Transmit of File
+Write Success - 437 bytes written!
+waited
+G1
+X187Y36
+G2
+X191Y126
+X191Y171
+G1
+X44Y50
+G2
+X47Y52
+X49Y54
+X52Y56
+X55Y58
+X57Y60
+X60Y62
+X62Y65
+X65Y67
+X67Y69
+X70Y71
+X81Y80
+X92Y89
+X103Y98
+X114Y107
+X125Y116
+X135Y126
+X146Y135
+X156Y145
+X167Y154
+X177Y164
+G1
+X11Y187
+G2
+X22Y187
+X32Y187
+X43Y187
+X54Y187
+X64Y187
+X75Y187
+X86Y187
+X97Y187
+X107Y187
+X118Y187
+X125Y187
+X131Y187
+X138Y188
+X145Y188
+X152Y188
+X158Y188
+X165Y188
+X172Y188
+X178Y187
+X185Y186
+                                                   FS:437G1X:187Y:36 G2X:191Y:126 X:191Y:171 G1X:44Y:50 G2X:47Y:52 X:49Y:54 X:52Y:56 X:55Y:58 X:57Y:60 X:60Y:62 X:62Y:65 X:65Y:67 X:67Y:69 X:70Y:71 X:81Y:80 X:92Y:89 X:103Y:98 X:114Y:107 X:125Y:116 X:135Y:126 X:146Y:135 X:156Y:145 X:167Y:154 X:177Y:164 G1X:11Y:187 G2X:22Y:187 X:32Y:187 X:43Y:187 X:54Y:187 X:64Y:187 X:75Y:187 X:86Y:187 X:97Y:187 X:107Y:187 X:118Y:187 X:125Y:187 X:131Y:187 X:138Y:188 X:145Y:188 X:152Y:188 X:158Y:188 X:165Y:188 X:172Y:188 X:178Y:187 X:185Y:186 X:0Y:0
+X1: 191 X2: 191
+Y1: 126 Y2: 171
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.000000
+
+X1: 47 X2: 49
+Y1: 52 Y2: 54
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 49 X2: 52
+Y1: 54 Y2: 56
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 52 X2: 55
+Y1: 56 Y2: 58
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 55 X2: 57
+Y1: 58 Y2: 60
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 57 X2: 60
+Y1: 60 Y2: 62
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 60 X2: 62
+Y1: 62 Y2: 65
+X-Speed: 100
+Y-Speed: 150
+Slope: 1.500000
+
+X1: 62 X2: 65
+Y1: 65 Y2: 67
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 65 X2: 67
+Y1: 67 Y2: 69
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 67 X2: 70
+Y1: 69 Y2: 71
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 70 X2: 81
+Y1: 71 Y2: 80
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 81 X2: 92
+Y1: 80 Y2: 89
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 92 X2: 103
+Y1: 89 Y2: 98
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 103 X2: 114
+Y1: 98 Y2: 107
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 114 X2: 125
+Y1: 107 Y2: 116
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+PS D:\AAStudium\Study\Mechatronics Semester Project 2\C.A.K.E\FileUpload> .\CAKECommunication COM7 MOTORTEST.cake
+3
+COM7
+MOTORTEST.cake
+
+BaudRate = 115200, ByteSize = 8, Parity = 0, StopBits = 0
+
+BaudRate = 9600, ByteSize = 8, Parity = 0, StopBits = 0
+Serial port COM7 successfully reconfigured.
+
+SettingMemoryInitflags
+0 0 0 0 0 0 0 0 0 0
+Filelength: 437
+
+52 instructions found!
+Determined filelength: 437
+Updated memoryinitflags:
+1 182 0 52 0 0 0 0 0 0
+Successfully set Commask
+
+Start Writing to USB-Port
+
+Number of bytes written to the serial port = 10
+waited
+FeedbackValue 0:1
+
+FeedbackValue 1:182
+
+FeedbackValue 2:0
+
+FeedbackValue 3:52
+
+FeedbackValue 4:0
+
+FeedbackValue 5:0
+
+FeedbackValue 6:0
+
+FeedbackValue 7:0
+
+FeedbackValue 8:0
+
+FeedbackValue 9:0
+
+ Bytes returned by the microcontroller:
+1 182 0 52 0 0 0 0 0 0
+Returned filelength: 1
+
+Successfull filelength transmit
+
+Start of File Transmission
+Successfully allocated memory for sendbuffer, 6 bytes
+
+Successfully allocated memory for receivebuffer, 6 bytes
+G1
+X187Y36
+G2
+X191Y126
+X191Y171
+G1
+X44Y50
+G2
+X47Y52
+X49Y54
+X52Y56
+X55Y58
+X57Y60
+X60Y62
+X62Y65
+X65Y67
+X67Y69
+X70Y71
+X81Y80
+X92Y89
+X103Y98
+X114Y107
+X125Y116
+X135Y126
+X146Y135
+X156Y145
+X167Y154
+X177Y164
+G1
+X11Y187
+G2
+X22Y187
+X32Y187
+X43Y187
+X54Y187
+X64Y187
+X75Y187
+X86Y187
+X97Y187
+X107Y187
+X118Y187
+X125Y187
+X131Y187
+X138Y188
+X145Y188
+X152Y188
+X158Y188
+X165Y188
+X172Y188
+X178Y187
+X185Y186
+                                                   
+Purging ComSurccessfully purged comm
+Start Transmit of File
+Write Success - 437 bytes written!
+waited
+G1
+X187Y36
+G2
+X191Y126
+X191Y171
+G1
+X44Y50
+G2
+X47Y52
+X49Y54
+X52Y56
+X55Y58
+X57Y60
+X60Y62
+X62Y65
+X65Y67
+X67Y69
+X70Y71
+X81Y80
+X92Y89
+X103Y98
+X114Y107
+X125Y116
+X135Y126
+X146Y135
+X156Y145
+X167Y154
+X177Y164
+G1
+X11Y187
+G2
+X22Y187
+X32Y187
+X43Y187
+X54Y187
+X64Y187
+X75Y187
+X86Y187
+X97Y187
+X107Y187
+X118Y187
+X125Y187
+X131Y187
+X138Y188
+X145Y188
+X152Y188
+X158Y188
+X165Y188
+X172Y188
+X178Y187
+X185Y186
+                                                   FS:437G1X:187Y:36 G2X:191Y:126 X:191Y:171 G1X:44Y:50 G2X:47Y:52 X:49Y:54 X:52Y:56 X:55Y:58 X:57Y:60 X:60Y:62 X:62Y:65 X:65Y:67 X:67Y:69 X:70Y:71 X:81Y:80 X:92Y:89 X:103Y:98 X:114Y:107 X:125Y:116 X:135Y:126 X:146Y:135 X:156Y:145 X:167Y:154 X:177Y:164 G1X:11Y:187 G2X:22Y:187 X:32Y:187 X:43Y:187 X:54Y:187 X:64Y:187 X:75Y:187 X:86Y:187 X:97Y:187 X:107Y:187 X:118Y:187 X:125Y:187 X:131Y:187 X:138Y:188 X:145Y:188 X:152Y:188 X:158Y:188 X:165Y:188 X:172Y:188 X:178Y:187 X:185Y:186 X:0Y:0
+X1: 191 X2: 191
+Y1: 126 Y2: 171
+X-Speed: 0
+Y-Speed: 100
+Slope: 0.000000
+
+X1: 47 X2: 49
+Y1: 52 Y2: 54
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 49 X2: 52
+Y1: 54 Y2: 56
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 52 X2: 55
+Y1: 56 Y2: 58
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 55 X2: 57
+Y1: 58 Y2: 60
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 57 X2: 60
+Y1: 60 Y2: 62
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 60 X2: 62
+Y1: 62 Y2: 65
+X-Speed: 100
+Y-Speed: 150
+Slope: 1.500000
+
+X1: 62 X2: 65
+Y1: 65 Y2: 67
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 65 X2: 67
+Y1: 67 Y2: 69
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 67 X2: 70
+Y1: 69 Y2: 71
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 70 X2: 81
+Y1: 71 Y2: 80
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 81 X2: 92
+Y1: 80 Y2: 89
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 92 X2: 103
+Y1: 89 Y2: 98
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 103 X2: 114
+Y1: 98 Y2: 107
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 114 X2: 125
+Y1: 107 Y2: 116
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 125 X2: 135
+Y1: 116 Y2: 126
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 135 X2: 146
+Y1: 126 Y2: 135
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 146 X2: 156
+Y1: 135 Y2: 145
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 156 X2: 167
+Y1: 145 Y2: 154
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 167 X2: 177
+Y1: 154 Y2: 164
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 22 X2: 32
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 10
+Slope: 0.100000
+
+X1: 32 X2: 43
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 9
+Slope: 0.090909
+
+X1: 43 X2: 54
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 9
+Slope: 0.090909
+
+X1: 54 X2: 64
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 10
+Slope: 0.100000
+
+X1: 64 X2: 75
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 9
+Slope: 0.090909
+
+X1: 75 X2: 86
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 9
+Slope: 0.090909
+
+X1: 86 X2: 97
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 9
+Slope: 0.090909
+
+X1: 97 X2: 107
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 10
+Slope: 0.100000
+
+X1: 107 X2: 118
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 9
+Slope: 0.090909
+
+X1: 118 X2: 125
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 14
+Slope: 0.142857
+
+X1: 125 X2: 131
+Y1: 187 Y2: 187
+X-Speed: 100
+Y-Speed: 16
+Slope: 0.166667
+
+X1: 131 X2: 138
+Y1: 187 Y2: 188
+X-Speed: 100
+Y-Speed: 14
+Slope: 0.142857
+
+X1: 138 X2: 145
+Y1: 188 Y2: 188
+X-Speed: 100
+Y-Speed: 14
+Slope: 0.142857
+
+X1: 145 X2: 152
+Y1: 188 Y2: 188
+X-Speed: 100
+Y-Speed: 14
+Slope: 0.142857
+
+X1: 152 X2: 158
+Y1: 188 Y2: 188
+X-Speed: 100
+Y-Speed: 16
+Slope: 0.166667
+
+X1: 158 X2: 165
+Y1: 188 Y2: 188
+X-Speed: 100
+Y-Speed: 14
+Slope: 0.142857
+
+X1: 165 X2: 172
+Y1: 188 Y2: 188
+X-Speed: 100
+Y-Speed: 14
+Slope: 0.142857
+
+X1: 172 X2: 178
+Y1: 188 Y2: 187
+X-Speed: 100
+Y-Speed: 16
+Slope: 0.166667
+
+X1: 178 X2: 185
+Y1: 187 Y2: 186
+X-Speed: 100
+Y-Speed: 14
+Slope: 0.142857
+
+X1: 185 X2: 0
+Y1: 186 Y2: 0
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.005405
+
+X1: 0 X2: 0
+Y1: 0 Y2: 0
+X-Speed: 0
+Y-Speed: 100
+Slope: 0.000000
+
+X1: 191 X2: 191
+Y1: 126 Y2: 171
+X-Speed: 0
+Y-Speed: 100
+Slope: 0.000000
+
+X1: 47 X2: 49
+Y1: 52 Y2: 54
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 49 X2: 52
+Y1: 54 Y2: 56
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 52 X2: 55
+Y1: 56 Y2: 58
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 55 X2: 57
+Y1: 58 Y2: 60
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 57 X2: 60
+Y1: 60 Y2: 62
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 60 X2: 62
+Y1: 62 Y2: 65
+X-Speed: 100
+Y-Speed: 150
+Slope: 1.500000
+
+X1: 62 X2: 65
+Y1: 65 Y2: 67
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 65 X2: 67
+Y1: 67 Y2: 69
+X-Speed: 100
+Y-Speed: 100
+Slope: 1.000000
+
+X1: 67 X2: 70
+Y1: 69 Y2: 71
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.666667
+
+X1: 70 X2: 81
+Y1: 71 Y2: 80
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
+
+X1: 81 X2: 92
+Y1: 80 Y2: 89
+X-Speed: 0
+Y-Speed: 0
+Slope: 0.818182
