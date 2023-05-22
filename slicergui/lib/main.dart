@@ -291,7 +291,6 @@ class UploadPage extends StatefulWidget {
 }
 
 class _UploadPageState extends State<UploadPage> {
-  @override
 
   String? uploadfilepath;
   final pathError = const SnackBar(content: Text("Error selecting the file."));
@@ -314,6 +313,7 @@ class _UploadPageState extends State<UploadPage> {
     }
   }
 
+  @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -328,6 +328,12 @@ class _UploadPageState extends State<UploadPage> {
             },
           child: Text('Select File'),
         ),
+        /*TextField(
+          decoration: InputDecoration(
+            border: UnderlineInputBorder(),
+            labelText: 'Enter COM-port of C.A.K.E device like: COMx',
+          ),
+        ),*/
       ],
     );
   }

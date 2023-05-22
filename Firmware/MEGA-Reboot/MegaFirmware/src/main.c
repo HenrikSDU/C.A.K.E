@@ -203,40 +203,22 @@ int main(void) {
 
             // This new and improved version needs to be tested
             unsigned char desired_PWM = 100;
-            unsigned char x_array[] = {2, 2, 50, 100, 60, 50, 0, 1};
+           /* unsigned char x_array[] = {2, 2, 50, 100, 60, 50, 0, 1};
             unsigned char y_array[] = {2, 2, 50, 120, 140, 10, 0, 200};
 
             for(int i = 0; i < 7; i++) {
                 PWM_control(desired_PWM, x_array[i], x_array[i + 1], y_array[i], y_array[i + 1]);
                 _delay_ms(1000);
             }
+            */
+            for(int print_index = 0; print_index < instruction_count; print_index++) {
 
-            for(int print_index = 0; print_index < 7; print_index++) {
-
-                /* From the internet:     also half of this file is empty lines
-                Disadvantages of Using goto Statement
-                The use of the goto statement is highly discouraged as it makes the program logic very complex.
-                The use of goto makes tracing the flow of the program very difficult.
-                The use of goto makes the task of analyzing and verifying the correctness of programs (particularly those involving loops) very difficult.
-                */
-               // Here the goto would not be a main component of the program logic as it would only be called if desired so by the user
-               // It would just serve as a reentry point when jumping back from paused - we could implement a same functionality with global variables of course
-               // But I think in this case that would be more complex then a goto
-
-               // I think main just being a polling loop is the optimal way, if so no need for goto, one global variable which is the index of where we are at
-               // potentially calling blocking functions or interrupts that wait for enough optocoupler interrupts to happen or something
-
-            reentrypoint: // If we paused the print we can use this goto to continue in the print - maybe
-                // also also i think that having this seprarate instruction for the g commands is going to be bad here, bc more execptions will need to be handled
-
-                // But how do we want to handle the g commands else? Also due to the elses the conditions only get checked occacionally thus not slowing down the process much
-                // it isnt about slowing down the process, I just don't like the way i made the gcode file, i dont like the fact that the g commands are separate
-                // i would sacrifice some of the avalible ram for a better command structure
+                
                 // Still not much time left and the current method works so lets not change it
 
-                /* This is completely bad for the moment 
-                if((array[print_index] == 0) && (array[print_index + 1] == 0)) {
-                    PWM_control(desired_PWM, array[print_index], array[print_index + 1], 100, 150);
+                
+                if((cakefile.instruction_locations[print_index] == 0) && (cakefile.instruction_locations[print_index + 1] == 0)) {
+                    PWM_control(desired_PWM, cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
                     _delay_ms(1000);
                 }
                 else {
@@ -248,7 +230,7 @@ int main(void) {
                         // Execute G2
                     }
                 }
-                */
+                
                 
 
             }

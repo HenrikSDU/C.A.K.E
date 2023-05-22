@@ -146,7 +146,7 @@ int main(int argc, char *argv[]){
    printf("\nSettingMemoryInitflags\n");
 
    // Filling the array initially with zeros only.
-   for(int r=0;r<10;r++){
+   for(int r=0;r<10;r++) {
       memory_init_flags[r]=0;
       printf("%d ", memory_init_flags[r]);
    }
