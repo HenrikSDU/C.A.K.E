@@ -319,12 +319,17 @@ class _UploadPageState extends State<UploadPage> {
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
       children: [
         ElevatedButton(
-          onPressed: () {
-            // Do nothing
-          },
+          onPressed: () async{
+            String? path = await getUploadFile();
+                setState(() {
+                  uploadfilepath = path;
+                });
+              debugPrint("path is $uploadfilepath");
+            },
           child: Text('Select File'),
         ),
       ],
     );
   }
 }
+
