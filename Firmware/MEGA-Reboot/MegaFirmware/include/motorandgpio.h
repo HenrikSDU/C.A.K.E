@@ -235,3 +235,21 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
     PWM_T4B_set(y_speed);
 }
 
+void alternative_PWM_control_init(void) {
+
+    // Initialize input capture mode
+    TCCR1B |= ((1<<ICNC1)|(1<<ICES1)); //input noise cancel & selecting rising edge for input capture
+    TCCR1B |= ((1<<CS12)|(1<<CS10)); //setting prescaler of 1024
+
+    // Enable Input Capture Interrupt and the Timer 1 Overflow interrupt
+    TIMSK1 |= ((1 << ICIE1) | (1 << TOIE1));
+
+}
+
+void alternative_PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
+
+
+
+
+
+}
