@@ -201,7 +201,7 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
         slope = x_mod * y_mod * (dy / dx); // Had problems with unsigned chars being divided so I used floats
     }
 
-    // First try at logic controlling overflows and underflows
+    // Second try at logic controlling overflows and underflows
     if(slope > 1 && x_mod != 0 && y_mod != 0) {
         if((slope * (float)base_PWM) > 255.0) { // The idea here is to find the maximum value of base_PWM that will not overflow the OCR0A register, the limit can be decreased as needed
             while((slope * (float)base_PWM) > 255.0) {
