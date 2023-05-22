@@ -227,6 +227,10 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
     }
 
     // Setting the PWM
+    printf("\nX-Speed: %d", x_speed);
+    printf("\nY-Speed: %d", y_speed);
+    printf("\nSlope: %f\n", slope);
+
     PWM_T4A_set(x_speed);
     PWM_T4B_set(y_speed);
 }

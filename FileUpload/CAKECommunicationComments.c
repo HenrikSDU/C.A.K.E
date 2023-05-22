@@ -353,10 +353,22 @@ int main(int argc, char *argv[]){
                if(NoBytesRead!=0){
                   filereceivebuffer[i] = ReadData;
                   printf("%c", filereceivebuffer[i]);
-                  //printf("\nNumber of bytes read:%d\n",NoBytesRead);
+                  
                }
                i++;
          }while(NoBytesRead>0);
+
+      while(1) {
+
+         comreistatus = ReadFile(hCom, &ReadData, sizeof(ReadData),&NoBytesRead, NULL);
+               if(NoBytesRead!=0){
+                  
+                  filereceivebuffer[i] = ReadData;
+                  printf("%c", filereceivebuffer[i]);
+                  
+               }
+
+      }
       
       
       free(filesendbuffer); // Free allocated memory

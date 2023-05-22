@@ -193,10 +193,7 @@ int main(void) {
             
             PWM_T4AB_init();
             PWM_T4A_set(200);
-            _delay_ms(500);
-            PWM_T4A_set(0);
-            PWM_T4A_set(200);
-            _delay_ms(500);
+            _delay_ms(1000);
             PWM_T4A_set(0);
             _delay_ms(3000);
             
@@ -220,6 +217,10 @@ int main(void) {
 
                 
                 if((cakefile.instruction_locations[print_index] == 0) && (cakefile.instruction_locations[print_index + 1] == 0)) {
+                    printf("\nX1: %d", cakefile.path[print_index].table_coord.x);
+                    printf(" X2: %d", cakefile.path[print_index + 1].table_coord.x);
+                    printf("\nY1: %d", cakefile.path[print_index].table_coord.y);
+                    printf(" Y2: %d", cakefile.path[print_index + 1].table_coord.y);
                     PWM_control(desired_PWM, cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
                     _delay_ms(1000);
                 }
