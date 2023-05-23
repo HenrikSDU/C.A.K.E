@@ -2,10 +2,16 @@
 #include <stdlib.h>
 #include <windows.h>
 
-void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
-    int x_mod;
-    int y_mod;
+float abs_value(float x) {
+    if(x < 0) {
+        return -x;
+    }
+    else {
+        return x;
+    }
+}
 
+void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
     //Sim variables
     unsigned char x_dir[1];
     unsigned char y_dir[1];
@@ -13,92 +19,88 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
     unsigned char y_speed = 0;
     float dx = (float)x2 - (float)x1; // Unsigned chars are not good for division
     float dy = (float)y2 - (float)y1;
-
     float slope = 0.0;
 
     if(dx > 0) {
+        //PWM_T4A_direction_change(1); // Forward
         x_dir[0] = 'F'; // Forward
-        x_mod = 1; // Setting x_mod to 1 to multiply the slope by
-    }
-    else if(dx < 0) {
+    } else if(dx < 0) {
+        //PWM_T4A_direction_change(0); // Backward
         x_dir[0] = 'B'; // Backward
-        x_mod = -1; // Setting x_mod to -1 to multiply the slope by
-    }
-    else if(dx == 0) {
+    } else if(dx == 0) {
         x_dir[0] = 'S'; // Stop
-        x_mod = 0; // Setting x_mod to 0 to multiply the slope by
     }
 
     if(dy > 0) {
+        //PWM_T4B_direction_change(1); // Forward
         y_dir[0] = 'F';
-        y_mod = 1;
-    }
-    else if(dy < 0) {
+    } else if(dy < 0) {
+        //PWM_T4B_direction_change(0); // Backward
         y_dir[0] = 'B';
-        y_mod = -1;
-    }
-    else if(dy == 0) {
+    } else if(dy == 0) {
         y_dir[0] = 'S';
-        y_mod = 0;
     }
 
-    
-    if(x_dir[0] == 'S') {
-        x_speed = 0;
-    }
-    if(y_dir[0] == 'S') {
-        y_speed = 0;
-    }
-    if(x_mod != 0) {
-        slope = x_mod * y_mod * (dy / dx); // Had problems with unsigned chars being divided so I used floats
-    }
+    dx = abs_value(dx); // Taking absolute value of dx and dy bc the sign is handled out by the direction change
+    dy = abs_value(dy);
 
-    // First try at logic controlling overflows and underflows
-    if(slope > 1 && x_mod != 0 && y_mod != 0) {
-        if((slope * (float)base_PWM) > 255.0) { // The idea here is to find the maximum value of base_PWM that will not overflow the OCR0A register, the limit can be decreased as needed
-            while((slope * (float)base_PWM) > 255.0) {
-                base_PWM--;
-                printf("    base_PWM: %d\n", base_PWM);
-            }
+    if(x_dir[0] == 'S' || y_dir[0] == 'S') {
+        if(x_dir[0] == 'S') {
+            //PWM_T4A_set(0);
         }
-        x_speed = base_PWM;
-        y_speed = (int)(slope * (float)base_PWM);
-    }
-    else if(slope < 1 && x_mod != 0 && y_mod != 0) {
-        if((slope * (float)base_PWM) > 50.0) { // The idea here is to find the minimum value of base_PWM that will not be too small to to make the motors run, while roughly achieving the target speed
-            while((slope * (float)base_PWM) > 50.0) {
+        else if(x_dir[0] != 'S') {
+            //PWM_T4A_set(base_PWM);
+        }
+        if(y_dir[0] == 'S') {
+            //PWM_T4B_set(0);
+        }
+        else if(y_dir[0] != 'S') {
+            //PWM_T4B_set(base_PWM);
+        }
+    } else {
+        slope = dy / dx; // Had problems with unsigned chars being divided so I used floats
+
+        if(slope < 1) {
+            while((slope * base_PWM) < 60) {
                 base_PWM++;
-                printf("    base_PWM: %d\n", base_PWM);
             }
-        }
-        x_speed = base_PWM;
-        y_speed = (int)(slope * (float)base_PWM);
-    }
-    else if(slope == 1.0 && x_mod != 0 && y_mod != 0) { // Setting PWM so the motors run at roughly desired speed / sqrt(2)
-        base_PWM = 100; // Some predefined value to roughly get the desired speed
-        printf("    base_PWM: %d\n", base_PWM);
-        x_speed = base_PWM;
-        y_speed = base_PWM;
-    }
+            x_speed = base_PWM;
+            y_speed = (int)(slope * (float)base_PWM);
 
+        } else if(slope > 1) {
+            while((slope * base_PWM) > 255) {
+                base_PWM--;
+            }
+            x_speed = base_PWM;
+            y_speed = (int)(slope * (float)base_PWM);
+
+        } else if(slope == 1) {
+            base_PWM = 100;
+            x_speed = base_PWM;
+            y_speed = base_PWM;
+        }
+        //PWM_T4A_set(x_speed);
+        //PWM_T4B_set(y_speed);
+    }
     // Debug prints
-    printf("x2 - x1 = %f, y2 - y1 = %f\n", dx, dy);
-    printf("X direction: %c, speed: %d\n", x_dir[0], x_speed);
-    printf("Y direction: %c, speed: %d\n", y_dir[0], y_speed);
+    printf("\ndx: %d - %d = %d (%f), %d - %d = %d (%f)\n", x2, x1, x2 - x1, dx, y2, y1, y2 - y1, dy);
+    printf("X_dir: %c, Speed: %d\n", x_dir[0], x_speed);
+    printf("Y_dir: %c, Speed: %d\n", y_dir[0], y_speed);
     printf("Slope: %f\n", slope);
 }
 
 int main(void) {
 
     unsigned char desired_PWM = 100;
-    unsigned char x_array[] = {2, 2, 50, 100, 60, 50, 0, 1};
-    unsigned char y_array[] = {2, 2, 50, 120, 140, 10, 0, 200};
+    unsigned char x_array[] = {187, 191, 191, 44, 47, 49, 52, 55, 57, 60, 62, 65, 67, 70, 81, 92, 103, 114, 125, 135, 146, 156, 167, 177 };
+    unsigned char y_array[] = {36, 126, 171, 50, 52, 54, 56, 58, 60, 62, 65, 67, 69, 71, 80, 89, 98, 107, 116, 126, 135, 145, 154, 164};
+    int counter = 0;
 
-    for(int i = 0; i < 7; i++) {
-        printf("FOR LOOP #%d\n", i);
-        PWM_control(desired_PWM, x_array[i], x_array[i + 1], y_array[i], y_array[i + 1]);
-        printf("\n");
+    while(x_array[counter] != 0) {
+        printf("While loop #%d\n", counter);
+        PWM_control(desired_PWM, x_array[counter], x_array[counter + 1], y_array[counter], y_array[counter + 1]);
         Sleep(200);
+        counter++;
     }
 
     return 0;
