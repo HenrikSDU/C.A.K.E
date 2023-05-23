@@ -241,12 +241,11 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
         PWM_T3B_set(y_speed);
     }
     // Debug prints
-    /*
+    /**/
     printf("\ndx: %d - %d = %d (%f), %d - %d = %d (%f)\n", x2, x1, x2 - x1, dx, y2, y1, y2 - y1, dy);
     printf("X_dir: %c, Speed: %d\n", x_dir, x_speed);
     printf("Y_dir: %c, Speed: %d\n", y_dir, y_speed);
     printf("Slope: %f\n", slope);
-    */
 }
 
 void alternative_PWM_control_init(void) {
@@ -298,7 +297,7 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
 
     // Determine directions    
     char x_direction = copysign(1.0, x_distance);
-    //printf("\nX-direction: %d", x_direction);
+    printf("\nX-direction: %d", x_direction);
 
     if(x_direction == 1) {
         PWM_T3A_direction_change(1);
@@ -308,7 +307,7 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
     }
 
     char y_direction = copysign(1.0, x_distance);
-    //printf("\nY-direction: %d", y_direction);
+    printf("\nY-direction: %d", y_direction);
     if(y_direction == 1) {
         PWM_T3B_direction_change(1);
     }
