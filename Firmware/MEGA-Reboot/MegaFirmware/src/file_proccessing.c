@@ -22,17 +22,17 @@
 
 void file_processing(CAKEFILE* cakefile, volatile char* file, int filesize){
     
-    //This function has to deal with the problem of extracting data from the recieved array of characters/bytes. On the PC the information 
-    //is saved in ASCII, even the numbers. For example, 15 would not be send as 0b00001111, but as first a 1 and then a 5
-    //in ASCII. That means first 1 in ASCII: 0b00110001 and then a 5, also in ASCII: 0b00110101; 
-    //This function checks whether in this array of characters for extruder instructions and coordinates and saves them in the CAKEFILE structure.
-    //Observe, its table instruction component is a union. The array of instruction_locations then indicates whether the element saved
-    //at a specific location is an extruder_instruction or a coordinate. 1 means extruder instruction, 0 means coordinate.
-    //For example, when later reading the CAKEFILE cakefile, when cakefile.instruction_locations[x] == 1, then cakefile.table_instructions[x] is an instruction.
-    //Conversly, if cakefile.instruction_locations[x] == 0 then cakefile.table_instructions[x] is a coordinate.
+    // This function has to deal with the problem of extracting data from the recieved array of characters/bytes. On the PC the information 
+    // is saved in ASCII, even the numbers. For example, 15 would not be send as 0b00001111, but as first a 1 and then a 5
+    // in ASCII. That means first 1 in ASCII: 0b00110001 and then a 5, also in ASCII: 0b00110101; 
+    // This function checks whether in this array of characters for extruder instructions and coordinates and saves them in the CAKEFILE structure.
+    // Observe, its table instruction component is a union. The array of instruction_locations then indicates whether the element saved
+    // at a specific location is an extruder_instruction or a coordinate. 1 means extruder instruction, 0 means coordinate.
+    // For example, when later reading the CAKEFILE cakefile, when cakefile.instruction_locations[x] == 1, then cakefile.table_instructions[x] is an instruction.
+    // Conversly, if cakefile.instruction_locations[x] == 0 then cakefile.table_instructions[x] is a coordinate.
 
-    //An ASCII table:
-    //https://www.sciencebuddies.org/science-fair-projects/references/ascii-table
+    // An ASCII table:
+    // https://www.sciencebuddies.org/science-fair-projects/references/ascii-table
 
 
    
@@ -93,9 +93,6 @@ void file_processing(CAKEFILE* cakefile, volatile char* file, int filesize){
 
         }
         
-        //_delay_ms(150);
-
-
     }
     
 }

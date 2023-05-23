@@ -1,3 +1,5 @@
+// The SDU CAKE program
+
 /* Macros for GPIO pins */
 #define BUTTON0 PK0
 #define BUTTON1 PK1
@@ -17,11 +19,11 @@
 
 
 #define ACTEXTENSIONPERROT (double) 0.25 // cm
+#define TICKDISTANCE (double) 0.008333333333333333
 
 /* Very fancy custom macro for easy debugging command */
 #define TOGGLE_ONBOARD_LED DDRB |= 0b10000000; PORTB ^= (1 << PORTB7);
 
-//The SDU CAKE program
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
@@ -29,13 +31,23 @@
 #include <avr/interrupt.h>
 #include <avr/eeprom.h>
 #include <util/delay.h>
+#include <math.h>
 
 #include "lcd.h"
 #include "usart.h"
 #include "i2cmaster.h"
 #include "lm75.h"
 
+// External variables (they can be accessed by the file this header is included in, the word extern does this)
+extern volatile double axisspeed_motor_A;
+extern volatile double current_x_distance;
+extern volatile double axisspeed_motor_B;
+extern volatile double current_y_distance;
 
+extern volatile unsigned char x_pos_current = 0; // Used for tracking current position of the linear actuator
+extern volatile unsigned char y_pos_current = 0;
+extern volatile unsigned char x_pos_next = 0; // Used for comparison between current position and the next position
+extern volatile unsigned char y_pos_next = 0;
 
 void PWM_T3AB_init(void) { //function to initialize the PWM for the motors moving the table
 
@@ -142,64 +154,65 @@ void button_init(void){
     PCMSK1 |= ((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //subscribing to changes on PCINT9
     sei();
     */
-    
-
-
 }
 
 float abs_value(float x) {
     if(x < 0) {
         return -x;
-    }
-    else {
+    } else {
         return x;
     }
 }
 
+void PWM_control_ext_int_init() {
+    EICRA |= ((1 << ISC11) | (1 << ISC10) | (1 << ISC01) | (1 << ISC00));
+    EIMSK |= ((1 << INT1) | (1 << INT0));
+    sei();
+}
+
 void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
-    //Sim variables
-    unsigned char x_dir[1];
-    unsigned char y_dir[1];
-    unsigned char x_speed = 0;
+    unsigned char x_dir; // X direction, indicated by F, B or S
+    unsigned char y_dir;
+    unsigned char x_speed = 0; // Self-explanatory
     unsigned char y_speed = 0;
-    float dx = (float)x2 - (float)x1; // Unsigned chars are not good for division
+    float dx = (float)x2 - (float)x1; // Unsigned chars are not good for division, hence the conversion to float
     float dy = (float)y2 - (float)y1;
-    float slope = 0.0;
+    float slope = 0.0; // Slope of the vector between the two points
 
     if(dx > 0) {
         PWM_T3A_direction_change(1); // Forward
-        x_dir[0] = 'F'; // Forward
+        x_dir = 'F'; // Forward
     } else if(dx < 0) {
         PWM_T3A_direction_change(0); // Backward
-        x_dir[0] = 'B'; // Backward
+        x_dir = 'B'; // Backward
     } else if(dx == 0) {
-        x_dir[0] = 'S'; // Stop
+        x_dir = 'S'; // Stop
     }
 
     if(dy > 0) {
         PWM_T3B_direction_change(1); // Forward
-        y_dir[0] = 'F';
+        y_dir = 'F';
     } else if(dy < 0) {
         PWM_T3B_direction_change(0); // Backward
-        y_dir[0] = 'B';
+        y_dir = 'B';
     } else if(dy == 0) {
-        y_dir[0] = 'S';
+        y_dir = 'S';
     }
 
     dx = abs_value(dx); // Taking absolute value of dx and dy bc the sign is handled out by the direction change
     dy = abs_value(dy);
 
-    if(x_dir[0] == 'S' || y_dir[0] == 'S') {
-        if(x_dir[0] == 'S') {
+    if(x_dir == 'S' || y_dir == 'S') {
+        if(x_dir == 'S') {
             PWM_T3A_set(0);
         }
-        else if(x_dir[0] != 'S') {
+        else if(x_dir != 'S') {
             PWM_T3A_set(base_PWM);
         }
-        if(y_dir[0] == 'S') {
+        if(y_dir == 'S') {
             PWM_T3B_set(0);
         }
-        else if(y_dir[0] != 'S') {
+        else if(y_dir != 'S') {
             PWM_T3B_set(base_PWM);
         }
     } else {
@@ -228,10 +241,12 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
         PWM_T3B_set(y_speed);
     }
     // Debug prints
+    /*
     printf("\ndx: %d - %d = %d (%f), %d - %d = %d (%f)\n", x2, x1, x2 - x1, dx, y2, y1, y2 - y1, dy);
-    printf("X_dir: %c, Speed: %d\n", x_dir[0], x_speed);
-    printf("Y_dir: %c, Speed: %d\n", y_dir[0], y_speed);
+    printf("X_dir: %c, Speed: %d\n", x_dir, x_speed);
+    printf("Y_dir: %c, Speed: %d\n", y_dir, y_speed);
     printf("Slope: %f\n", slope);
+    */
 }
 
 void alternative_PWM_control_init(void) {
@@ -258,10 +273,85 @@ void alternative_PWM_control_init(void) {
 
 }
 
-void alternative_PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
+void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
 
+    unsigned char motor_A_PWM = 0;
+    unsigned char motor_B_PWM = 0;
+    double slope;
+    double x_distance = x2 - x1;
+    double y_distance = y2 - y1;
 
+    // Determine slope
+    
+    if(!((x_distance == 0.0) || (y_distance == 0.0))) { 
+        slope = (y_distance / x_distance);
+        slope = fabs((y_distance / x_distance));
+    }
+    else {
+        if(x_distance == 0.0) {
+            slope = 1000000;
+        }
+        if(y_distance == 0.0) {
+            slope = 0.0;
+        }
+    }
 
+    // Determine directions    
+    char x_direction = copysign(1.0, x_distance);
+    //printf("\nX-direction: %d", x_direction);
 
+    if(x_direction == 1) {
+        PWM_T3A_direction_change(1);
+    }
+    else {
+        PWM_T3A_direction_change(0);
+    }
 
+    char y_direction = copysign(1.0, x_distance);
+    //printf("\nY-direction: %d", y_direction);
+    if(y_direction == 1) {
+        PWM_T3B_direction_change(1);
+    }
+    else {
+        PWM_T3B_direction_change(0);
+    }
+
+    // Set start PWM - Motor A: X Motor B: Y
+    if(slope < 1000000) {
+        motor_A_PWM = 60;
+        PWM_T3A_set(motor_A_PWM);
+    }
+    if(slope != 0.0) {
+        motor_B_PWM = 60;
+        PWM_T3B_set(motor_A_PWM);
+    }
+
+    while((fabs(current_x_distance) <= x_distance) && (fabs(current_y_distance) <= y_distance)) {
+        if((motor_B_PWM + 20) <= 255) {
+            if((axisspeed_motor_B < (axisspeed_motor_A * slope)) || ((axisspeed_motor_B == 0.0) && (slope != 0.0))) {
+                motor_B_PWM += 20;
+            }
+        }
+        if((motor_B_PWM - 20) >= 0){
+            if((axisspeed_motor_B > (axisspeed_motor_A * slope))) {
+                motor_B_PWM -= 20;
+            }
+        }
+        if((motor_A_PWM + 20) <= 255) {
+            if((axisspeed_motor_A < (axisspeed_motor_B / slope)) ||  ((axisspeed_motor_A == 0.0) && (slope != 1000000))) {
+                motor_A_PWM += 20;
+            }
+        }
+        if((motor_A_PWM - 20) >= 0){
+            if((axisspeed_motor_A > (axisspeed_motor_B / slope))){
+                motor_A_PWM -= 20;
+            }
+        }
+        PWM_T3A_set(motor_A_PWM);
+        PWM_T3B_set(motor_B_PWM);
+    }
+    
+    // Reset distances 
+    current_x_distance = 0;
+    current_y_distance = 0;
 }

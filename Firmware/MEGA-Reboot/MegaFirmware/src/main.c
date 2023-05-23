@@ -10,8 +10,6 @@
 #include <util/delay.h>
 #include <string.h>
 
-
-
 #include "lcd.h"
 #include "usart.h"
 #include "i2cmaster.h"
@@ -29,9 +27,6 @@ typedef enum{
 
 }programstate_e;
 
-
-
-
 void usart_send(unsigned char); // Function to send bytes via usart
 
 
@@ -46,7 +41,9 @@ volatile bool readcycle_complete = false; // Read cycle complete
 volatile int timer4overflow_count = 0;
 volatile int timer5overflow_count = 0;
 volatile double axisspeed_motor_A = 0;
+volatile double current_x_distance = 0;
 volatile double axisspeed_motor_B = 0;
+volatile double current_y_distance = 0;
 
 volatile char file[SUPPORTEDFILESIZE]; // Saves the incoming bytes from the computer 
 
@@ -90,6 +87,14 @@ ISR(PCINT2_vect) {
    
 }
 
+ISR(INT0_vect) {
+    x_pos_current++;
+}
+
+ISR(INT1_vect) {
+    y_pos_current++;
+}
+
 ISR(TIMER5_OVF_vect) {
 
     timer5overflow_count++;
@@ -97,8 +102,12 @@ ISR(TIMER5_OVF_vect) {
 }
 
 ISR(TIMER5_CAPT_vect) { // heeey
+
     axisspeed_motor_A = ACTEXTENSIONPERROT / (double)(ICR1 + 0xFFFF * timer5overflow_count);
+    current_y_distance += TICKDISTANCE;
+
     timer5overflow_count = 0;
+    TOGGLE_ONBOARD_LED
 
 }
 
@@ -111,8 +120,10 @@ ISR(TIMER4_OVF_vect) {
 ISR(TIMER4_CAPT_vect) {
 
     axisspeed_motor_B = ACTEXTENSIONPERROT / (double)(ICR3 + 0xFFFF * timer4overflow_count);
+    current_x_distance += TICKDISTANCE;
+
     timer4overflow_count = 0;
-    
+    TOGGLE_ONBOARD_LED    
 
 }
 
@@ -222,6 +233,7 @@ int main(void) {
 
         while(phase == main_operation) {
             //alternative_PWM_control_init();
+            PWM_control_ext_int_init();
             button_init();
             PWM_T3AB_init();
             PWM_T3A_set(200);
@@ -246,18 +258,16 @@ int main(void) {
                 counter++;
             }
             */
+
+
             for(int print_index = 0; print_index < instruction_count; print_index++) {
-
-                
-                // Still not much time left and the current method works so lets not change it
-
-                
                 if((cakefile.instruction_locations[print_index] == 0) && (cakefile.instruction_locations[print_index + 1] == 0)) {
                     printf("\nX1: %d", cakefile.path[print_index].table_coord.x);
                     printf(" X2: %d", cakefile.path[print_index + 1].table_coord.x);
                     printf("\nY1: %d", cakefile.path[print_index].table_coord.y);
                     printf(" Y2: %d", cakefile.path[print_index + 1].table_coord.y);
-                    PWM_control(desired_PWM, cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
+                    //PWM_control(desired_PWM, cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
+                    alternative_PWM_control(cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
                     _delay_ms(1000);
                 }
                 else {
@@ -269,19 +279,11 @@ int main(void) {
                         // Execute G2
                     }
                 }
-                
-                
-
             }
-
             ////////////////////////
             //cli();
             ///////////////////////
-
             //printf("B3:setB4:incB5:decB6:dich");
-            
-           
-            
         }
 
         while(phase == paused){
