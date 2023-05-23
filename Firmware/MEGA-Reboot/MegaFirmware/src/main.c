@@ -232,11 +232,10 @@ int main(void) {
 
 
         while(phase == main_operation) {
-            alternative_PWM_control_init();
+            //alternative_PWM_control_init();
             //PWM_control_ext_int_init();
             button_init();
             PWM_T3AB_init();
-
             PWM_T3A_set(200);
             _delay_ms(1000);
             PWM_T3A_set(0);
@@ -245,26 +244,27 @@ int main(void) {
             //LCD_init();
             //LCD_set_cursor(0,0);
 
-            // Variables for motor control
+            // This new and improved version needs to be tested
             unsigned char desired_PWM = 100;
 
             for(int print_index = 0; print_index < instruction_count; print_index++) {
+                                
                 if((cakefile.instruction_locations[print_index] == 0) && (cakefile.instruction_locations[print_index + 1] == 0)) {
-                    printf("\nX1: %d", cakefile.path[print_index].table_coord.x);
-                    printf(" X2: %d", cakefile.path[print_index + 1].table_coord.x);
-                    printf("\nY1: %d", cakefile.path[print_index].table_coord.y);
-                    printf(" Y2: %d", cakefile.path[print_index + 1].table_coord.y);
-                    x_pos_next = cakefile.path[print_index + 1].table_coord.x - cakefile.path[print_index].table_coord.x;
-                    y_pos_next = cakefile.path[print_index + 1].table_coord.y - cakefile.path[print_index].table_coord.y;
-                    while((x_pos_next != x_pos_current) && (y_pos_next != y_pos_current)); // This could be a good condition to test for position
-                    //PWM_control(desired_PWM, cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
-                    alternative_PWM_control(cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
+                    //printf("\nX1: %d", cakefile.path[print_index].table_coord.x);
+                    //printf(" X2: %d", cakefile.path[print_index + 1].table_coord.x);
+                    //printf("\nY1: %d", cakefile.path[print_index].table_coord.y);
+                    //printf(" Y2: %d", cakefile.path[print_index + 1].table_coord.y);
+                    //while((cakefile.path[print_index + 1].table_coord.x - cakefile.path[print_index].table_coord.x))
+                    PWM_control(desired_PWM, cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
+                    //alternative_PWM_control(cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
                     _delay_ms(1000);
-                } else {
+                }
+                else {
                     if(cakefile.path[print_index].extruder_inst== G1) {
                         // Execute G1
                     }
-                    else if(cakefile.path[print_index].extruder_inst == G2) {
+                    else                    
+                    if(cakefile.path[print_index].extruder_inst == G2) {
                         // Execute G2
                     }
                 }
@@ -289,6 +289,7 @@ int main(void) {
 
                     PWM_T3A_set(desired_PWM);
                     TOGGLE_ONBOARD_LED
+                    
                     
                     _delay_ms(200);
                 }
