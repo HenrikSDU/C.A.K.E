@@ -230,7 +230,6 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
         base_PWM = 100;
         y_speed = base_PWM;
     }
-    
 
     // Setting the PWM
     printf("\nX-Speed: %d", x_speed);
