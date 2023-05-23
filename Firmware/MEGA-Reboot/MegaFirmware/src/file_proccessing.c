@@ -35,8 +35,7 @@ void file_processing(CAKEFILE* cakefile, volatile char* file, int filesize){
     //https://www.sciencebuddies.org/science-fair-projects/references/ascii-table
 
 
-    //LCD_init();
-    //LCD_set_cursor(0,0);
+   
     int savelocation = 0; //location in the CAKEFILE that is written to
     for(int read_index = 0; read_index < filesize; read_index++){
 
@@ -99,7 +98,4 @@ void file_processing(CAKEFILE* cakefile, volatile char* file, int filesize){
 
     }
     
-
-    uart_init();
-    io_redirect();
 }

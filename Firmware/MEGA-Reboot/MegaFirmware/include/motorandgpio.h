@@ -15,6 +15,9 @@
 #define DIRECTION_F_A PF4
 #define DIRECTION_B_A PF5
 
+
+#define ACTEXTENSIONPERROT (double) 0.25 // cm
+
 /* Very fancy custom macro for easy debugging command */
 #define TOGGLE_ONBOARD_LED DDRB |= 0b10000000; PORTB ^= (1 << PORTB7);
 
@@ -34,36 +37,36 @@
 
 
 
-void PWM_T4AB_init(void) { //function to initialize the PWM for the motors moving the table
+void PWM_T3AB_init(void) { //function to initialize the PWM for the motors moving the table
 
     // PWM Setup, see page 145 and following in datasheet for register description
-    TCCR4A |= ((1 << COM4A1) | (1 << COM4B1) | (0 << WGM41) | (1 << WGM40)); // PWM output on 3 pins, OC4A, OC4B, OC4C
-    TCCR4B |= ((0 << WGM42) | (0 << WGM43) | (1 << CS42) | (1 << CS40)); // prescaler 1024, set BOTTOM (meaning timer to be 0) and clear on compare match
+    TCCR3A |= ((1 << COM3A1) | (1 << COM3B1) | (0 << WGM31) | (1 << WGM30)); // PWM output on 3 pins, OC4A, OC4B, OC4C
+    TCCR3B |= ((0 << WGM32) | (0 << WGM33) | (1 << CS32) | (1 << CS30)); // prescaler 1024, set BOTTOM (meaning timer to be 0) and clear on compare match
     
     // PWM signal output pin setup
-    DDRH |= ((1 << PH4) | (1 << PH3)); //configuring OC4 A/B/C pins to be output    
-    PORTH &= ~((1 << PH4) | (1 << PH3));
+    DDRE |= ((1 << PE4) | (1 << PE3)); //configuring OC4 A/B/C pins to be output    
+    PORTE &= ~((1 << PE4) | (1 << PE3));
 
     // Direction toggle pins setup, default direction = forward
-    DDRF |= ((1 << DIRECTION_B_A) | (1 << DIRECTION_F_A) | (1 <<  DIRECTION_B_B) | (1 << DIRECTION_F_B));
+    DDRF |= ((1 << DIRECTION_B_A) | (1 << DIRECTION_F_A) | (1 << DIRECTION_B_B) | (1 << DIRECTION_F_B));
     PORTF |= ((1 << DIRECTION_F_A) | (1 << DIRECTION_F_B));
     PORTF &= ~((1 << DIRECTION_B_A) | (1 << DIRECTION_B_B));
 
     //zero the PWM initially
-    OCR4A = 0;
-    OCR4B = 0;
+    OCR3A = 0;
+    OCR3B = 0;
 
     PRR1 &= ~(1 << PRTIM4);
 }
 
-void PWM_T4C_init(void) { // Function to initialize the PWM for the motor controlling the extruder
+void PWM_T3C_init(void) { // Function to initialize the PWM for the motor controlling the extruder
     
     TCCR4A |= (1 << COM4C1 | (1 << WGM41) | (1 << WGM40));
     TCCR4B |= ((1 << WGM42) | (1 << WGM43) | (1 << CS40));
 
     // PWM signal output pin setup
-    DDRH |= (1 << PH5);
-    PORTH &= ~((1 << PH5));
+    DDRE |= (1 << PE5);
+    PORTE &= ~((1 << PE5));
     
     // Direction toggle pins setup, default direction = forward
     DDRF |= ((1 << DIRECTION_F_C) | (1 << DIRECTION_B_C));
@@ -71,21 +74,21 @@ void PWM_T4C_init(void) { // Function to initialize the PWM for the motor contro
     PORTF &= ~(1 << DIRECTION_B_C);
     
     // Zero the PWM initially
-    OCR4C = 0;
+    OCR3C = 0;
 }
 
-void PWM_T4A_set(unsigned char PWM_val){
-    OCR4A = PWM_val;
+void PWM_T3A_set(unsigned char PWM_val){
+    OCR3A = PWM_val;
 }
 
-void PWM_T4B_set(unsigned char PWM_val){
-    OCR4B = PWM_val;
+void PWM_T3B_set(unsigned char PWM_val){
+    OCR3B = PWM_val;
 }
-void PWM_T4C_set(int PWM_val){
-    OCR4C = PWM_val;
+void PWM_T3C_set(int PWM_val){
+    OCR3C = PWM_val;
 }
 
-void PWM_T4A_direction_change(int direction) { // direction = 1 => forwards, direction = 0 => backwards
+void PWM_T3A_direction_change(int direction) { // direction = 1 => forwards, direction = 0 => backwards
     if(direction == 1) {
         PORTF &= ~(1 << DIRECTION_B_A);
         PORTF |= (1 << DIRECTION_F_A);
@@ -96,7 +99,7 @@ void PWM_T4A_direction_change(int direction) { // direction = 1 => forwards, dir
     }
 }
 
-void PWM_T4B_direction_change(char direction) { // direction = 1 => forwards, direction = 0 => backwards
+void PWM_T3B_direction_change(char direction) { // direction = 1 => forwards, direction = 0 => backwards
     if(direction == 1) {
         PORTF &= ~(1 << DIRECTION_B_B);
         PORTF |= (1 << DIRECTION_F_B);
@@ -107,7 +110,7 @@ void PWM_T4B_direction_change(char direction) { // direction = 1 => forwards, di
     }
 }
 
-void PWM_T4C_direction_change(int direction) {
+void PWM_T3C_direction_change(int direction) {
     if(direction == 1) {
         PORTF &= ~(1 << DIRECTION_B_C);
         PORTF |= (1 << DIRECTION_F_C);
@@ -144,10 +147,16 @@ void button_init(void){
 
 }
 
-void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
-    int x_mod;
-    int y_mod;
+float abs_value(float x) {
+    if(x < 0) {
+        return -x;
+    }
+    else {
+        return x;
+    }
+}
 
+void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
     //Sim variables
     unsigned char x_dir[1];
     unsigned char y_dir[1];
@@ -155,99 +164,97 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
     unsigned char y_speed = 0;
     float dx = (float)x2 - (float)x1; // Unsigned chars are not good for division
     float dy = (float)y2 - (float)y1;
-
     float slope = 0.0;
 
     if(dx > 0) {
-        PWM_T4A_direction_change(1); // Forward
+        PWM_T3A_direction_change(1); // Forward
         x_dir[0] = 'F'; // Forward
-        x_mod = 1; // Setting x_mod to 1 to multiply the slope by
-    }
-    else if(dx < 0) {
-        PWM_T4A_direction_change(0); // Backward
+    } else if(dx < 0) {
+        PWM_T3A_direction_change(0); // Backward
         x_dir[0] = 'B'; // Backward
-        x_mod = -1; // Setting x_mod to -1 to multiply the slope by
-    }
-    else if(dx == 0) {
+    } else if(dx == 0) {
         x_dir[0] = 'S'; // Stop
-        x_mod = 0; // Setting x_mod to 0 to multiply the slope by
     }
 
     if(dy > 0) {
-        PWM_T4B_direction_change(1); // Forward
+        PWM_T3B_direction_change(1); // Forward
         y_dir[0] = 'F';
-        y_mod = 1;
-    }
-    else if(dy < 0) {
-        PWM_T4B_direction_change(0); // Backward
+    } else if(dy < 0) {
+        PWM_T3B_direction_change(0); // Backward
         y_dir[0] = 'B';
-        y_mod = -1;
-    }
-    else if(dy == 0) {
+    } else if(dy == 0) {
         y_dir[0] = 'S';
-        y_mod = 1;
-        dy = 1.0;
     }
 
-    
-    if(x_dir[0] == 'S') {
-        PWM_T4A_set(0);
-        x_speed = 0;
-    }
-    if(y_dir[0] == 'S') {
-        PWM_T4B_set(0);
-        y_speed = 0;
-    }
-    if(x_mod != 0) {
-        slope = x_mod * y_mod * (dy / dx); // Had problems with unsigned chars being divided so I used floats
-    }
+    dx = abs_value(dx); // Taking absolute value of dx and dy bc the sign is handled out by the direction change
+    dy = abs_value(dy);
 
-    // Second try at logic controlling overflows and underflows
-    if(slope > 1 && x_mod != 0 && y_mod != 0) {
-        if((slope * (float)base_PWM) > 255.0) { // The idea here is to find the maximum value of base_PWM that will not overflow the OCR0A register, the limit can be decreased as needed
-            while((slope * (float)base_PWM) > 255.0) {
-                base_PWM--;
-            }
+    if(x_dir[0] == 'S' || y_dir[0] == 'S') {
+        if(x_dir[0] == 'S') {
+            PWM_T3A_set(0);
         }
-        x_speed = base_PWM;
-        y_speed = (int)(slope * (float)base_PWM);
-    }
-    else if(slope < 1 && slope != 0 && x_mod != 0 && y_mod != 0) {
-        if((slope * (float)base_PWM) > 50.0) { // The idea here is to find the minimum value of base_PWM that will not be too small to to make the motors run, while roughly achieving the target speed
-            while((slope * (float)base_PWM) > 50.0) {
+        else if(x_dir[0] != 'S') {
+            PWM_T3A_set(base_PWM);
+        }
+        if(y_dir[0] == 'S') {
+            PWM_T3B_set(0);
+        }
+        else if(y_dir[0] != 'S') {
+            PWM_T3B_set(base_PWM);
+        }
+    } else {
+        slope = dy / dx; // Had problems with unsigned chars being divided so I used floats
+
+        if(slope < 1) {
+            while((slope * base_PWM) < 60) {
                 base_PWM++;
             }
+            x_speed = base_PWM;
+            y_speed = (int)(slope * (float)base_PWM);
+
+        } else if(slope > 1) {
+            while((slope * base_PWM) > 255) {
+                base_PWM--;
+            }
+            x_speed = base_PWM;
+            y_speed = (int)(slope * (float)base_PWM);
+
+        } else if(slope == 1) {
+            base_PWM = 100;
+            x_speed = base_PWM;
+            y_speed = base_PWM;
         }
-        x_speed = base_PWM;
-        y_speed = (int)(slope * (float)base_PWM);
+        PWM_T3A_set(x_speed);
+        PWM_T3B_set(y_speed);
     }
-    else if(slope == 1.0 && x_mod != 0 && y_mod != 0) { // Setting PWM so the motors run at roughly desired speed / sqrt(2)
-        base_PWM = 100; // Some predefined value to roughly get the desired speed
-        x_speed = base_PWM;
-        y_speed = base_PWM;
-    }
-    else if(slope == 0.0) {
-        base_PWM = 100;
-        y_speed = base_PWM;
-    }
-
-    // Setting the PWM
-    printf("\nX-Speed: %d", x_speed);
-    printf("\nY-Speed: %d", y_speed);
-    printf("\nSlope: %f\n", slope);
-
-    PWM_T4A_set(x_speed);
-    PWM_T4B_set(y_speed);
+    // Debug prints
+    printf("\ndx: %d - %d = %d (%f), %d - %d = %d (%f)\n", x2, x1, x2 - x1, dx, y2, y1, y2 - y1, dy);
+    printf("X_dir: %c, Speed: %d\n", x_dir[0], x_speed);
+    printf("Y_dir: %c, Speed: %d\n", y_dir[0], y_speed);
+    printf("Slope: %f\n", slope);
 }
 
 void alternative_PWM_control_init(void) {
 
-    // Initialize input capture mode
-    TCCR1B |= ((1<<ICNC1)|(1<<ICES1)); //input noise cancel & selecting rising edge for input capture
-    TCCR1B |= ((1<<CS12)|(1<<CS10)); //setting prescaler of 1024
+    // Configure the pins ICP4 and ICP5 as input with pull-up
+    
+    DDRL &= ~((1 << PL1) | (1 << PL0)); // ICP5 & ICP4
+    PORTL |= ((1 << PL1) | (1 << PL0));
 
-    // Enable Input Capture Interrupt and the Timer 1 Overflow interrupt
-    TIMSK1 |= ((1 << ICIE1) | (1 << TOIE1));
+    // Initialize input capture mode for timer 4
+    TCCR4B |= ((1 << ICNC4) | (1 << ICES4)); //input noise cancel & selecting rising edge for input capture
+    TCCR4B |= ((1 << CS42)|(1 << CS40)); //setting prescaler of 1024
+
+    // Initialize input capture mode for timer 5
+    TCCR5B |= ((1 << ICNC5) | (1 << ICES5)); //input noise cancel & selecting rising edge for input capture
+    TCCR5B |= ((1 << CS52)|(1 << CS50)); //setting prescaler of 1024
+
+
+    // Enable Input Capture Interrupt and the Timer 1 Overflow Interrupt
+    TIMSK4 |= ((1 << ICIE4) | (1 << TOIE4));
+
+    // Enable Input Capture Interrupt and the Timer 5 Overflow Interrupt
+    TIMSK5 |= ((1 << ICIE5) | (1 << TOIE5));
 
 }
 
