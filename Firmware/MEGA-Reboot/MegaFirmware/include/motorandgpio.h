@@ -44,10 +44,12 @@ extern volatile double current_x_distance;
 extern volatile double axisspeed_motor_B;
 extern volatile double current_y_distance;
 
+/*
 extern volatile unsigned char x_pos_current = 0; // Used for tracking current position of the linear actuator
 extern volatile unsigned char y_pos_current = 0;
 extern volatile unsigned char x_pos_next = 0; // Used for comparison between current position and the next position
 extern volatile unsigned char y_pos_next = 0;
+*/
 
 void PWM_T3AB_init(void) { //function to initialize the PWM for the motors moving the table
 
@@ -68,7 +70,7 @@ void PWM_T3AB_init(void) { //function to initialize the PWM for the motors movin
     OCR3A = 0;
     OCR3B = 0;
 
-    PRR1 &= ~(1 << PRTIM4);
+    //PRR1 &= ~(1 << PRTIM4);
 }
 
 void PWM_T3C_init(void) { // Function to initialize the PWM for the motor controlling the extruder
@@ -202,7 +204,7 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
     dx = abs_value(dx); // Taking absolute value of dx and dy bc the sign is handled out by the direction change
     dy = abs_value(dy);
 
-    if(x_dir == 'S' || y_dir == 'S') {
+    if((x_dir == 'S') || (y_dir == 'S')) {
         if(x_dir == 'S') {
             PWM_T3A_set(0);
         }
@@ -219,15 +221,18 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
         slope = dy / dx; // Had problems with unsigned chars being divided so I used floats
 
         if(slope < 1) {
-            while((slope * base_PWM) < 60) {
+            while(((slope * base_PWM) < 60) &&  (base_PWM != 255)) {
                 base_PWM++;
+                printf("while condition: %f   ", slope * base_PWM);
+                printf("BasePWM: %d\n", base_PWM);
             }
             x_speed = base_PWM;
             y_speed = (int)(slope * (float)base_PWM);
 
         } else if(slope > 1) {
-            while((slope * base_PWM) > 255) {
+            while(((slope * base_PWM) > 255) && (base_PWM != 40)) {
                 base_PWM--;
+                printf("BasePWM: %d", base_PWM);
             }
             x_speed = base_PWM;
             y_speed = (int)(slope * (float)base_PWM);

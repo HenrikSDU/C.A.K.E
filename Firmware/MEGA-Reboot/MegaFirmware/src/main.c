@@ -45,6 +45,11 @@ volatile double current_x_distance = 0;
 volatile double axisspeed_motor_B = 0;
 volatile double current_y_distance = 0;
 
+volatile unsigned char x_pos_current = 0; // Used for tracking current position of the linear actuator
+volatile unsigned char y_pos_current = 0;
+volatile unsigned char x_pos_next = 0; // Used for comparison between current position and the next position
+volatile unsigned char y_pos_next = 0;
+
 volatile char file[SUPPORTEDFILESIZE]; // Saves the incoming bytes from the computer 
 
 CAKEFILE cakefile; // Contains an array of instructions and points (table_instruction(s)) and an array that indicates whether the data saved at a specific index is a coordinate or an extruder instruction
@@ -87,6 +92,7 @@ ISR(PCINT2_vect) {
    
 }
 
+/*
 ISR(INT0_vect) {
     x_pos_current++;
 }
@@ -94,6 +100,7 @@ ISR(INT0_vect) {
 ISR(INT1_vect) {
     y_pos_current++;
 }
+*/
 
 ISR(TIMER5_OVF_vect) {
 
@@ -139,7 +146,7 @@ int main(void) {
     io_redirect();
 
     // Custom function initialization
-    button_init();
+    //button_init();
 
     // Configuration of the IO pins
 
@@ -234,7 +241,7 @@ int main(void) {
         while(phase == main_operation) {
             //alternative_PWM_control_init();
             //PWM_control_ext_int_init();
-            button_init();
+            //button_init();
             PWM_T3AB_init();
             PWM_T3A_set(200);
             _delay_ms(1000);
@@ -246,29 +253,31 @@ int main(void) {
 
             // This new and improved version needs to be tested
             unsigned char desired_PWM = 100;
+            coordinate temp;
+            temp.x = 0;
+            temp.y = 0;
 
             for(int print_index = 0; print_index < instruction_count; print_index++) {
-                                
-                if((cakefile.instruction_locations[print_index] == 0) && (cakefile.instruction_locations[print_index + 1] == 0)) {
-                    //printf("\nX1: %d", cakefile.path[print_index].table_coord.x);
-                    //printf(" X2: %d", cakefile.path[print_index + 1].table_coord.x);
-                    //printf("\nY1: %d", cakefile.path[print_index].table_coord.y);
-                    //printf(" Y2: %d", cakefile.path[print_index + 1].table_coord.y);
-                    //while((cakefile.path[print_index + 1].table_coord.x - cakefile.path[print_index].table_coord.x))
-                    PWM_control(desired_PWM, cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
-                    //alternative_PWM_control(cakefile.path[print_index].table_coord.x, cakefile.path[print_index+1].table_coord.x, cakefile.path[print_index].table_coord.y , cakefile.path[print_index + 1].table_coord.y);
-                    _delay_ms(1000);
+                   printf("\nPrintIndex: %d", print_index); 
+            	
+                if(cakefile.instruction_locations[print_index] == 0) {
+                    printf("\nGo from x: %d to %d and from y: %d and %d", temp.x, cakefile.path[print_index].table_coord.x, temp.y, cakefile.path[print_index].table_coord.y);
+                    PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
+                    temp.x = cakefile.path[print_index].table_coord.x;
+                    temp.y = cakefile.path[print_index].table_coord.y;
+                    _delay_ms(2000);
                 }
-                else {
-                    if(cakefile.path[print_index].extruder_inst== G1) {
-                        // Execute G1
-                    }
-                    else                    
-                    if(cakefile.path[print_index].extruder_inst == G2) {
-                        // Execute G2
-                    }
+
+                if(cakefile.instruction_locations[print_index] == 1) {
+                    printf("\nExecute G%d", cakefile.path[print_index].extruder_inst + 1);
+                    // Execute G instruction
                 }
+
+               
             }
+            PWM_T3A_set(0);
+            PWM_T3A_set(0);
+            _delay_ms(10000);
             ////////////////////////
             //cli();
             ///////////////////////
