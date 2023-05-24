@@ -293,7 +293,14 @@ class UploadPage extends StatefulWidget {
 class _UploadPageState extends State<UploadPage> {
 
   String? uploadfilepath;
+  String path = 'test';
   final pathError = const SnackBar(content: Text("Error selecting the file."));
+  String? dropdownValue;
+  List<String?> args = [];
+  List<String> nonnullargs = [];
+
+  
+
 
   Future<String?> getUploadFile() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -313,6 +320,33 @@ class _UploadPageState extends State<UploadPage> {
     }
   }
 
+  Future<dynamic> runUpload(String path) async {
+    String exeUpload = 'lib\\UPLOADCAKE.exe';
+    if (dropdownValue != null) {
+      nonnullargs.add(dropdownValue!);
+    }
+    else{ 
+      debugPrint("Button value is null");
+      return 1;
+    }
+    if(uploadfilepath != null){
+      nonnullargs.add(uploadfilepath!);
+    }
+    else{
+      debugPrint("Path value is null");
+      return 1;
+    }
+
+
+    debugPrint("running slicer with args $nonnullargs");
+    Process process3 = await Process.start(exeUpload, nonnullargs);
+    stdout.addStream(process3.stdout);
+    stderr.addStream(process3.stderr);
+    int exitCode = await process3.exitCode;
+    process3.kill();
+    return exitCode;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -328,12 +362,28 @@ class _UploadPageState extends State<UploadPage> {
             },
           child: Text('Select File'),
         ),
-        /*TextField(
-          decoration: InputDecoration(
-            border: UnderlineInputBorder(),
-            labelText: 'Enter COM-port of C.A.K.E device like: COMx',
-          ),
-        ),*/
+        DropdownButton<String>(
+        value: dropdownValue,
+        onChanged: (String? newValue) {
+        setState(() {
+        dropdownValue = newValue;
+            });
+          },
+            items: <String>['COM1', 'COM2', 'COM3','COM4', 'COM5', 'COM6','COM7', 'COM8', 'COM9']
+            .map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+            value: value,
+            child: Text(value),
+            );
+          }).toList(),
+        ),
+
+        ElevatedButton(
+          onPressed: () async{
+            runUpload(path);
+            },
+          child: Text('Upload!'),
+        ),
       ],
     );
   }
