@@ -84,10 +84,10 @@ ISR(PCINT2_vect) {
 
         if(phase == paused) {
             phase = main_operation;
-        } else if(phase == main_operation) {
+        } else {
             phase = paused;
         }
-        _delay_ms(100);
+        _delay_ms(200);
     }
    
 }
@@ -137,17 +137,13 @@ ISR(TIMER4_CAPT_vect) {
 
 int main(void) { 
 
-    i2c_init();// Initialization of the I2C communication
-    
-    //LCD_init();// Initialization of the LCD
-    //lm75_init();// Initialization of the temperature sensor
-    
     uart_init();
     io_redirect();
 
     // Custom function initialization
-    //button_init();
-
+    button_init();
+    PWM_T3AB_init();
+    
     // Configuration of the IO pins
 
    
@@ -284,19 +280,14 @@ int main(void) {
             //printf("B3:setB4:incB5:decB6:dich");
         }
 
-        while(phase == paused){
-
-            TOGGLE_ONBOARD_LED
-            _delay_ms(1000);
-            PWM_T3A_set(0); 
-
-            uint8_t direction = 0;
-            uint8_t desired_PWM = 100;
-            while(phase != paused) {
+        uint8_t direction  = 0;
+        uint8_t desired_PWM = 0;
+        while(phase == paused) {
+            
 
                 if((PINK & (1 << BUTTON3)) == 0) {
 
-                    PWM_T3A_set(desired_PWM);
+                    PWM_T3B_set(desired_PWM);
                     TOGGLE_ONBOARD_LED
                     
                     
@@ -304,7 +295,7 @@ int main(void) {
                 }
 
                 if((PINK & (1 << BUTTON4)) == 0) {
-                    desired_PWM += 50;
+                    desired_PWM += 10;
                     //LCD_set_cursor(0,2);
                     //printf("desPWM: %u ", desired_PWM);
                     TOGGLE_ONBOARD_LED
@@ -312,7 +303,7 @@ int main(void) {
                 }
                 if((PINK & (1 << BUTTON5)) == 0) {
 
-                    desired_PWM -= 50;
+                    desired_PWM -= 10;
                     TOGGLE_ONBOARD_LED
                     //LCD_set_cursor(0,2);
                     //printf("desPWM: %u ", desired_PWM);
@@ -320,7 +311,8 @@ int main(void) {
                 }
                 if((PINK & (1 << BUTTON6)) == 0) {
                     direction = 0b00000001 & direction;
-                    PWM_T3A_direction_change(direction);
+                    PWM_T3B_direction_change(direction);
+                    //PWM_T3B_direction_change(direction);
                     //LCD_set_cursor(0,3);
                     //printf("dir:%d",direction);
                     TOGGLE_ONBOARD_LED
@@ -328,7 +320,7 @@ int main(void) {
                     _delay_ms(2000);
                 }
 
-            }
+            
         }
     
     }
