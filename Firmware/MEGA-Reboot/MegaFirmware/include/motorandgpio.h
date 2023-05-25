@@ -75,8 +75,8 @@ void PWM_T3AB_init(void) { //function to initialize the PWM for the motors movin
 
 void PWM_T3C_init(void) { // Function to initialize the PWM for the motor controlling the extruder
     
-    TCCR4A |= (1 << COM4C1 | (1 << WGM41) | (1 << WGM40));
-    TCCR4B |= ((1 << WGM42) | (1 << WGM43) | (1 << CS40));
+    TCCR3A |= (1 << COM4C1 | (1 << WGM41) | (1 << WGM40));
+    TCCR3B |= ((1 << WGM42) | (1 << WGM43) | (1 << CS40));
 
     // PWM signal output pin setup
     DDRE |= (1 << PE5);
@@ -154,8 +154,8 @@ void button_init(void){
     PCICR |= ((1<<PCIE2)|(1<<PCIE1)); //enabeling pin interrupts of pin group 1 and 2 
     PCMSK2 |= (1<<BUTTON2);
     PCMSK1 |= ((1<<BUTTON6)|(1<<BUTTON5)|(1<<BUTTON4)|(1<<BUTTON3)); //subscribing to changes on PCINT9
-    sei();
     */
+    sei();
 }
 
 float abs_value(float x) {
