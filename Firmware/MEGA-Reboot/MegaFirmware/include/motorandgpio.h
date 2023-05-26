@@ -19,7 +19,7 @@
 
 
 #define ACTEXTENSIONPERROT (double) 0.25 // cm
-#define TICKDISTANCE (double) 0.008333333333333333
+#define TICKDISTANCE (double) 0.02083333333333333333333333333333
 
 /* Very fancy custom macro for easy debugging command */
 #define TOGGLE_ONBOARD_LED DDRB |= 0b10000000; PORTB ^= (1 << PORTB7);
@@ -33,10 +33,10 @@
 #include <util/delay.h>
 #include <math.h>
 
-#include "lcd.h"
+
 #include "usart.h"
-#include "i2cmaster.h"
-#include "lm75.h"
+
+
 
 // External variables (they can be accessed by the file this header is included in, the word extern does this)
 extern volatile double axisspeed_motor_A;

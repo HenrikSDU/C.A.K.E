@@ -275,7 +275,7 @@ class _SlicePageState extends State<SlicePage> {
         Padding(
           padding: const EdgeInsets.fromLTRB(20.0, 20.0, 20.0, 20.0),
           child: Image.file(
-            File(filepath ?? 'lib\\exampleBMP.bmp'),
+            File(filepath ?? 'lib\\logo.bmp'),
             width: 500,
             height: 500,
           ),
