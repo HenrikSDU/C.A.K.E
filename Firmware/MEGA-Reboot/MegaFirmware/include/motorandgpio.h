@@ -18,10 +18,10 @@
 #define DIRECTION_B_A PF5
 
 
-#define ACTEXTENSIONPERROT (double) 0.25 // cm
-#define TICKDISTANCE (double) 0.02083333333333333333333333333333
+#define ACTEXTENSIONPERROT (double) 2.5 // mm
+#define TICKDISTANCE (double) 0.2083333333333333333333333333333
 
-#define PWMADJUSTRATE 1
+#define PWMADJUSTRATE 50
 #define EXTRUDERSQUISHSTRENGTH 30
 
 /* Very fancy custom macro for easy debugging command */

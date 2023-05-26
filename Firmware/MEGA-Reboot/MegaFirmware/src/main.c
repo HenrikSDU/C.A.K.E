@@ -259,13 +259,13 @@ int main(void) {
                     //PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
                     temp.x = cakefile.path[print_index].table_coord.x;
                     temp.y = cakefile.path[print_index].table_coord.y;
-                    //_delay_ms(2000);
+                    //_delay_ms(1000);
                 }
 
                 if(cakefile.instruction_locations[print_index] == 1) {
                     printf("\nExecute G%d", cakefile.path[print_index].extruder_inst + 1);
                     // Execute G instruction
-                    //extruder_control(cakefile.path[print_index].extruder_inst);
+                    extruder_control(cakefile.path[print_index].extruder_inst);
                 }
 
                
