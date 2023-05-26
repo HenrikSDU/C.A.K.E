@@ -10,10 +10,7 @@
 #include <util/delay.h>
 #include <string.h>
 
-#include "lcd.h"
 #include "usart.h"
-#include "i2cmaster.h"
-#include "lm75.h"
 
 #include "file_proccessing.h"
 #include "motorandgpio.h"
