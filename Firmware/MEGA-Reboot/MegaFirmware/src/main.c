@@ -17,10 +17,10 @@
 
 typedef enum{
 
-    memory_init, //preparing for incoming file
-    upload, //upload of file
-    main_operation, //creation of icing
-    paused //paused from main
+    memory_init, // Preparing for incoming file
+    upload, // Upload of file
+    main_operation, // Creation of icing
+    paused // Paused from main
 
 }programstate_e;
 
@@ -107,10 +107,11 @@ ISR(TIMER5_OVF_vect) {
 
 ISR(TIMER5_CAPT_vect) { // heeey
 
-    axisspeed_motor_A = ACTEXTENSIONPERROT / (double)(ICR1 + 0xFFFF * timer5overflow_count);
+    axisspeed_motor_A = TICKDISTANCE / (double)(ICR1 + 0xFFFF * timer5overflow_count);
     current_y_distance += TICKDISTANCE;
 
     timer5overflow_count = 0;
+    printf("Hello");
     TOGGLE_ONBOARD_LED
 
 }
@@ -123,11 +124,12 @@ ISR(TIMER4_OVF_vect) {
 
 ISR(TIMER4_CAPT_vect) {
 
-    axisspeed_motor_B = ACTEXTENSIONPERROT / (double)(ICR3 + 0xFFFF * timer4overflow_count);
+    axisspeed_motor_B = TICKDISTANCE / (double)(ICR3 + 0xFFFF * timer4overflow_count);
     current_x_distance += TICKDISTANCE;
 
     timer4overflow_count = 0;
-    TOGGLE_ONBOARD_LED    
+    TOGGLE_ONBOARD_LED   
+    printf("Hello"); 
 
 }
 
@@ -140,6 +142,8 @@ int main(void) {
     // Custom function initialization
     button_init();
     PWM_T3AB_init();
+    PWM_T3C_init();
+    //alternative_PWM_control_init();
     
     // Configuration of the IO pins
 
@@ -203,27 +207,23 @@ int main(void) {
                     usart_send(file[k]);
 
                 UCSR0B &= ~(1 << RXCIE0); // Disable rx-interrupt
+
                 file_processing(&cakefile, file, filesize); // Proccessing the recieved array
-                
-                //LCD_init();
-                //LCD_set_cursor(0,0);
-                
+                             
                 printf("FS:%d", filesize);
                 for(k = 0; k < instruction_count; k++) {
 
-                // LCD_set_cursor(0, (k%4));
                     if(cakefile.instruction_locations[k] == 1) {
                         printf("G%d", cakefile.path[k].extruder_inst + 1);
                     }
                     else {
                         printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
                     }
-                    //_delay_ms(500);
+                    
                 }
                 
                 
                 phase = main_operation;
-
 
             }
             
@@ -232,18 +232,18 @@ int main(void) {
 
 
         while(phase == main_operation) {
-            //alternative_PWM_control_init();
+            alternative_PWM_control_init();
             //PWM_control_ext_int_init();
-            //button_init();
             PWM_T3AB_init();
+            PWM_T3A_direction_change(1);
             PWM_T3A_set(200);
-            _delay_ms(1000);
+            _delay_ms(3000);
+            PWM_T3A_direction_change(0);
+            _delay_ms(3000);
             PWM_T3A_set(0);
+            PWM_T3A_direction_change(0);
             _delay_ms(3000);
             
-            //LCD_init();
-            //LCD_set_cursor(0,0);
-
             // This new and improved version needs to be tested
             unsigned char desired_PWM = 100;
             coordinate temp;
@@ -255,15 +255,17 @@ int main(void) {
             	
                 if(cakefile.instruction_locations[print_index] == 0) {
                     printf("\nGo from x: %d to %d and from y: %d and %d", temp.x, cakefile.path[print_index].table_coord.x, temp.y, cakefile.path[print_index].table_coord.y);
-                    PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
+                    alternative_PWM_control((unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
+                    //PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
                     temp.x = cakefile.path[print_index].table_coord.x;
                     temp.y = cakefile.path[print_index].table_coord.y;
-                    _delay_ms(2000);
+                    //_delay_ms(2000);
                 }
 
                 if(cakefile.instruction_locations[print_index] == 1) {
                     printf("\nExecute G%d", cakefile.path[print_index].extruder_inst + 1);
                     // Execute G instruction
+                    //extruder_control(cakefile.path[print_index].extruder_inst);
                 }
 
                
@@ -284,7 +286,7 @@ int main(void) {
 
                 if((PINK & (1 << BUTTON3)) == 0) {
 
-                    PWM_T3B_set(desired_PWM);
+                    PWM_T3A_set(desired_PWM);
                     TOGGLE_ONBOARD_LED
                     
                     
@@ -293,7 +295,6 @@ int main(void) {
 
                 if((PINK & (1 << BUTTON4)) == 0) {
                     desired_PWM += 10;
-                    //LCD_set_cursor(0,2);
                     //printf("desPWM: %u ", desired_PWM);
                     TOGGLE_ONBOARD_LED
                     _delay_ms(200);
@@ -302,15 +303,13 @@ int main(void) {
 
                     desired_PWM -= 10;
                     TOGGLE_ONBOARD_LED
-                    //LCD_set_cursor(0,2);
                     //printf("desPWM: %u ", desired_PWM);
                     _delay_ms(200);
                 }
                 if((PINK & (1 << BUTTON6)) == 0) {
                     direction = 0b00000001 & direction;
-                    PWM_T3B_direction_change(direction);
+                    PWM_T3A_direction_change(direction);
                     //PWM_T3B_direction_change(direction);
-                    //LCD_set_cursor(0,3);
                     //printf("dir:%d",direction);
                     TOGGLE_ONBOARD_LED
                     direction++;

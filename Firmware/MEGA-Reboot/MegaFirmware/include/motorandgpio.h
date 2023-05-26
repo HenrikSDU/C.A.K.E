@@ -10,8 +10,8 @@
 #define BUTTON6 PK6
 #define BUTTON7 PK7
 
-#define DIRECTION_F_C PF0
-#define DIRECTION_B_C PF1
+#define DIRECTION_F_C PF6
+#define DIRECTION_B_C PF7
 #define DIRECTION_F_B PF2
 #define DIRECTION_B_B PF3
 #define DIRECTION_F_A PF4
@@ -20,6 +20,9 @@
 
 #define ACTEXTENSIONPERROT (double) 0.25 // cm
 #define TICKDISTANCE (double) 0.02083333333333333333333333333333
+
+#define PWMADJUSTRATE 1
+#define EXTRUDERSQUISHSTRENGTH 30
 
 /* Very fancy custom macro for easy debugging command */
 #define TOGGLE_ONBOARD_LED DDRB |= 0b10000000; PORTB ^= (1 << PORTB7);
@@ -75,8 +78,8 @@ void PWM_T3AB_init(void) { //function to initialize the PWM for the motors movin
 
 void PWM_T3C_init(void) { // Function to initialize the PWM for the motor controlling the extruder
     
-    TCCR3A |= (1 << COM4C1 | (1 << WGM41) | (1 << WGM40));
-    TCCR3B |= ((1 << WGM42) | (1 << WGM43) | (1 << CS40));
+    TCCR3A |= (1 << COM3C1 | (1 << WGM31) | (1 << WGM30));
+    TCCR3B |= ((0 << WGM32) | (0 << WGM33) | (1 << CS30));
 
     // PWM signal output pin setup
     DDRE |= (1 << PE5);
@@ -282,8 +285,10 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
     unsigned char motor_A_PWM = 0;
     unsigned char motor_B_PWM = 0;
     double slope;
-    double x_distance = x2 - x1;
-    double y_distance = y2 - y1;
+    double x_distance = (double)x2 - (double)x1;
+    double y_distance = (double)y2 - (double)y1;
+    double absolute_x_distance = fabs(x_distance);
+    double aboulute_y_distance = fabs(y_distance);
 
     // Determine slope
     
@@ -301,7 +306,7 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
     }
 
     // Determine directions    
-    char x_direction = copysign(1.0, x_distance);
+    char x_direction = copysign(1.0, x_distance); 
     printf("\nX-direction: %d", x_direction);
 
     if(x_direction == 1) {
@@ -322,35 +327,52 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
 
     // Set start PWM - Motor A: X Motor B: Y
     if(slope < 1000000) {
-        motor_A_PWM = 60;
+        motor_A_PWM = 20;
         PWM_T3A_set(motor_A_PWM);
     }
     if(slope != 0.0) {
-        motor_B_PWM = 60;
+        motor_B_PWM = 20;
         PWM_T3B_set(motor_A_PWM);
     }
 
-    while((fabs(current_x_distance) <= x_distance) && (fabs(current_y_distance) <= y_distance)) {
-        if((motor_B_PWM + 20) <= 255) {
+    current_x_distance = 0;
+    current_y_distance = 0;
+
+    while((current_x_distance <= absolute_x_distance) && (current_y_distance <= aboulute_y_distance)) { // Adjust PWM for the give interval
+        
+        // Motor B Control
+        if((motor_B_PWM + PWMADJUSTRATE) <= 255) { // Checking whether the PWM is already maximum
+            
             if((axisspeed_motor_B < (axisspeed_motor_A * slope)) || ((axisspeed_motor_B == 0.0) && (slope != 0.0))) {
-                motor_B_PWM += 20;
+                motor_B_PWM += PWMADJUSTRATE;
             }
+
         }
-        if((motor_B_PWM - 20) >= 0){
+        if((motor_B_PWM - PWMADJUSTRATE) >= 0){ // Checking whether the PWM is already minimum
+            
             if((axisspeed_motor_B > (axisspeed_motor_A * slope))) {
-                motor_B_PWM -= 20;
+                motor_B_PWM -= PWMADJUSTRATE;
             }
+
         }
-        if((motor_A_PWM + 20) <= 255) {
+
+        // Motor A Control
+        if((motor_A_PWM + PWMADJUSTRATE) <= 255) {  // Checking whether the PWM is already maximum
+            
             if((axisspeed_motor_A < (axisspeed_motor_B / slope)) ||  ((axisspeed_motor_A == 0.0) && (slope != 1000000))) {
-                motor_A_PWM += 20;
+                motor_A_PWM += PWMADJUSTRATE;
             }
+
         }
-        if((motor_A_PWM - 20) >= 0){
+        if((motor_A_PWM - PWMADJUSTRATE) >= 0){ // Checking whether the PWM is already minimum
+            
             if((axisspeed_motor_A > (axisspeed_motor_B / slope))){
-                motor_A_PWM -= 20;
+                motor_A_PWM -= PWMADJUSTRATE;
             }
+
         }
+
+        // Set the new value of PWM
         PWM_T3A_set(motor_A_PWM);
         PWM_T3B_set(motor_B_PWM);
     }
@@ -358,4 +380,16 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
     // Reset distances 
     current_x_distance = 0;
     current_y_distance = 0;
+}
+
+void extruder_control(extruder_instruction g_instruction) {
+
+    if(g_instruction == G1) {
+        PWM_T3C_set(0);
+    }
+    else
+    if(g_instruction == G2) {
+        PWM_T3C_set(EXTRUDERSQUISHSTRENGTH);
+    }
+
 }

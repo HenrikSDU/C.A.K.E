@@ -2,6 +2,9 @@
     "files.associations": {
         "math.h": "c",
         "stdbool.h": "c",
-        "lm75.h": "c"
-    }
+        "lm75.h": "c",
+        "usart.h": "c",
+        "file_proccessing.h": "c"
+    },
+    "cmake.configureOnOpen": false
 }

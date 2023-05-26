@@ -16,10 +16,8 @@
 
 
 
-#include "lcd.h"
 #include "usart.h"
-#include "i2cmaster.h"
-#include "lm75.h"
+
 
 
 typedef struct{
