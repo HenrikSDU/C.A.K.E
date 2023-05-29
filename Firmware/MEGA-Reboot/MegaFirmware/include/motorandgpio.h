@@ -9,6 +9,8 @@
 #define BUTTON5 PK5
 #define BUTTON6 PK6
 #define BUTTON7 PK7
+#define BUTTON8 PB0
+#define BUTTON9 PB2
 
 #define DIRECTION_F_C PF6
 #define DIRECTION_B_C PF7
@@ -142,6 +144,8 @@ void button_init(void){
     // Mega buttons
     DDRK &= ~((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON2) | (1 << BUTTON3) | (1 << BUTTON4) | (1 << BUTTON5) | (1 << BUTTON6) | (1 << BUTTON7));
     PORTK |= ((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON2) | (1 << BUTTON3) | (1 << BUTTON4) | (1 << BUTTON5) | (1 << BUTTON6) | (1 << BUTTON7));
+    DDRB &= ~((1 << BUTTON8) | (1 << BUTTON9));
+    PORTB |= ((1 << BUTTON8) | (1 << BUTTON9));
     
     PCICR |= (1 << PCIE2); // Pin change interrupt control register, enabled the bit where out buttons are
     PCMSK2 |= (1 << BUTTON7); // Enabling the interrupt for BUTTON7, so only when that is pressed will the interrupt be executed

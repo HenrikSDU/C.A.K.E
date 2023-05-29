@@ -281,40 +281,55 @@ int main(void) {
 
         uint8_t direction  = 0;
         uint8_t desired_PWM = 0;
+        uint8_t motorA_PWM = 0;
+        uint8_t motorB_PWM = 0;
+        uint8_t motorC_PWM = 0;
+
         while(phase == paused) {
             
 
-                if((PINK & (1 << BUTTON3)) == 0) {
+                if((PINK & (1 << BUTTON3)) == 0) { // Red cable
 
-                    PWM_T3A_set(desired_PWM);
+                    PWM_T3A_set(motorA_PWM);
+                    PWM_T3B_set(motorB_PWM);
+                    PWM_T3C_set(motorC_PWM);
                     TOGGLE_ONBOARD_LED
                     
                     
                     _delay_ms(200);
                 }
 
-                if((PINK & (1 << BUTTON4)) == 0) {
-                    desired_PWM += 10;
+                if((PINK & (1 << BUTTON4)) == 0) { // Green Cable
+                    motorA_PWM += 10;
                     //printf("desPWM: %u ", desired_PWM);
                     TOGGLE_ONBOARD_LED
                     _delay_ms(200);
                 }
-                if((PINK & (1 << BUTTON5)) == 0) {
+                if((PINK & (1 << BUTTON5)) == 0) { // White Cable
 
-                    desired_PWM -= 10;
+                    motorA_PWM -= 10;
                     TOGGLE_ONBOARD_LED
                     //printf("desPWM: %u ", desired_PWM);
                     _delay_ms(200);
                 }
-                if((PINK & (1 << BUTTON6)) == 0) {
+                if((PINK & (1 << BUTTON6)) == 0) { // Grey Cable
                     direction = 0b00000001 & direction;
                     PWM_T3A_direction_change(direction);
-                    //PWM_T3B_direction_change(direction);
+                    PWM_T3B_direction_change(direction);
+                    PWM_T3C_direction_change(direction);
                     //printf("dir:%d",direction);
                     TOGGLE_ONBOARD_LED
                     direction++;
                     _delay_ms(2000);
                 }
+                if((PINB & (1 << BUTTON8)) == 0) { // Yellow Cable
+                    motorB_PWM += 10;
+                }
+                if((PINB & (1 << BUTTON9)) == 0) { // Purple Cable
+                    motorB_PWM = 255;
+                    motorA_PWM = 255;
+                    
+                }       
 
             
         }
