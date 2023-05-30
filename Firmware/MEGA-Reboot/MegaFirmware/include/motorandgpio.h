@@ -21,9 +21,9 @@
 
 
 #define ACTEXTENSIONPERROT (double) 2.5 // mm
-#define TICKDISTANCE (double) 0.2083333333333333333333333333333
+#define TICKDISTANCE (double) 0.2083333333333333333333333333333 // mm
 
-#define PWMADJUSTRATE 50
+#define PWMADJUSTRATE 30
 #define EXTRUDERSQUISHSTRENGTH 30
 
 /* Very fancy custom macro for easy debugging command */
@@ -60,7 +60,7 @@ void PWM_T3AB_init(void) { //function to initialize the PWM for the motors movin
 
     // PWM Setup, see page 145 and following in datasheet for register description
     TCCR3A |= ((1 << COM3A1) | (1 << COM3B1) | (0 << WGM31) | (1 << WGM30)); // PWM output on 3 pins, OC4A, OC4B, OC4C
-    TCCR3B |= ((0 << WGM32) | (0 << WGM33) | (1 << CS32) | (1 << CS30)); // prescaler 1024, set BOTTOM (meaning timer to be 0) and clear on compare match
+    TCCR3B |= ((1 << WGM32) | (0 << WGM33) | (1 << CS32) | (1 << CS30)); // prescaler 1024, set BOTTOM (meaning timer to be 0) and clear on compare match
     
     // PWM signal output pin setup
     DDRE |= ((1 << PE4) | (1 << PE3)); //configuring OC4 A/B/C pins to be output    
@@ -80,8 +80,8 @@ void PWM_T3AB_init(void) { //function to initialize the PWM for the motors movin
 
 void PWM_T3C_init(void) { // Function to initialize the PWM for the motor controlling the extruder
     
-    TCCR3A |= (1 << COM3C1 | (1 << WGM31) | (1 << WGM30));
-    TCCR3B |= ((0 << WGM32) | (0 << WGM33) | (1 << CS30));
+    TCCR3A |= (1 << COM3C1 | (0 << WGM31) | (1 << WGM30));
+    TCCR3B |= ((1 << WGM32) | (0 << WGM33) | (1 << CS30));
 
     // PWM signal output pin setup
     DDRE |= (1 << PE5);
@@ -288,6 +288,7 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
 
     unsigned char motor_A_PWM = 0;
     unsigned char motor_B_PWM = 0;
+    unsigned char base_PWM = 100;
     double slope;
     double x_distance = (double)x2 - (double)x1;
     double y_distance = (double)y2 - (double)y1;
@@ -331,11 +332,11 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
 
     // Set start PWM - Motor A: X Motor B: Y
     if(slope < 1000000) {
-        motor_A_PWM = 20;
+        motor_A_PWM = base_PWM;
         PWM_T3A_set(motor_A_PWM);
     }
     if(slope != 0.0) {
-        motor_B_PWM = 20;
+        motor_B_PWM = base_PWM;
         PWM_T3B_set(motor_A_PWM);
     }
 

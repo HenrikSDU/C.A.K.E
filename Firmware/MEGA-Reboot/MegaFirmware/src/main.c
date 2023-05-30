@@ -42,10 +42,8 @@ volatile double current_x_distance = 0;
 volatile double axisspeed_motor_B = 0;
 volatile double current_y_distance = 0;
 
-volatile unsigned char x_pos_current = 0; // Used for tracking current position of the linear actuator
-volatile unsigned char y_pos_current = 0;
-volatile unsigned char x_pos_next = 0; // Used for comparison between current position and the next position
-volatile unsigned char y_pos_next = 0;
+volatile unsigned char dx_pos = 0; // Used for tracking current position of the linear actuator
+volatile unsigned char dy_pos = 0;
 
 volatile char file[SUPPORTEDFILESIZE]; // Saves the incoming bytes from the computer 
 
@@ -89,16 +87,6 @@ ISR(PCINT2_vect) {
    
 }
 
-/*
-ISR(INT0_vect) {
-    x_pos_current++;
-}
-
-ISR(INT1_vect) {
-    y_pos_current++;
-}
-*/
-
 ISR(TIMER5_OVF_vect) {
 
     timer5overflow_count++;
@@ -114,6 +102,7 @@ ISR(TIMER5_CAPT_vect) { // heeey
     printf("Hello");
     TOGGLE_ONBOARD_LED
 
+    dx_pos++;
 }
 
 ISR(TIMER4_OVF_vect) {
@@ -131,6 +120,7 @@ ISR(TIMER4_CAPT_vect) {
     TOGGLE_ONBOARD_LED   
     printf("Hello"); 
 
+    dy_pos++;
 }
 
 
@@ -236,10 +226,10 @@ int main(void) {
             //PWM_control_ext_int_init();
             PWM_T3AB_init();
             PWM_T3A_direction_change(1);
-            PWM_T3A_set(200);
-            _delay_ms(3000);
+            PWM_T3A_set(100);
+            _delay_ms(1000);
             PWM_T3A_direction_change(0);
-            _delay_ms(3000);
+            _delay_ms(1000);
             PWM_T3A_set(0);
             PWM_T3A_direction_change(0);
             _delay_ms(3000);
@@ -251,15 +241,18 @@ int main(void) {
             temp.y = 0;
 
             for(int print_index = 0; print_index < instruction_count; print_index++) {
-                   printf("\nPrintIndex: %d", print_index); 
+                   printf("\nPrintIndex: %d", print_index);
             	
                 if(cakefile.instruction_locations[print_index] == 0) {
                     printf("\nGo from x: %d to %d and from y: %d and %d", temp.x, cakefile.path[print_index].table_coord.x, temp.y, cakefile.path[print_index].table_coord.y);
-                    alternative_PWM_control((unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
-                    //PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
+                    //alternative_PWM_control((unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
+                    PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
+                    while(((unsigned char)cakefile.path[print_index].table_coord.x > dx_pos) && ((unsigned char)cakefile.path[print_index].table_coord.y > dy_pos));
                     temp.x = cakefile.path[print_index].table_coord.x;
                     temp.y = cakefile.path[print_index].table_coord.y;
                     //_delay_ms(1000);
+                    dx_pos = 0;
+                    dy_pos = 0;
                 }
 
                 if(cakefile.instruction_locations[print_index] == 1) {
@@ -267,7 +260,6 @@ int main(void) {
                     // Execute G instruction
                     extruder_control(cakefile.path[print_index].extruder_inst);
                 }
-
                
             }
             PWM_T3A_set(0);
@@ -328,7 +320,8 @@ int main(void) {
                 if((PINB & (1 << BUTTON9)) == 0) { // Purple Cable
                     motorB_PWM = 255;
                     motorA_PWM = 255;
-                    
+                    motorC_PWM = 255;
+
                 }       
 
             
