@@ -1,6 +1,8 @@
 #include <windows.h>
 #include <tchar.h>
 #include <stdio.h>
+#include <math.h>
+#include <time.h>
 
 
 void PrintCommState(DCB dcb)
@@ -132,22 +134,49 @@ int main(int argc, char *argv[]){
 
    //filling the array
    for(int r=0;r<10;r++){
-      memory_init_flags[r]=r;
+      memory_init_flags[r]=0;
       printf("%d ", memory_init_flags[r]);
    }
 
    //putting filesize
-   memory_init_flags[0]=(unsigned char)filelength;
+   double required_capacity;
+   unsigned char remaining_bytes;
+   required_capacity = (double)filelength/(double)255; //determining how many bytes are needed to transmit filelength
+   
+   //calculating required capacity
+   required_capacity = floor(required_capacity); //round up to the next full integer
+   remaining_bytes = filelength - (required_capacity*255);
+
+   //determine how many instructions are saved
+   int instruction_count = 1;
+   char temp;
+   while((temp = fgetc(file)) != EOF){
+
+      if(temp == '\n') //if new-line character gets recognized increment the instruction counter
+         instruction_count++;
+
+   }
+   rewind(file);
+   printf("\n%d instructions found!", instruction_count);
+   double required_instruction_capacity = (double)instruction_count/(double)255;
+   required_instruction_capacity = floor(required_instruction_capacity);
+   unsigned char remaining_instructions = instruction_count - (255 * required_instruction_capacity);
+
+   memory_init_flags[0] = (unsigned char)required_capacity;
+   memory_init_flags[1] = remaining_bytes;
+   memory_init_flags[2] = (unsigned char)required_instruction_capacity;
+   memory_init_flags[3] = remaining_instructions;
+   
    printf("\nDetermined filelength: %d \n",filelength);
    printf("Updated memoryinitflags:\n");
    for(int r=0;r<10;r++){
       printf("%d ", memory_init_flags[r]);
    }
-      
-   do{
+      input = 1;
+   do {
 
       printf("\nInput: ");
-      scanf("%d",&input);
+      //scanf("%d",&input);
       
       if (input==0){
             CloseHandle(hCom);
@@ -155,7 +184,7 @@ int main(int argc, char *argv[]){
             printf("\nCancel Of Program");
          return 0;
       }
-      
+      input = 0;
       
       comreistatus = SetCommMask(hCom, EV_RXCHAR);
       if(comreistatus == FALSE){
@@ -214,7 +243,7 @@ int main(int argc, char *argv[]){
       }
 
       printf("\nReturned filelength: %u\n",memory_init_feedback[0]);
-      if(memory_init_feedback[0]==filelength){
+      if((memory_init_feedback[0]==required_capacity) && (memory_init_feedback[1]==remaining_bytes)){
          printf("\nSuccessfull filelength transmit\n");
       }
       else{
@@ -246,6 +275,12 @@ int main(int argc, char *argv[]){
          filesendbuffer_index++;
       }
       printf("\n");
+
+      printf("Purging Com");
+      BOOL purgesuccess = PurgeComm(hCom, PURGE_RXCLEAR);
+      if(purgesuccess)
+      printf("Surccessfully purged comm");
+
       printf("\nStart Transmit of File\n");
       writesuccess = WriteFile(hCom,// Handle to the Serialport
                         filesendbuffer,            // Data to be written to the port
@@ -260,6 +295,7 @@ int main(int argc, char *argv[]){
       
       //Reading Feedback
       //scanf("%d",&input);
+      Sleep(10000);
       comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
       if(!comreistatus){
          printf("Error setting WaitCommEvent");
@@ -272,7 +308,7 @@ int main(int argc, char *argv[]){
       i=0;
       
          do{
-               printf(" (LoIter: %u) ",i);
+               //printf(" (LoIter: %u) ",i);
                comreistatus = ReadFile(hCom, &ReadData, sizeof(ReadData),&NoBytesRead, NULL);
                if(NoBytesRead!=0){
                   filereceivebuffer[i] = ReadData;
@@ -281,6 +317,15 @@ int main(int argc, char *argv[]){
                }
                i++;
          }while(NoBytesRead>0);
+
+         printf("WAITING FOR RXPIN:\n");
+
+         comreistatus = WaitCommEvent(hCom, &dwEventMask, NULL); //Wait for the character to be received
+         if(!comreistatus){
+            printf("Error setting WaitCommEvent");
+         }
+         else
+            printf("waited\n");
       
       
       free(filesendbuffer);

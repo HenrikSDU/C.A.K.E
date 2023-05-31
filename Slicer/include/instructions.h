@@ -1,8 +1,10 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void move_to_point(FILE* file, int x, int y) {
-    fprintf(file, "X%dY%d\n", x, y);
+void move_to_point(FILE* file, double x, double y) {
+    int xint = (int)round(x);
+    int yint = (int)round(y);
+    fprintf(file, "X%dY%d\n", xint, yint);
 }
 
 void extruder_down(FILE* file) {
