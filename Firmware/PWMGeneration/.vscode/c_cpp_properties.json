@@ -1,0 +1,42 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/PWMGeneration/include",
+                "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/PWMGeneration/src",
+                "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/PWMGeneration/.pio/libdeps/nanoatmega328new/Unity/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/PWMGeneration/include",
+                    "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/PWMGeneration/src",
+                    "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/PWMGeneration/.pio/libdeps/nanoatmega328new/Unity/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "F_CPU=16000000L",
+                "PLATFORMIO=60107",
+                "ARDUINO_AVR_NANO",
+                "__AVR_ATmega328P__",
+                ""
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "C:/Users/f-bon/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+            "compilerArgs": [
+                "-mmcu=atmega328p",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}

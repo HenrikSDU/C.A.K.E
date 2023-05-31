@@ -1,0 +1,42 @@
+//
+// !!! WARNING !!! AUTO-GENERATED FILE!
+// PLEASE DO NOT MODIFY IT AND USE "platformio.ini":
+// https://docs.platformio.org/page/projectconf/section_env_build.html#build-flags
+//
+{
+    "configurations": [
+        {
+            "name": "PlatformIO",
+            "includePath": [
+                "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/include",
+                "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/src",
+                "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/.pio/libdeps/megaatmega2560/Unity/src",
+                ""
+            ],
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true,
+                "path": [
+                    "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/include",
+                    "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/src",
+                    "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/.pio/libdeps/megaatmega2560/Unity/src",
+                    ""
+                ]
+            },
+            "defines": [
+                "F_CPU=16000000L",
+                "PLATFORMIO=60107",
+                "ARDUINO_AVR_MEGA2560",
+                "__AVR_ATmega2560__",
+                ""
+            ],
+            "cStandard": "c11",
+            "cppStandard": "c++11",
+            "compilerPath": "C:/Users/f-bon/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+            "compilerArgs": [
+                "-mmcu=atmega2560",
+                ""
+            ]
+        }
+    ],
+    "version": 4
+}
