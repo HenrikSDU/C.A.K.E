@@ -23,8 +23,9 @@
 #define ACTEXTENSIONPERROT (double) 2.5 // mm
 #define TICKDISTANCE (double) 0.2083333333333333333333333333333 // mm
 
-#define PWMADJUSTRATE 30
+#define PWMADJUSTRATE 5
 #define EXTRUDERSQUISHSTRENGTH 30
+#define ORIGIN_PWM_STRENGTH 35
 
 /* Very fancy custom macro for easy debugging command */
 #define TOGGLE_ONBOARD_LED DDRB |= 0b10000000; PORTB ^= (1 << PORTB7);
@@ -48,6 +49,9 @@ extern volatile double axisspeed_motor_A;
 extern volatile double current_x_distance;
 extern volatile double axisspeed_motor_B;
 extern volatile double current_y_distance;
+
+extern volatile bool a_origin_found;
+extern volatile bool b_origin_found;
 
 /*
 extern volatile unsigned char x_pos_current = 0; // Used for tracking current position of the linear actuator
@@ -148,7 +152,9 @@ void button_init(void){
     PORTB |= ((1 << BUTTON8) | (1 << BUTTON9));
     
     PCICR |= (1 << PCIE2); // Pin change interrupt control register, enabled the bit where out buttons are
-    PCMSK2 |= ((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON7)); // Enabling the interrupt for BUTTON7, so only when that is pressed will the interrupt be executed
+    PCMSK2 |= ((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON7)); 
+    // Enabling the interrupt for BUTTON0,1,7, so only when that is pressed will the interrupt be executed 
+    // - 0,1 for edge detection - 7 paused mode
 
     /*
     //initializing the external interrupts - see page 54
@@ -396,5 +402,29 @@ void extruder_control(extruder_instruction g_instruction) {
     if(g_instruction == G2) {
         PWM_T3C_set(EXTRUDERSQUISHSTRENGTH);
     }
+
+}
+
+void origin_function(void) {
+
+    // Center with A motor
+    PWM_T3A_direction_change(0);
+    while(a_origin_found == false) {
+
+        PWM_T3A_set(ORIGIN_PWM_STRENGTH);
+
+    }
+    PWM_T3A_set(0);
+    PWM_T3A_direction_change(1);
+
+    PWM_T3B_direction_change(0);
+    while(b_origin_found == false) {
+
+        PWM_T3B_set(ORIGIN_PWM_STRENGTH);
+
+    }
+    PWM_T3B_set(0);
+    PWM_T3B_direction_change(1);
+
 
 }

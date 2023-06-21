@@ -15,7 +15,7 @@
 #include "file_proccessing.h"
 #include "motorandgpio.h"
 
-typedef enum{
+typedef enum {
 
     memory_init, // Preparing for incoming file
     upload, // Upload of file
@@ -41,6 +41,9 @@ volatile double axisspeed_motor_A = 0;
 volatile double current_x_distance = 0;
 volatile double axisspeed_motor_B = 0;
 volatile double current_y_distance = 0;
+
+volatile bool a_origin_found = false;
+volatile bool b_origin_found = false;
 
 volatile unsigned char dx_pos = 0; // Used for tracking current position of the linear actuator
 volatile unsigned char dy_pos = 0;
@@ -84,6 +87,16 @@ ISR(PCINT2_vect) {
         }
         _delay_ms(200);
     }
+
+    if((PINK & (1 << BUTTON0)) == 0) {
+
+
+    }
+
+    if((PINK & (1 << BUTTON7)) == 0) {
+
+
+    }
    
 }
 
@@ -103,7 +116,7 @@ ISR(TIMER5_CAPT_vect) { // heeey
     TOGGLE_ONBOARD_LED
 
     dx_pos++;
-    printf("dx_pos %d\n", dx_pos);
+    //printf("dx_pos %d\n", dx_pos);
 }
 
 ISR(TIMER4_OVF_vect) {
@@ -119,10 +132,10 @@ ISR(TIMER4_CAPT_vect) {
 
     timer4overflow_count = 0;
     TOGGLE_ONBOARD_LED   
-    printf("Hello"); 
+    
 
     dy_pos++;
-    printf("dy_pos %d", dy_pos);
+    //printf("dy_pos %d\n", dy_pos);
 }
 
 
@@ -227,6 +240,7 @@ int main(void) {
             alternative_PWM_control_init();
             //PWM_control_ext_int_init();
             PWM_T3AB_init();
+            /*
             PWM_T3A_direction_change(1);
             PWM_T3A_set(100);
             _delay_ms(1000);
@@ -235,6 +249,7 @@ int main(void) {
             PWM_T3A_set(0);
             PWM_T3A_direction_change(0);
             _delay_ms(3000);
+            */
             
             // This new and improved version needs to be tested
             unsigned char desired_PWM = 100;
@@ -247,9 +262,9 @@ int main(void) {
             	
                 if(cakefile.instruction_locations[print_index] == 0) {
                     printf("\nGo from x: %d to %d and from y: %d and %d", temp.x, cakefile.path[print_index].table_coord.x, temp.y, cakefile.path[print_index].table_coord.y);
-                    //alternative_PWM_control((unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
-                    PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
-                    while(((unsigned char)cakefile.path[print_index].table_coord.x > dx_pos) && ((unsigned char)cakefile.path[print_index].table_coord.y > dy_pos));
+                    alternative_PWM_control((unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
+                    //PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
+                    //while(((unsigned char)cakefile.path[print_index].table_coord.x > dx_pos) && ((unsigned char)cakefile.path[print_index].table_coord.y > dy_pos));
                     temp.x = cakefile.path[print_index].table_coord.x;
                     temp.y = cakefile.path[print_index].table_coord.y;
                     //_delay_ms(1000);
