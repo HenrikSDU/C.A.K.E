@@ -99,11 +99,11 @@ ISR(TIMER5_CAPT_vect) { // heeey
     current_y_distance += TICKDISTANCE;
 
     timer5overflow_count = 0;
-    printf("Hello");
+    
     TOGGLE_ONBOARD_LED
 
     dx_pos++;
-    printf("dx_pos %d", dx_pos);
+    printf("dx_pos %d\n", dx_pos);
 }
 
 ISR(TIMER4_OVF_vect) {
