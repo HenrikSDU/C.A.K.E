@@ -103,6 +103,7 @@ ISR(TIMER5_CAPT_vect) { // heeey
     TOGGLE_ONBOARD_LED
 
     dx_pos++;
+    printf("dx_pos %d", dx_pos);
 }
 
 ISR(TIMER4_OVF_vect) {
@@ -121,6 +122,7 @@ ISR(TIMER4_CAPT_vect) {
     printf("Hello"); 
 
     dy_pos++;
+    printf("dy_pos %d", dy_pos);
 }
 
 
