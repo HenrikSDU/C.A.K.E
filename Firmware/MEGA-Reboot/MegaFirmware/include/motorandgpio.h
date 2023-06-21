@@ -148,7 +148,7 @@ void button_init(void){
     PORTB |= ((1 << BUTTON8) | (1 << BUTTON9));
     
     PCICR |= (1 << PCIE2); // Pin change interrupt control register, enabled the bit where out buttons are
-    PCMSK2 |= (1 << BUTTON7); // Enabling the interrupt for BUTTON7, so only when that is pressed will the interrupt be executed
+    PCMSK2 |= ((1 << BUTTON0) | (1 << BUTTON1) | (1 << BUTTON7)); // Enabling the interrupt for BUTTON7, so only when that is pressed will the interrupt be executed
 
     /*
     //initializing the external interrupts - see page 54
