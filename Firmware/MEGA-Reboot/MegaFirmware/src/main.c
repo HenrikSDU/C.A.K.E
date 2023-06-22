@@ -45,8 +45,8 @@ volatile double current_y_distance = 0;
 volatile bool a_origin_found = false;
 volatile bool b_origin_found = false;
 
-volatile unsigned char dx_pos = 0; // Used for tracking current position of the linear actuator
-volatile unsigned char dy_pos = 0;
+volatile float dx_pos = 0.0; // Used for tracking current position of the linear actuator
+volatile float dy_pos = 0.0;
 
 volatile char file[SUPPORTEDFILESIZE]; // Saves the incoming bytes from the computer 
 
@@ -115,8 +115,7 @@ ISR(TIMER5_CAPT_vect) { // heeey
     
     TOGGLE_ONBOARD_LED
 
-    dx_pos++;
-    //printf("dx_pos %d\n", dx_pos);
+    dx_pos = dx_pos + TICKDISTANCE;
 }
 
 ISR(TIMER4_OVF_vect) {
@@ -131,11 +130,9 @@ ISR(TIMER4_CAPT_vect) {
     current_x_distance += TICKDISTANCE;
 
     timer4overflow_count = 0;
-    TOGGLE_ONBOARD_LED   
-    
+    TOGGLE_ONBOARD_LED 
 
-    dy_pos++;
-    //printf("dy_pos %d\n", dy_pos);
+    dy_pos = dy_pos + TICKDISTANCE;
 }
 
 
@@ -237,6 +234,9 @@ int main(void) {
 
 
         while(phase == main_operation) {
+
+            PWM_CONTROL_RETURN PWM_control_feedback = {0};
+
             alternative_PWM_control_init();
             //PWM_control_ext_int_init();
             PWM_T3AB_init();
@@ -252,7 +252,7 @@ int main(void) {
             */
             
             // This new and improved version needs to be tested
-            unsigned char desired_PWM = 100;
+            unsigned char desired_PWM = 150;
             coordinate temp;
             temp.x = 0;
             temp.y = 0;
@@ -262,25 +262,61 @@ int main(void) {
             	
                 if(cakefile.instruction_locations[print_index] == 0) {
                     printf("\nGo from x: %d to %d and from y: %d and %d", temp.x, cakefile.path[print_index].table_coord.x, temp.y, cakefile.path[print_index].table_coord.y);
-                    alternative_PWM_control((unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
-                    //PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
-                    //while(((unsigned char)cakefile.path[print_index].table_coord.x > dx_pos) && ((unsigned char)cakefile.path[print_index].table_coord.y > dy_pos));
+                    //alternative_PWM_control((unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
+                    PWM_control_feedback = PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
+                    printf("Before while\n");
+                    printf("table_coord.x - temp.x = %.2f   ,   table_coord.y - temp.y = %.2f\n", (float)(cakefile.path[print_index].table_coord.x - temp.x), (float)(cakefile.path[print_index].table_coord.y - temp.y));
+                    
+                    uint8_t x_speed_adjustable = PWM_control_feedback.x_speed;
+                    uint8_t y_speed_adjustable = PWM_control_feedback.y_speed;
+                    printf("x_speed_adjustable %d   ,   y_speed_adjustable %d\n", x_speed_adjustable, y_speed_adjustable);
+
+                    while((abs_value((float)(cakefile.path[print_index].table_coord.x - temp.x)) > dx_pos) && (abs_value((float)(cakefile.path[print_index].table_coord.y - temp.y)) > dy_pos)) {
+                        float actual_slope = dy_pos/dx_pos;
+                        printf("dx = %.2f  ,  dy = %.2f, slope: %.2f  ,  PWM_x %d  ,  PWM_y %d\n", dx_pos, dy_pos, actual_slope, x_speed_adjustable, y_speed_adjustable);
+                        /*
+                        */
+                        
+                        // Control Section checking the slope
+                        // uint8_t pwm_adjust_value = (uint8_t)PWMADJUSTVALUE(fabs(actual_slope - PWM_control_feedback.slope));
+                        /*
+                        if(pwm_adjust_value > 40) {
+                            pwm_adjust_value = 40;
+                        }
+                        */
+
+                        if((actual_slope < PWM_control_feedback.slope) && (y_speed_adjustable < (0xFF - PWMADJUSTRATE))) {
+                            y_speed_adjustable += PWMADJUSTRATE;
+                            printf("y_speed adjusted to: %u\n", y_speed_adjustable);
+                        } 
+                        else {
+                            if((actual_slope > PWM_control_feedback.slope) && (y_speed_adjustable > (0x00 + PWMADJUSTRATE))) {
+                                y_speed_adjustable -= PWMADJUSTRATE;
+                                printf("y_speed adjusted to: %u\n", y_speed_adjustable);
+                            }
+                        }
+                        //PWM_T3B_set(x_speed_adjustable);                         
+                        PWM_T3A_set(y_speed_adjustable);  
+                                             
+                    }
+                    printf("After while\n");
+                    
                     temp.x = cakefile.path[print_index].table_coord.x;
                     temp.y = cakefile.path[print_index].table_coord.y;
                     //_delay_ms(1000);
-                    dx_pos = 0;
-                    dy_pos = 0;
+                    dx_pos = 0.0;
+                    dy_pos = 0.0;
                 }
 
                 if(cakefile.instruction_locations[print_index] == 1) {
-                    printf("\nExecute G%d", cakefile.path[print_index].extruder_inst + 1);
+                    printf("\nExecute G%d\n", cakefile.path[print_index].extruder_inst + 1);
                     // Execute G instruction
-                    extruder_control(cakefile.path[print_index].extruder_inst);
+                    //extruder_control(cakefile.path[print_index].extruder_inst);
                 }
                
             }
             PWM_T3A_set(0);
-            PWM_T3A_set(0);
+            PWM_T3B_set(0);
             _delay_ms(10000);
             ////////////////////////
             //cli();
@@ -305,21 +341,21 @@ int main(void) {
                     TOGGLE_ONBOARD_LED
                     
                     
-                    _delay_ms(200);
+                    _delay_ms(100);
                 }
 
                 if((PINK & (1 << BUTTON4)) == 0) { // Green Cable
                     motorA_PWM += 10;
                     //printf("desPWM: %u ", desired_PWM);
                     TOGGLE_ONBOARD_LED
-                    _delay_ms(200);
+                    _delay_ms(100);
                 }
                 if((PINK & (1 << BUTTON5)) == 0) { // White Cable
 
                     motorA_PWM -= 10;
                     TOGGLE_ONBOARD_LED
                     //printf("desPWM: %u ", desired_PWM);
-                    _delay_ms(200);
+                    _delay_ms(100);
                 }
                 if((PINK & (1 << BUTTON6)) == 0) { // Grey Cable
                     direction = 0b00000001 & direction;
@@ -329,7 +365,7 @@ int main(void) {
                     //printf("dir:%d",direction);
                     TOGGLE_ONBOARD_LED
                     direction++;
-                    _delay_ms(2000);
+                    _delay_ms(500);
                 }
                 if((PINB & (1 << BUTTON8)) == 0) { // Yellow Cable
                     motorB_PWM += 10;

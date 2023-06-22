@@ -1,5 +1,12 @@
 // The SDU CAKE program
 
+/*
+    Motor A: Y-direction - measured by timer 4 ICP
+    Motor B: X-direction - measured by timer 5 ICP
+
+
+*/
+
 /* Macros for GPIO pins */
 #define BUTTON0 PK0
 #define BUTTON1 PK1
@@ -27,6 +34,9 @@
 #define EXTRUDERSQUISHSTRENGTH 30
 #define ORIGIN_PWM_STRENGTH 35
 
+#define PWMADJUSTVALUE(ERROR) (18.9 * ERROR) + 1
+// (147.1*square(ERROR)) + (18.9 * ERROR) + 1
+
 /* Very fancy custom macro for easy debugging command */
 #define TOGGLE_ONBOARD_LED DDRB |= 0b10000000; PORTB ^= (1 << PORTB7);
 
@@ -42,7 +52,14 @@
 
 #include "usart.h"
 
+// Return Struct for PWM_control function containing PWM values for x and y speed and slope
+typedef struct {
+    
+    uint8_t x_speed;
+    uint8_t y_speed;
+    float slope;
 
+} PWM_CONTROL_RETURN;
 
 // External variables (they can be accessed by the file this header is included in, the word extern does this)
 extern volatile double axisspeed_motor_A;
@@ -185,30 +202,37 @@ void PWM_control_ext_int_init() {
     sei();
 }
 
-void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
+PWM_CONTROL_RETURN PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, unsigned char y1, unsigned char y2) {
+    
+    // Reset PWM to zero in order to stop unwanted movement
+    //PWM_T3A_set(0);
+    //PWM_T3B_set(0);
+
+    PWM_CONTROL_RETURN function_return;
+
     unsigned char x_dir; // X direction, indicated by F, B or S
     unsigned char y_dir;
-    unsigned char x_speed = 0; // Self-explanatory
+    unsigned char x_speed = 0; // PWM values for x and y axis
     unsigned char y_speed = 0;
     float dx = (float)x2 - (float)x1; // Unsigned chars are not good for division, hence the conversion to float
     float dy = (float)y2 - (float)y1;
     float slope = 0.0; // Slope of the vector between the two points
 
     if(dx > 0) {
-        PWM_T3A_direction_change(1); // Forward
+        PWM_T3B_direction_change(1); // Forward
         x_dir = 'F'; // Forward
     } else if(dx < 0) {
-        PWM_T3A_direction_change(0); // Backward
+        PWM_T3B_direction_change(0); // Backward
         x_dir = 'B'; // Backward
     } else if(dx == 0) {
         x_dir = 'S'; // Stop
     }
 
     if(dy > 0) {
-        PWM_T3B_direction_change(1); // Forward
+        PWM_T3A_direction_change(1); // Forward
         y_dir = 'F';
     } else if(dy < 0) {
-        PWM_T3B_direction_change(0); // Backward
+        PWM_T3A_direction_change(0); // Backward
         y_dir = 'B';
     } else if(dy == 0) {
         y_dir = 'S';
@@ -219,44 +243,50 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
 
     if((x_dir == 'S') || (y_dir == 'S')) {
         if(x_dir == 'S') {
-            PWM_T3A_set(0);
-        }
-        else if(x_dir != 'S') {
-            PWM_T3A_set(base_PWM);
-        }
-        if(y_dir == 'S') {
             PWM_T3B_set(0);
         }
-        else if(y_dir != 'S') {
+        else if(x_dir != 'S') {
             PWM_T3B_set(base_PWM);
+        }
+        
+        if(y_dir == 'S') {
+            PWM_T3A_set(0);
+        }
+        else if(y_dir != 'S') {
+            PWM_T3A_set(base_PWM);
         }
     } else {
         slope = dy / dx; // Had problems with unsigned chars being divided so I used floats
 
         if(slope < 1) {
-            while(((slope * base_PWM) < 60) &&  (base_PWM != 255)) {
+            PWM_T3B_set(0);
+            PWM_T3A_set(0);
+            while(((slope * (float)base_PWM) < 60) &&  (base_PWM != 255)) {
                 base_PWM++;
                 printf("while condition: %f   ", slope * base_PWM);
                 printf("BasePWM: %d\n", base_PWM);
+                printf("Slope: %f\n", slope);
             }
             x_speed = base_PWM;
-            y_speed = (int)(slope * (float)base_PWM);
+            y_speed = (unsigned char)(slope * (float)base_PWM);
 
         } else if(slope > 1) {
-            while(((slope * base_PWM) > 255) && (base_PWM != 40)) {
+            PWM_T3B_set(0);
+            PWM_T3A_set(0);
+            while(((slope * (float)base_PWM) > 255) && (base_PWM != 60)) {
                 base_PWM--;
                 printf("BasePWM: %d", base_PWM);
             }
             x_speed = base_PWM;
-            y_speed = (int)(slope * (float)base_PWM);
+            y_speed = (unsigned char)(slope * (float)base_PWM);
 
         } else if(slope == 1) {
-            base_PWM = 100;
+            base_PWM = 120;
             x_speed = base_PWM;
             y_speed = base_PWM;
         }
-        PWM_T3A_set(x_speed);
-        PWM_T3B_set(y_speed);
+        PWM_T3B_set(x_speed);
+        PWM_T3A_set(y_speed);
     }
     // Debug prints
     /**/
@@ -264,6 +294,12 @@ void PWM_control(unsigned char base_PWM, unsigned char x1, unsigned char x2, uns
     printf("X_dir: %c, Speed: %d\n", x_dir, x_speed);
     printf("Y_dir: %c, Speed: %d\n", y_dir, y_speed);
     printf("Slope: %f\n", slope);
+
+    function_return.x_speed = x_speed;
+    function_return.y_speed = y_speed;
+    function_return.slope = slope;
+    
+    return function_return;
 }
 
 void alternative_PWM_control_init(void) {
