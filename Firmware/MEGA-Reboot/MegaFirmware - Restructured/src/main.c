@@ -96,7 +96,7 @@ ISR(PCINT2_vect) {
 
     }
 
-    if((PINK & (1 << BUTTON7)) == 0) {
+    if((PINK & (1 << BUTTON1)) == 0) {
 
         // Indicate successful zeroing on axis b
         a_origin_found = true;
