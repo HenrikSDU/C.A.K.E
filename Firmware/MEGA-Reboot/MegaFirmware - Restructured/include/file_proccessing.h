@@ -51,6 +51,15 @@ typedef struct{
 
 }CAKEFILE;
 
+typedef struct {
+
+    coordinate point;
+    uint8_t g_command;
+
+}g_instruction_t;
 
 
-void file_processing(CAKEFILE* cakefile, volatile char* file, int filesize);
+
+
+
+void file_processing(g_instruction_t* g_instructions, volatile char* file, int filesize);

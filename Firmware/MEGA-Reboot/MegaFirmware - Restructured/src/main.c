@@ -50,7 +50,8 @@ volatile float dy_pos = 0.0;
 
 volatile char file[SUPPORTEDFILESIZE]; // Saves the incoming bytes from the computer 
 
-CAKEFILE cakefile; // Contains an array of instructions and points (table_instruction(s)) and an array that indicates whether the data saved at a specific index is a coordinate or an extruder instruction
+//CAKEFILE cakefile; // Contains an array of instructions and points (table_instruction(s)) and an array that indicates whether the data saved at a specific index is a coordinate or an extruder instruction
+g_instruction_t g_instructions[MAXIMUMINSTRUCTIONCOUNT];
 
 ISR(USART0_RX_vect) {
     
@@ -197,7 +198,7 @@ int main(void) {
         
 
         while(phase == upload) {
-            int k;
+        
             //PORTB |= (1 << PB5);
 
             if((interrupt_count) >= filesize) { // Checking for successful upload
@@ -205,27 +206,23 @@ int main(void) {
                 interrupt_count = 0; // Resetting interrupt count
                 //PORTD |= (1 << PD4);
                 
-                for(k = 0; k < filesize; k++) // Send file back for feedback
+                for(int k = 0; k < filesize; k++) // Send file back for feedback
                     usart_send(file[k]);
 
                 UCSR0B &= ~(1 << RXCIE0); // Disable rx-interrupt
 
-                file_processing(&cakefile, file, filesize); // Proccessing the recieved array
+                file_processing(g_instructions, file, filesize); // Proccessing the recieved array
                              
-                printf("FS:%d", filesize);
-                for(k = 0; k < instruction_count; k++) {
+                printf("FS:%d\n", filesize);
+                printf("\nG%d X%d Y%d\n\n", g_instructions[0].g_command, g_instructions[0].point.x, g_instructions[0].point.y);
+                for(int k = 0; k < instruction_count; k++) {
 
-                    if(cakefile.instruction_locations[k] == 1) {
-                        printf("G%d", cakefile.path[k].extruder_inst + 1);
-                    }
-                    else {
-                        printf("X:%dY:%d ", cakefile.path[k].table_coord.x, cakefile.path[k].table_coord.y);
-                    }
+                    printf("G%d X%d Y%d\n", g_instructions[k].g_command, g_instructions[k].point.x, g_instructions[k].point.y);
                     
                 }
                 
                 
-                phase = main_operation;
+                //phase = main_operation;
 
             }
             
@@ -240,81 +237,7 @@ int main(void) {
             alternative_PWM_control_init();
             //PWM_control_ext_int_init();
             PWM_T3AB_init();
-            /*
-            PWM_T3A_direction_change(1);
-            PWM_T3A_set(100);
-            _delay_ms(1000);
-            PWM_T3A_direction_change(0);
-            _delay_ms(1000);
-            PWM_T3A_set(0);
-            PWM_T3A_direction_change(0);
-            _delay_ms(3000);
-            */
-            
-            // This new and improved version needs to be tested
-            unsigned char desired_PWM = 150;
-            coordinate temp;
-            temp.x = 0;
-            temp.y = 0;
-
-            for(int print_index = 0; print_index < instruction_count; print_index++) {
-                   printf("\nPrintIndex: %d", print_index);
-            	
-                if(cakefile.instruction_locations[print_index] == 0) {
-                    printf("\nGo from x: %d to %d and from y: %d and %d", temp.x, cakefile.path[print_index].table_coord.x, temp.y, cakefile.path[print_index].table_coord.y);
-                    //alternative_PWM_control((unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
-                    PWM_control_feedback = PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)cakefile.path[print_index].table_coord.x, (unsigned char)temp.y, (unsigned char)cakefile.path[print_index].table_coord.y);
-                    printf("Before while\n");
-                    printf("table_coord.x - temp.x = %.2f   ,   table_coord.y - temp.y = %.2f\n", (float)(cakefile.path[print_index].table_coord.x - temp.x), (float)(cakefile.path[print_index].table_coord.y - temp.y));
-                    
-                    uint8_t x_speed_adjustable = PWM_control_feedback.x_speed;
-                    uint8_t y_speed_adjustable = PWM_control_feedback.y_speed;
-                    printf("x_speed_adjustable %d   ,   y_speed_adjustable %d\n", x_speed_adjustable, y_speed_adjustable);
-
-                    while((abs_value((float)(cakefile.path[print_index].table_coord.x - temp.x)) > dx_pos) && (abs_value((float)(cakefile.path[print_index].table_coord.y - temp.y)) > dy_pos)) {
-                        float actual_slope = dy_pos/dx_pos;
-                        printf("dx = %.2f  ,  dy = %.2f, slope: %.2f  ,  PWM_x %d  ,  PWM_y %d\n", dx_pos, dy_pos, actual_slope, x_speed_adjustable, y_speed_adjustable);
-                        /*
-                        */
-                        
-                        // Control Section checking the slope
-                        // uint8_t pwm_adjust_value = (uint8_t)PWMADJUSTVALUE(fabs(actual_slope - PWM_control_feedback.slope));
-                        /*
-                        if(pwm_adjust_value > 40) {
-                            pwm_adjust_value = 40;
-                        }
-                        */
-                        
-                        if((actual_slope < PWM_control_feedback.slope) && (y_speed_adjustable < (0xFF - PWMADJUSTRATE))) {
-                            y_speed_adjustable += PWMADJUSTRATE;
-                            printf("y_speed adjusted to: %u\n", y_speed_adjustable);
-                        } 
-                        else {
-                            if((actual_slope > PWM_control_feedback.slope) && (y_speed_adjustable > (0x00 + PWMADJUSTRATE))) {
-                                y_speed_adjustable -= PWMADJUSTRATE;
-                                printf("y_speed adjusted to: %u\n", y_speed_adjustable);
-                            }
-                        }
-                        // PWM_T3B_set(x_speed_adjustable);                         
-                        // PWM_T3A_set(y_speed_adjustable);  
-                                             
-                    }
-                    printf("After while\n");
-                    
-                    temp.x = cakefile.path[print_index].table_coord.x;
-                    temp.y = cakefile.path[print_index].table_coord.y;
-                    //_delay_ms(1000);
-                    dx_pos = 0.0;
-                    dy_pos = 0.0;
-                }
-
-                if(cakefile.instruction_locations[print_index] == 1) {
-                    printf("\nExecute G%d\n", cakefile.path[print_index].extruder_inst + 1);
-                    // Execute G instruction
-                    //extruder_control(cakefile.path[print_index].extruder_inst);
-                }
-               
-            }
+    
             PWM_T3A_set(0);
             PWM_T3B_set(0);
             _delay_ms(10000);

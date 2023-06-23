@@ -14,7 +14,7 @@
 
 #include "file_proccessing.h"
 
-void file_processing(CAKEFILE* cakefile, volatile char* file, int filesize){
+void file_processing(g_instruction_t* g_instructions, volatile char* file, int filesize){
     
     // This function has to deal with the problem of extracting data from the recieved array of characters/bytes. On the PC the information 
     // is saved in ASCII, even the numbers. For example, 15 would not be send as 0b00001111, but as first a 1 and then a 5
@@ -29,64 +29,70 @@ void file_processing(CAKEFILE* cakefile, volatile char* file, int filesize){
     // https://www.sciencebuddies.org/science-fair-projects/references/ascii-table
 
 
-   
+    extruder_instruction temp_extruder_instruction;
     int savelocation = 0; // Location in the CAKEFILE that is written to
     for(int read_index = 0; read_index < filesize; read_index++) {
 
         if(file[read_index] == 'G') {
-            
-            cakefile->instruction_locations[savelocation] = 1; // A one indicates that at the position a instruction is saved
 
-            cakefile->path[savelocation].extruder_inst = (file[read_index + 1] & 0x0F) - 1;//extracts the instruction  -- atoi() -
+            g_instructions[savelocation].g_command = (file[read_index + 1] & 0x0F);
+            temp_extruder_instruction = g_instructions[savelocation].g_command;
+
+            printf("G_found: %d\n", g_instructions[savelocation].g_command);
             
             //read_index++;//handeling that the instruction is two bytes
 
-            savelocation++; // Incrementing savelocation in order not to overwrite the old instruction when a new one is extracted from the array
+            //savelocation++; // Incrementing savelocation in order not to overwrite the old instruction when a new one is extracted from the array
 
             //printf("G%d", cakefile.path[savelocation].extruder_inst);
         }
         else
         if(file[read_index] == 'X') { // Check for the beginning of a coordinate block - they all are in the form of X(coordinate in ASCII)Y(coordinate in ASCII)
-            
-            cakefile->instruction_locations[savelocation] = 0;//a one indicates that at the position no instruction is saved
-
+            printf("\nG%d X%d Y%d\n\n", g_instructions[0].g_command, g_instructions[0].point.x, g_instructions[0].point.y);
             // Extracting the coordinates
             // X-coordinate
             int string_scanner = 1;//variable to "look ahead" in the string without incrementing read_index
-            cakefile->path[savelocation].table_coord.x = 0; //initializing the coorinate to zero
+            
+            g_instructions[savelocation].point.x = 0;
             while(file[read_index + string_scanner] != 'Y') {
                 
-                cakefile->path[savelocation].table_coord.x *= 10;//shifting the previous number one decimal to the side
-                cakefile->path[savelocation].table_coord.x += (file[read_index + string_scanner] & 0x0F);//adding the new number
+                g_instructions[savelocation].point.x *= 10;
+                g_instructions[savelocation].point.x += (file[read_index + string_scanner] & 0x0F);
+
+                string_scanner++;//increment in order to look one element further in the file array -the next time the while-loop starts
                 
-                string_scanner++;//increment in order to look one element further in the file array the next time the while-loop starts
-                //printf(" %d ", file[read_index + string_scanner] & 0x0F);
             } 
+
+            printf("X_found: %d\n", g_instructions[savelocation].point.x);
+            
             // Updating read_index to start at Y-coordinate
             read_index += string_scanner; //file[read_index] should now be equal to 'Y'
 
-            //printf("X:%d", cakefile.path[savelocation].table_coord.x);
-            
             // Y-coordinate
             string_scanner = 1; // Reseting string scanner variable
-            cakefile->path[savelocation].table_coord.y = 0; // Initializing the coorinate to zero
+            
+            g_instructions[savelocation].point.y = 0;
             while((file[read_index + string_scanner] & 0b00110000)) { // Checking whether there a numbers hidden in ASCII - the expression comes from the ASCII characteristics - numbers are saved like: 0b0011xxxx with the x's being the actual number; new line characters are 0b0000xxxx 
                 
-                cakefile->path[savelocation].table_coord.y *= 10; // Shifting the previous number one decimal to the side
-                cakefile->path[savelocation].table_coord.y += (file[read_index + string_scanner] & 0x0F); // Adding the new number
-                
+                g_instructions[savelocation].point.y *= 10;
+                g_instructions[savelocation].point.y += (file[read_index + string_scanner] & 0x0F);
+
                 string_scanner++;//increment in order to look one element further in the file array the next time the while-loop starts
             }
 
             //printf("Y:%d", cakefile.path[savelocation].table_coord.y);
-
+            printf("Y_found: %d\n", g_instructions[savelocation].point.y);
             //updating read_index in order not to read the chordinates again
-            //read_index += string_scanner; //file[read_index] should now be equal to newline character
+            read_index += string_scanner; //file[read_index] should now be equal to newline character
+
+            g_instructions[savelocation].g_command = temp_extruder_instruction;
 
             savelocation++;//incrementing savelocation in order not to overwrite the old instruction when a new one is extracted from the array
 
         }
         
     }
+
+    printf("\nG%d X%d Y%d\n\n", g_instructions[0].g_command, g_instructions[0].point.x, g_instructions[0].point.y);
     
 }
