@@ -30,7 +30,7 @@ void file_processing(g_instruction_t* g_instructions, volatile char* file, int f
 
 
     extruder_instruction temp_extruder_instruction;
-    int savelocation = 0; // Location in the CAKEFILE that is written to
+    int savelocation = 0; // Location in the g_instructions array that is written to
     for(int read_index = 0; read_index < filesize; read_index++) {
 
         if(file[read_index] == 'G') {
@@ -39,16 +39,11 @@ void file_processing(g_instruction_t* g_instructions, volatile char* file, int f
             temp_extruder_instruction = g_instructions[savelocation].g_command;
 
             printf("G_found: %d\n", g_instructions[savelocation].g_command);
-            
-            //read_index++;//handeling that the instruction is two bytes
-
-            //savelocation++; // Incrementing savelocation in order not to overwrite the old instruction when a new one is extracted from the array
-
-            //printf("G%d", cakefile.path[savelocation].extruder_inst);
+                        
         }
         else
         if(file[read_index] == 'X') { // Check for the beginning of a coordinate block - they all are in the form of X(coordinate in ASCII)Y(coordinate in ASCII)
-            printf("\nG%d X%d Y%d\n\n", g_instructions[0].g_command, g_instructions[0].point.x, g_instructions[0].point.y);
+
             // Extracting the coordinates
             // X-coordinate
             int string_scanner = 1;//variable to "look ahead" in the string without incrementing read_index
@@ -62,8 +57,6 @@ void file_processing(g_instruction_t* g_instructions, volatile char* file, int f
                 string_scanner++;//increment in order to look one element further in the file array -the next time the while-loop starts
                 
             } 
-
-            printf("X_found: %d\n", g_instructions[savelocation].point.x);
             
             // Updating read_index to start at Y-coordinate
             read_index += string_scanner; //file[read_index] should now be equal to 'Y'
@@ -80,8 +73,7 @@ void file_processing(g_instruction_t* g_instructions, volatile char* file, int f
                 string_scanner++;//increment in order to look one element further in the file array the next time the while-loop starts
             }
 
-            //printf("Y:%d", cakefile.path[savelocation].table_coord.y);
-            printf("Y_found: %d\n", g_instructions[savelocation].point.y);
+            
             //updating read_index in order not to read the chordinates again
             read_index += string_scanner; //file[read_index] should now be equal to newline character
 
@@ -92,7 +84,5 @@ void file_processing(g_instruction_t* g_instructions, volatile char* file, int f
         }
         
     }
-
-    printf("\nG%d X%d Y%d\n\n", g_instructions[0].g_command, g_instructions[0].point.x, g_instructions[0].point.y);
     
 }
