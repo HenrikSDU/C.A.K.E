@@ -2,8 +2,11 @@
 
 /*
     Motor A: Y-direction - measured by timer 4 ICP
-    Motor B: X-direction - measured by timer 5 ICP
+    Zero: BUTTON1 yellow
 
+
+    Motor B: X-direction - measured by timer 5 ICP
+    Zero: BUTTON0
 
 */
 

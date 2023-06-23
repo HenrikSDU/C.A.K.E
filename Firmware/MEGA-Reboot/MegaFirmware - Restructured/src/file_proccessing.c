@@ -37,8 +37,6 @@ void file_processing(g_instruction_t* g_instructions, volatile char* file, int f
 
             g_instructions[savelocation].g_command = (file[read_index + 1] & 0x0F);
             temp_extruder_instruction = g_instructions[savelocation].g_command;
-
-            printf("G_found: %d\n", g_instructions[savelocation].g_command);
                         
         }
         else

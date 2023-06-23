@@ -90,11 +90,17 @@ ISR(PCINT2_vect) {
 
     if((PINK & (1 << BUTTON0)) == 0) {
 
+        // Indicate successful zeroing on axis a
+        b_origin_found = true; 
+        printf("\nButton0\n");
 
     }
 
-    if((PINK & (1 << BUTTON7)) == 0) {
+    if((PINK & (1 << BUTTON1)) == 0) {
 
+        // Indicate successful zeroing on axis b
+        a_origin_found = true;
+        printf("\nButton1\n");
 
     }
    
@@ -240,6 +246,7 @@ int main(void) {
             alternative_PWM_control_init();
             //PWM_control_ext_int_init();
             PWM_T3AB_init();
+            origin_function();
             /*
             PWM_T3A_direction_change(1);
             PWM_T3A_set(100);
@@ -257,7 +264,7 @@ int main(void) {
             temp.x = 0;
             temp.y = 0;
 
-            for(int print_index = 0; print_index < instruction_count; print_index++) {
+            for(int print_index = 0; print_index < instruction_count-1; print_index++) {
                    printf("\nPrintIndex: %d", print_index);
             	
                 if(cakefile.instruction_locations[print_index] == 0) {
@@ -311,7 +318,7 @@ int main(void) {
                 if(cakefile.instruction_locations[print_index] == 1) {
                     printf("\nExecute G%d\n", cakefile.path[print_index].extruder_inst + 1);
                     // Execute G instruction
-                    //extruder_control(cakefile.path[print_index].extruder_inst);
+                    extruder_control(cakefile.path[print_index].extruder_inst);
                 }
                
             }

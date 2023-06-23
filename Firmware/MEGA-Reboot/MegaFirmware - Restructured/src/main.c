@@ -91,11 +91,15 @@ ISR(PCINT2_vect) {
 
     if((PINK & (1 << BUTTON0)) == 0) {
 
+        // Indicate successful zeroing on axis a
+        b_origin_found = true; 
 
     }
 
     if((PINK & (1 << BUTTON7)) == 0) {
 
+        // Indicate successful zeroing on axis b
+        a_origin_found = true;
 
     }
    
@@ -214,7 +218,6 @@ int main(void) {
                 file_processing(g_instructions, file, filesize); // Proccessing the recieved array
                              
                 printf("FS:%d\n", filesize);
-                printf("\nG%d X%d Y%d\n\n", g_instructions[0].g_command, g_instructions[0].point.x, g_instructions[0].point.y);
                 for(int k = 0; k < instruction_count; k++) {
 
                     printf("G%d X%d Y%d\n", g_instructions[k].g_command, g_instructions[k].point.x, g_instructions[k].point.y);
@@ -222,7 +225,7 @@ int main(void) {
                 }
                 
                 
-                //phase = main_operation;
+                phase = main_operation;
 
             }
             
@@ -232,14 +235,22 @@ int main(void) {
 
         while(phase == main_operation) {
 
+
+            // Initialization of Table
             PWM_CONTROL_RETURN PWM_control_feedback = {0};
 
             alternative_PWM_control_init();
-            //PWM_control_ext_int_init();
+            
             PWM_T3AB_init();
+
+            // origin_function();
     
             PWM_T3A_set(0);
             PWM_T3B_set(0);
+
+            // Control Section
+
+
             _delay_ms(10000);
             ////////////////////////
             //cli();
