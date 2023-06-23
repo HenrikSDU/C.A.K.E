@@ -1,0 +1,526 @@
+PS C:\Users\botib\OneDrive\Dokumentumok\EmbeddedSystems\SemesterProject2\Code\C.A.K.E\FileUpload> .\FileUpload COM8 NewTest1.cake
+3
+COM8
+NewTest1.cake
+
+BaudRate = 115200, ByteSize = 8, Parity = 0, StopBits = 0
+
+BaudRate = 9600, ByteSize = 8, Parity = 0, StopBits = 0
+Serial port COM8 successfully reconfigured.
+
+SettingMemoryInitflags
+0 0 0 0 0 0 0 0 0 0
+Filelength: 52
+
+9 instructions found!
+Determined filelength: 52
+Updated memoryinitflags:
+0 52 0 9 0 0 0 0 0 0
+Successfully set Commask
+
+Start Writing to USB-Port
+
+Number of bytes written to the serial port = 10
+waited
+FeedbackValue 0:0
+
+FeedbackValue 1:52
+
+FeedbackValue 2:0
+
+FeedbackValue 3:9
+
+FeedbackValue 4:0
+
+FeedbackValue 5:0
+
+FeedbackValue 6:0
+
+FeedbackValue 7:0
+
+FeedbackValue 8:0
+
+FeedbackValue 9:0
+
+ Bytes returned by the microcontroller:
+0 52 0 9 0 0 0 0 0 0
+Returned filelength: 0
+
+Successfull filelength transmit
+
+Start of File Transmission
+Successfully allocated memory for sendbuffer, 6 bytes
+
+Successfully allocated memory for receivebuffer, 6 bytes
+G1
+X31Y24
+G2
+X146Y96
+G1
+X15Y141
+G2
+X135Y141
+        
+Purging ComSurccessfully purged comm
+Start Transmit of File
+Write Success - 52 bytes written!
+waited
+G1
+X31Y24
+G2
+X146Y96
+G1
+X15Y141
+G2
+X135Y141
+        FS:52G1X:31Y:24 G2X:146Y:96 G1X:15Y:141 G2X:135Y:141 X:0Y:0
+PrintIndex: 0
+Execute G1
+
+PrintIndex: 1
+Go from x: 0 to 31 and from y: 0 and 24
+dx: 31 - 0 = 31 (31.000000), 24 - 0 = 24 (24.000000)
+X_dir: F, Speed: 90
+Y_dir: F, Speed: 69
+Slope: 0.774194
+Before while
+table_coord.x - temp.x = 31.00   ,   table_coord.y - temp.y = 24.00
+x_speed_adjustable 90   ,   y_speed_adjustable 69
+dx = 5.42  ,  dy = 2.08, slope: 0.38
+y_speed adjusted to: 72
+dx = 7.08  ,  dy = 2.71, slope: 0.38
+y_speed adjusted to: 75
+dx = 8.96  ,  dy = 3.33, slope: 0.37
+y_speed adjusted to: 78
+dx = 10.83  ,  dy = 4.17, slope: 0.38
+y_speed adjusted to: 81
+dx = 12.29  ,  dy = 4.58, slope: 0.37
+y_speed adjusted to: 84
+dx = 13.75  ,  dy = 5.42, slope: 0.39
+y_speed adjusted to: 87
+dx = 15.42  ,  dy = 6.25, slope: 0.41
+y_speed adjusted to: 90
+dx = 17.08  ,  dy = 7.29, slope: 0.43
+y_speed adjusted to: 93
+dx = 18.54  ,  dy = 8.75, slope: 0.47
+y_speed adjusted to: 96
+dx = 20.00  ,  dy = 10.00, slope: 0.50
+y_speed adjusted to: 99
+dx = 21.46  ,  dy = 11.25, slope: 0.52
+y_speed adjusted to: 102
+dx = 23.13  ,  dy = 12.50, slope: 0.54
+y_speed adjusted to: 105
+dx = 24.79  ,  dy = 13.96, slope: 0.56
+y_speed adjusted to: 108
+dx = 26.67  ,  dy = 15.42, slope: 0.58
+y_speed adjusted to: 111
+dx = 28.13  ,  dy = 17.08, slope: 0.61
+y_speed adjusted to: 114
+dx = 29.79  ,  dy = 18.33, slope: 0.62
+y_speed adjusted to: 117
+After while
+
+PrintIndex: 2
+Execute G2
+
+PrintIndex: 3
+Go from x: 31 to 146 and from y: 24 and 96
+dx: 146 - 31 = 115 (115.000000), 96 - 24 = 72 (72.000000)
+X_dir: F, Speed: 90
+Y_dir: F, Speed: 56
+Slope: 0.626087
+Before while
+table_coord.x - temp.x = 115.00   ,   table_coord.y - temp.y = 72.00
+x_speed_adjustable 90   ,   y_speed_adjustable 56
+dx = 7.92  ,  dy = 5.00, slope: 0.63
+y_speed adjusted to: 53
+dx = 9.58  ,  dy = 6.04, slope: 0.63
+y_speed adjusted to: 50
+dx = 11.04  ,  dy = 6.46, slope: 0.58
+y_speed adjusted to: 53
+dx = 12.29  ,  dy = 7.29, slope: 0.59
+y_speed adjusted to: 56
+dx = 14.17  ,  dy = 7.50, slope: 0.53
+y_speed adjusted to: 59
+dx = 16.04  ,  dy = 7.92, slope: 0.49
+y_speed adjusted to: 62
+dx = 17.29  ,  dy = 8.33, slope: 0.48
+y_speed adjusted to: 65
+dx = 18.54  ,  dy = 8.54, slope: 0.46
+y_speed adjusted to: 68
+dx = 20.21  ,  dy = 8.96, slope: 0.44
+y_speed adjusted to: 71
+dx = 21.88  ,  dy = 9.58, slope: 0.44
+y_speed adjusted to: 74
+dx = 23.13  ,  dy = 10.42, slope: 0.45
+y_speed adjusted to: 77
+dx = 25.21  ,  dy = 11.04, slope: 0.44
+y_speed adjusted to: 80
+dx = 26.67  ,  dy = 11.67, slope: 0.44
+y_speed adjusted to: 83
+dx = 27.71  ,  dy = 12.29, slope: 0.44
+y_speed adjusted to: 86
+dx = 28.96  ,  dy = 12.92, slope: 0.45
+y_speed adjusted to: 89
+dx = 30.21  ,  dy = 13.75, slope: 0.46
+y_speed adjusted to: 92
+dx = 32.08  ,  dy = 14.37, slope: 0.45
+y_speed adjusted to: 95
+dx = 33.13  ,  dy = 15.42, slope: 0.47
+y_speed adjusted to: 98
+dx = 35.21  ,  dy = 16.46, slope: 0.47
+y_speed adjusted to: 101
+dx = 36.46  ,  dy = 17.71, slope: 0.49
+y_speed adjusted to: 104
+dx = 38.13  ,  dy = 18.54, slope: 0.49
+y_speed adjusted to: 107
+dx = 39.79  ,  dy = 20.00, slope: 0.50
+y_speed adjusted to: 110
+dx = 41.25  ,  dy = 21.25, slope: 0.52
+y_speed adjusted to: 113
+dx = 42.71  ,  dy = 22.92, slope: 0.54
+y_speed adjusted to: 116
+dx = 43.96  ,  dy = 24.58, slope: 0.56
+y_speed adjusted to: 119
+dx = 45.83  ,  dy = 25.83, slope: 0.56
+y_speed adjusted to: 122
+dx = 47.08  ,  dy = 27.71, slope: 0.59
+y_speed adjusted to: 125
+dx = 48.75  ,  dy = 29.58, slope: 0.61
+y_speed adjusted to: 128
+dx = 50.42  ,  dy = 31.46, slope: 0.62
+y_speed adjusted to: 131
+dx = 51.87  ,  dy = 33.13, slope: 0.64
+y_speed adjusted to: 128
+dx = 53.33  ,  dy = 35.42, slope: 0.66
+y_speed adjusted to: 125
+dx = 54.58  ,  dy = 37.08, slope: 0.68
+y_speed adjusted to: 122
+dx = 56.46  ,  dy = 38.96, slope: 0.69
+y_speed adjusted to: 119
+dx = 57.92  ,  dy = 40.62, slope: 0.70
+y_speed adjusted to: 116
+dx = 59.37  ,  dy = 42.92, slope: 0.72
+y_speed adjusted to: 113
+dx = 61.04  ,  dy = 44.58, slope: 0.73
+y_speed adjusted to: 110
+dx = 62.50  ,  dy = 46.46, slope: 0.74
+y_speed adjusted to: 107
+dx = 63.54  ,  dy = 47.92, slope: 0.75
+y_speed adjusted to: 104
+dx = 65.21  ,  dy = 49.79, slope: 0.76
+y_speed adjusted to: 101
+dx = 67.08  ,  dy = 51.46, slope: 0.77
+y_speed adjusted to: 98
+dx = 69.17  ,  dy = 52.92, slope: 0.77
+y_speed adjusted to: 95
+dx = 70.62  ,  dy = 53.96, slope: 0.76
+y_speed adjusted to: 92
+dx = 72.08  ,  dy = 54.79, slope: 0.76
+y_speed adjusted to: 89
+dx = 73.54  ,  dy = 55.83, slope: 0.76
+y_speed adjusted to: 86
+dx = 74.79  ,  dy = 56.87, slope: 0.76
+y_speed adjusted to: 83
+dx = 76.25  ,  dy = 58.33, slope: 0.77
+y_speed adjusted to: 80
+dx = 77.71  ,  dy = 59.37, slope: 0.76
+y_speed adjusted to: 77
+dx = 79.58  ,  dy = 60.21, slope: 0.76
+y_speed adjusted to: 74
+dx = 81.04  ,  dy = 60.62, slope: 0.75
+y_speed adjusted to: 71
+dx = 83.33  ,  dy = 61.46, slope: 0.74
+y_speed adjusted to: 68
+dx = 84.79  ,  dy = 62.08, slope: 0.73
+y_speed adjusted to: 65
+dx = 86.25  ,  dy = 62.50, slope: 0.72
+y_speed adjusted to: 62
+dx = 88.33  ,  dy = 62.92, slope: 0.71
+y_speed adjusted to: 59
+dx = 89.58  ,  dy = 63.54, slope: 0.71
+y_speed adjusted to: 56
+dx = 91.25  ,  dy = 63.75, slope: 0.70
+y_speed adjusted to: 53
+dx = 92.29  ,  dy = 63.75, slope: 0.69
+y_speed adjusted to: 50
+dx = 93.96  ,  dy = 63.96, slope: 0.68
+y_speed adjusted to: 47
+dx = 95.42  ,  dy = 64.37, slope: 0.67
+y_speed adjusted to: 44
+dx = 97.08  ,  dy = 64.37, slope: 0.66
+y_speed adjusted to: 41
+dx = 98.54  ,  dy = 64.58, slope: 0.66
+y_speed adjusted to: 38
+dx = 100.21  ,  dy = 64.58, slope: 0.64
+y_speed adjusted to: 35
+dx = 101.88  ,  dy = 64.58, slope: 0.63
+y_speed adjusted to: 32
+dx = 103.13  ,  dy = 64.79, slope: 0.63
+y_speed adjusted to: 29
+dx = 105.00  ,  dy = 64.79, slope: 0.62
+y_speed adjusted to: 32
+dx = 106.88  ,  dy = 64.79, slope: 0.61
+y_speed adjusted to: 35
+dx = 108.33  ,  dy = 64.79, slope: 0.60
+y_speed adjusted to: 38
+dx = 109.79  ,  dy = 64.79, slope: 0.59
+y_speed adjusted to: 41
+dx = 111.67  ,  dy = 64.79, slope: 0.58
+y_speed adjusted to: 44
+dx = 113.13  ,  dy = 64.79, slope: 0.57
+y_speed adjusted to: 47
+dx = 114.79  ,  dy = 64.79, slope: 0.56
+y_speed adjusted to: 50
+After while
+
+PrintIndex: 4
+Execute G1
+
+PrintIndex: 5
+Go from x: 146 to 15 and from y: 96 and 141while condition: 31.259542   BasePWM: 91
+Slope: 0.343511
+while condition: 31.603054   BasePWM: 92
+Slope: 0.343511
+while condition: 31.946566   BasePWM: 93
+Slope: 0.343511
+while condition: 32.290077   BasePWM: 94
+Slope: 0.343511
+while condition: 32.633591   BasePWM: 95
+Slope: 0.343511
+while condition: 32.977100   BasePWM: 96
+Slope: 0.343511
+while condition: 33.320610   BasePWM: 97
+Slope: 0.343511
+while condition: 33.664124   BasePWM: 98
+Slope: 0.343511
+while condition: 34.007633   BasePWM: 99
+Slope: 0.343511
+while condition: 34.351147   BasePWM: 100
+Slope: 0.343511
+while condition: 34.694656   BasePWM: 101
+Slope: 0.343511
+while condition: 35.038170   BasePWM: 102
+Slope: 0.343511
+while condition: 35.381680   BasePWM: 103
+Slope: 0.343511
+while condition: 35.725193   BasePWM: 104
+Slope: 0.343511
+while condition: 36.068703   BasePWM: 105
+Slope: 0.343511
+while condition: 36.412216   BasePWM: 106
+Slope: 0.343511
+while condition: 36.755726   BasePWM: 107
+Slope: 0.343511
+while condition: 37.099239   BasePWM: 108
+Slope: 0.343511
+while condition: 37.442749   BasePWM: 109
+Slope: 0.343511
+while condition: 37.786263   BasePWM: 110
+Slope: 0.343511
+while condition: 38.129772   BasePWM: 111
+Slope: 0.343511
+while condition: 38.473282   BasePWM: 112
+Slope: 0.343511
+while condition: 38.816795   BasePWM: 113
+Slope: 0.343511
+while condition: 39.160305   BasePWM: 114
+Slope: 0.343511
+while condition: 39.503819   BasePWM: 115
+Slope: 0.343511
+while condition: 39.847328   BasePWM: 116
+Slope: 0.343511
+while condition: 40.190842   BasePWM: 117
+Slope: 0.343511
+
+dx: 15 - 146 = -131 (131.000000), 141 - 96 = 45 (45.000000)
+X_dir: B, Speed: 117
+Y_dir: F, Speed: 40
+Slope: 0.343511
+Before while
+table_coord.x - temp.x = -131.00   ,   table_coord.y - temp.y = 45.00
+x_speed_adjustable 117   ,   y_speed_adjustable 40
+dx = 10.62  ,  dy = 1.88, slope: 0.18
+y_speed adjusted to: 43
+dx = 12.71  ,  dy = 2.08, slope: 0.16
+y_speed adjusted to: 46
+dx = 14.79  ,  dy = 2.50, slope: 0.17
+y_speed adjusted to: 49
+dx = 16.87  ,  dy = 2.50, slope: 0.15
+y_speed adjusted to: 52
+dx = 18.75  ,  dy = 2.71, slope: 0.14
+y_speed adjusted to: 55
+dx = 20.83  ,  dy = 2.71, slope: 0.13
+y_speed adjusted to: 58
+dx = 22.50  ,  dy = 3.12, slope: 0.14
+y_speed adjusted to: 61
+dx = 24.17  ,  dy = 3.33, slope: 0.14
+y_speed adjusted to: 64
+dx = 26.88  ,  dy = 3.75, slope: 0.14
+y_speed adjusted to: 67
+dx = 28.96  ,  dy = 3.96, slope: 0.14
+y_speed adjusted to: 70
+dx = 31.25  ,  dy = 4.17, slope: 0.13
+y_speed adjusted to: 73
+dx = 33.54  ,  dy = 4.79, slope: 0.14
+y_speed adjusted to: 76
+dx = 35.42  ,  dy = 5.42, slope: 0.15
+y_speed adjusted to: 79
+dx = 37.50  ,  dy = 6.04, slope: 0.16
+y_speed adjusted to: 82
+dx = 39.37  ,  dy = 6.88, slope: 0.17
+y_speed adjusted to: 85
+dx = 41.67  ,  dy = 7.50, slope: 0.18
+y_speed adjusted to: 88
+dx = 43.54  ,  dy = 8.33, slope: 0.19
+y_speed adjusted to: 91
+dx = 45.42  ,  dy = 9.58, slope: 0.21
+y_speed adjusted to: 94
+dx = 47.50  ,  dy = 10.83, slope: 0.23
+y_speed adjusted to: 97
+dx = 49.58  ,  dy = 11.67, slope: 0.24
+y_speed adjusted to: 100
+dx = 51.87  ,  dy = 13.12, slope: 0.25
+y_speed adjusted to: 103
+dx = 53.75  ,  dy = 14.58, slope: 0.27
+y_speed adjusted to: 106
+dx = 55.21  ,  dy = 15.83, slope: 0.29
+y_speed adjusted to: 109
+dx = 57.08  ,  dy = 17.50, slope: 0.31
+y_speed adjusted to: 112
+dx = 58.96  ,  dy = 19.38, slope: 0.33
+y_speed adjusted to: 115
+dx = 60.62  ,  dy = 21.04, slope: 0.35
+y_speed adjusted to: 112
+dx = 62.29  ,  dy = 22.92, slope: 0.37
+y_speed adjusted to: 109
+dx = 63.75  ,  dy = 24.17, slope: 0.38
+y_speed adjusted to: 106
+dx = 65.83  ,  dy = 26.04, slope: 0.40
+y_speed adjusted to: 103
+dx = 67.29  ,  dy = 27.29, slope: 0.41
+y_speed adjusted to: 100
+dx = 68.75  ,  dy = 28.75, slope: 0.42
+y_speed adjusted to: 97
+dx = 70.21  ,  dy = 29.79, slope: 0.42
+y_speed adjusted to: 94
+dx = 72.08  ,  dy = 31.04, slope: 0.43
+y_speed adjusted to: 91
+dx = 73.54  ,  dy = 32.29, slope: 0.44
+y_speed adjusted to: 88
+dx = 75.21  ,  dy = 33.33, slope: 0.44
+y_speed adjusted to: 85
+dx = 77.29  ,  dy = 34.17, slope: 0.44
+y_speed adjusted to: 82
+dx = 79.38  ,  dy = 35.21, slope: 0.44
+y_speed adjusted to: 79
+dx = 80.83  ,  dy = 36.04, slope: 0.45
+y_speed adjusted to: 76
+dx = 82.71  ,  dy = 37.08, slope: 0.45
+y_speed adjusted to: 73
+dx = 84.38  ,  dy = 37.92, slope: 0.45
+y_speed adjusted to: 70
+dx = 86.04  ,  dy = 38.33, slope: 0.45
+y_speed adjusted to: 67
+dx = 87.50  ,  dy = 39.17, slope: 0.45
+y_speed adjusted to: 64
+dx = 89.17  ,  dy = 39.79, slope: 0.45
+y_speed adjusted to: 61
+dx = 91.04  ,  dy = 40.21, slope: 0.44
+y_speed adjusted to: 58
+dx = 92.50  ,  dy = 40.42, slope: 0.44
+y_speed adjusted to: 55
+dx = 94.79  ,  dy = 40.62, slope: 0.43
+y_speed adjusted to: 52
+dx = 96.46  ,  dy = 40.83, slope: 0.42
+y_speed adjusted to: 49
+dx = 98.33  ,  dy = 41.87, slope: 0.43
+y_speed adjusted to: 46
+dx = 100.21  ,  dy = 41.87, slope: 0.42
+y_speed adjusted to: 43
+dx = 102.29  ,  dy = 42.29, slope: 0.41
+y_speed adjusted to: 40
+dx = 104.58  ,  dy = 42.29, slope: 0.40
+y_speed adjusted to: 37
+dx = 106.46  ,  dy = 42.29, slope: 0.40
+y_speed adjusted to: 34
+dx = 108.33  ,  dy = 42.29, slope: 0.39
+y_speed adjusted to: 31
+dx = 110.63  ,  dy = 42.29, slope: 0.38
+y_speed adjusted to: 28
+dx = 112.50  ,  dy = 42.29, slope: 0.38
+y_speed adjusted to: 25
+dx = 114.58  ,  dy = 42.29, slope: 0.37
+y_speed adjusted to: 22
+dx = 116.67  ,  dy = 42.29, slope: 0.36
+y_speed adjusted to: 19
+dx = 118.75  ,  dy = 42.29, slope: 0.36
+y_speed adjusted to: 16
+dx = 120.63  ,  dy = 42.29, slope: 0.35
+y_speed adjusted to: 13
+dx = 122.29  ,  dy = 42.29, slope: 0.35
+y_speed adjusted to: 10
+dx = 124.38  ,  dy = 42.29, slope: 0.34
+y_speed adjusted to: 13
+dx = 126.25  ,  dy = 42.29, slope: 0.33
+y_speed adjusted to: 16
+dx = 127.71  ,  dy = 42.29, slope: 0.33
+y_speed adjusted to: 19
+dx = 129.38  ,  dy = 42.29, slope: 0.33
+y_speed adjusted to: 22
+After while
+
+PrintIndex: 6
+Execute G2
+
+PrintIndex: 7
+Go from x: 15 to 135 and from y: 141 and 141
+dx: 135 - 15 = 120 (120.000000), 141 - 141 = 0 (0.000000)
+X_dir: F, Speed: 0
+Y_dir: S, Speed: 0
+Slope: 0.000000
+Before while
+table_coord.x - temp.x = 120.00   ,   table_coord.y - temp.y = 0.00
+x_speed_adjustable 0   ,   y_speed_adjustable 0
+After while
+
+PrintIndex: 8
+Go from x: 135 to 0 and from y: 141 and 0
+dx: 0 - 135 = -135 (135.000000), 0 - 141 = -141 (141.000000)
+X_dir: B, Speed: 90
+Y_dir: B, Speed: 94
+Slope: 1.044444
+Before while
+table_coord.x - temp.x = -135.00   ,   table_coord.y - temp.y = -141.00
+x_speed_adjustable 90   ,   y_speed_adjustable 94
+dx = 6.46  ,  dy = 4.17, slope: 0.65
+y_speed adjusted to: 97
+dx = 7.71  ,  dy = 5.00, slope: 0.65
+y_speed adjusted to: 100
+dx = 8.75  ,  dy = 6.67, slope: 0.76
+y_speed adjusted to: 103
+dx = 9.79  ,  dy = 7.71, slope: 0.79
+y_speed adjusted to: 106
+dx = 11.25  ,  dy = 9.17, slope: 0.81
+y_speed adjusted to: 109
+dx = 12.08  ,  dy = 10.62, slope: 0.88
+y_speed adjusted to: 112
+dx = 13.54  ,  dy = 12.08, slope: 0.89
+y_speed adjusted to: 115
+dx = 14.79  ,  dy = 13.75, slope: 0.93
+y_speed adjusted to: 118
+dx = 16.04  ,  dy = 15.42, slope: 0.96
+y_speed adjusted to: 121
+dx = 17.92  ,  dy = 17.08, slope: 0.95
+y_speed adjusted to: 124
+dx = 19.38  ,  dy = 18.96, slope: 0.98
+y_speed adjusted to: 127
+dx = 20.83  ,  dy = 20.63, slope: 0.99
+y_speed adjusted to: 130
+dx = 22.08  ,  dy = 22.71, slope: 1.03
+y_speed adjusted to: 133
+dx = 23.54  ,  dy = 24.58, slope: 1.04
+y_speed adjusted to: 136
+dx = 24.79  ,  dy = 26.88, slope: 1.08
+y_speed adjusted to: 133
+dx = 25.83  ,  dy = 28.75, slope: 1.11

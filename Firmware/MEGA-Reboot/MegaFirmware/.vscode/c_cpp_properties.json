@@ -8,17 +8,17 @@
         {
             "name": "PlatformIO",
             "includePath": [
-                "C:/Users/botib/OneDrive/Dokumentumok/EmbeddedSystems/SemesterProject2/Code/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/include",
-                "C:/Users/botib/OneDrive/Dokumentumok/EmbeddedSystems/SemesterProject2/Code/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/src",
-                "C:/Users/botib/OneDrive/Dokumentumok/EmbeddedSystems/SemesterProject2/Code/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/.pio/libdeps/megaatmega2560/Unity/src",
+                "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/include",
+                "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/src",
+                "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/.pio/libdeps/megaatmega2560/Unity/src",
                 ""
             ],
             "browse": {
                 "limitSymbolsToIncludedHeaders": true,
                 "path": [
-                    "C:/Users/botib/OneDrive/Dokumentumok/EmbeddedSystems/SemesterProject2/Code/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/include",
-                    "C:/Users/botib/OneDrive/Dokumentumok/EmbeddedSystems/SemesterProject2/Code/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/src",
-                    "C:/Users/botib/OneDrive/Dokumentumok/EmbeddedSystems/SemesterProject2/Code/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/.pio/libdeps/megaatmega2560/Unity/src",
+                    "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/include",
+                    "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/src",
+                    "D:/AAStudium/Study/Mechatronics Semester Project 2/C.A.K.E/Firmware/MEGA-Reboot/MegaFirmware/.pio/libdeps/megaatmega2560/Unity/src",
                     ""
                 ]
             },
@@ -31,7 +31,7 @@
             ],
             "cStandard": "c11",
             "cppStandard": "c++11",
-            "compilerPath": "C:/Users/botib/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
+            "compilerPath": "C:/Users/f-bon/.platformio/packages/toolchain-atmelavr/bin/avr-gcc.exe",
             "compilerArgs": [
                 "-mmcu=atmega2560",
                 ""
