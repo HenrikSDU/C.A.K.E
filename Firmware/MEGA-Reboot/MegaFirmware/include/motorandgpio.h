@@ -446,6 +446,10 @@ void extruder_control(extruder_instruction g_instruction) {
 
 void origin_function(void) {
 
+    // Reset origin variables
+    b_origin_found = false;
+    a_origin_found = false;
+
     // Center with A motor
     PWM_T3A_direction_change(0);
     while(a_origin_found == false) {
@@ -464,6 +468,5 @@ void origin_function(void) {
     }
     PWM_T3B_set(0);
     PWM_T3B_direction_change(1);
-
 
 }
