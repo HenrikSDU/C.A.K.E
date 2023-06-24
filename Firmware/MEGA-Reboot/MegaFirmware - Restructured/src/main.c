@@ -112,12 +112,8 @@ ISR(TIMER5_OVF_vect) {
 }
 
 ISR(TIMER5_CAPT_vect) { // heeey
-
-    axisspeed_motor_A = TICKDISTANCE / (double)(ICR1 + 0xFFFF * timer5overflow_count);
-    current_y_distance += TICKDISTANCE;
-
-    timer5overflow_count = 0;
     
+    timer5overflow_count = 0;
     TOGGLE_ONBOARD_LED
 
     dx_pos = dx_pos + TICKDISTANCE;
@@ -130,9 +126,6 @@ ISR(TIMER4_OVF_vect) {
 }
 
 ISR(TIMER4_CAPT_vect) {
-
-    axisspeed_motor_B = TICKDISTANCE / (double)(ICR3 + 0xFFFF * timer4overflow_count);
-    current_x_distance += TICKDISTANCE;
 
     timer4overflow_count = 0;
     TOGGLE_ONBOARD_LED 
@@ -235,22 +228,70 @@ int main(void) {
 
         while(phase == main_operation) {
 
-
+            printf("Main operation\n");
             // Initialization of Table
             PWM_CONTROL_RETURN PWM_control_feedback = {0};
 
             alternative_PWM_control_init();
-            
             PWM_T3AB_init();
 
-            // origin_function();
+            origin_function();
     
             PWM_T3A_set(0);
             PWM_T3B_set(0);
 
+            // This new and improved version needs to be tested
+            unsigned char desired_PWM = 150;
+
+            coordinate temp;
+            temp.x = 0;
+            temp.y = 0;
+
             // Control Section
+            int execute_index = 0;
+            while(g_instructions[execute_index].g_command != 0) {
+                printf("\nPrintIndex: %d\n", execute_index);
+                printf("\nX: %d -> %d  &  Y: %d -> %d", temp.x, g_instructions[execute_index].point.x, temp.y, g_instructions[execute_index].point.y);
+                
+                PWM_control_feedback = PWM_control(desired_PWM, (unsigned char)temp.x, (unsigned char)g_instructions[execute_index].point.x, (unsigned char)temp.y, (unsigned char)g_instructions[execute_index].point.y);
+                
+                extruder_control(g_instructions[execute_index].g_command);
 
+                uint8_t x_speed_adjustable = PWM_control_feedback.x_speed;
+                uint8_t y_speed_adjustable = PWM_control_feedback.y_speed;
 
+                while((abs_value((float)(g_instructions[execute_index].point.x - temp.x)) > dx_pos) && (abs_value((float)(g_instructions[execute_index].point.y - temp.y)) > dy_pos)) {
+                    
+                    float actual_slope = dy_pos/dx_pos;
+                    
+                    printf("dx = %.2f  ,  dy = %.2f, slope: %.2f  ,  PWM_x %d  ,  PWM_y %d\n", dx_pos, dy_pos, actual_slope, x_speed_adjustable, y_speed_adjustable);
+
+                    if((actual_slope < PWM_control_feedback.slope) && (y_speed_adjustable < (0xFF - PWMADJUSTRATE))) {
+                            y_speed_adjustable += PWMADJUSTRATE;
+                            printf("y_speed adjusted to: %u\n", y_speed_adjustable);
+                        } 
+                        else {
+                            if((actual_slope > PWM_control_feedback.slope) && (y_speed_adjustable > (0x00 + PWMADJUSTRATE))) {
+                                y_speed_adjustable -= PWMADJUSTRATE;
+                                printf("y_speed adjusted to: %u\n", y_speed_adjustable);
+                            }
+                        }
+                        //PWM_T3B_set(x_speed_adjustable);                         
+                        PWM_T3B_set(y_speed_adjustable);
+                
+                }  
+                
+                temp.x = g_instructions[execute_index].point.x;
+                temp.y = g_instructions[execute_index].point.y;
+                
+                dx_pos = 0.0;
+                dy_pos = 0.0;
+
+                execute_index++;
+            }
+            //g_instructions[];
+
+            printf("10s delay\n");
             _delay_ms(10000);
             ////////////////////////
             //cli();

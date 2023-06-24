@@ -304,8 +304,8 @@ int main(void) {
                                 printf("y_speed adjusted to: %u\n", y_speed_adjustable);
                             }
                         }
-                        // PWM_T3B_set(x_speed_adjustable);                         
-                        // PWM_T3A_set(y_speed_adjustable);  
+                         PWM_T3B_set(x_speed_adjustable);                         
+                         PWM_T3A_set(y_speed_adjustable);  
                                              
                     }
                     printf("After while\n");
