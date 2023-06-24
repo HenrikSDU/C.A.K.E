@@ -35,7 +35,7 @@
 
 #define PWMADJUSTRATE 5
 #define EXTRUDERSQUISHSTRENGTH 32
-#define ORIGIN_PWM_STRENGTH 60
+#define ORIGIN_PWM_STRENGTH 70
 
 #define PWMADJUSTVALUE(ERROR) (18.9 * ERROR) + 1
 // (147.1*square(ERROR)) + (18.9 * ERROR) + 1
@@ -450,6 +450,8 @@ void origin_function(void) {
     b_origin_found = false;
     a_origin_found = false;
 
+    printf("OriginA");
+
     // Center with A motor
     PWM_T3A_direction_change(0);
     while(a_origin_found == false) {
@@ -460,6 +462,7 @@ void origin_function(void) {
     PWM_T3A_set(0);
     PWM_T3A_direction_change(1);
 
+    printf("OriginB");
     PWM_T3B_direction_change(0);
     while(b_origin_found == false) {
 

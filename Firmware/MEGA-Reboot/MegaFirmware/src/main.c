@@ -241,6 +241,8 @@ int main(void) {
 
         while(phase == main_operation) {
 
+            printf("Main operation starting\n");
+
             PWM_CONTROL_RETURN PWM_control_feedback = {0};
 
             alternative_PWM_control_init();
@@ -324,6 +326,7 @@ int main(void) {
             }
             PWM_T3A_set(0);
             PWM_T3B_set(0);
+            printf("10s delay\n");
             _delay_ms(10000);
             ////////////////////////
             //cli();
