@@ -299,8 +299,9 @@ int main(void) {
                 
                 PWM_T3A_set(0);
                 PWM_T3B_set(0);
+                PWM_T3C_set(0);
 
-                _delay_ms(5000);
+                _delay_ms(1000);
 
                 execute_index++;
             }
@@ -361,6 +362,7 @@ int main(void) {
                 }
                 if((PINB & (1 << BUTTON8)) == 0) { // Yellow Cable
                     motorB_PWM += 10;
+                    _delay_ms(100);
                 }
                 if((PINB & (1 << BUTTON9)) == 0) { // Purple Cable
                     motorB_PWM = 255;

@@ -34,7 +34,7 @@
 #define TICKDISTANCE (double) 0.2083333333333333333333333333333 // mm
 
 #define PWMADJUSTRATE 5
-#define EXTRUDERSQUISHSTRENGTH 30
+#define EXTRUDERSQUISHSTRENGTH 20
 #define ORIGIN_PWM_STRENGTH 100
 
 #define PWMADJUSTVALUE(ERROR) (18.9 * ERROR) + 1
@@ -433,7 +433,8 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
 }
 
 void extruder_control(extruder_instruction g_instruction) {
-
+    
+    PWM_T3C_direction_change(0); // Inward
     if(g_instruction == 1) {
         PWM_T3C_set(0);
     }
