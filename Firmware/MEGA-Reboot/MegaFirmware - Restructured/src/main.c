@@ -242,6 +242,10 @@ int main(void) {
             PWM_T3A_set(0);
             PWM_T3B_set(0);
 
+            // Reseting dx_pos and dy_pos
+            dx_pos = 0.0;
+            dy_pos = 0.0;
+
             // This new and improved version needs to be tested
             unsigned char desired_PWM = 150;
 
@@ -262,8 +266,11 @@ int main(void) {
                 uint8_t x_speed_adjustable = PWM_control_feedback.x_speed;
                 uint8_t y_speed_adjustable = PWM_control_feedback.y_speed;
 
-                while((abs_value((float)(g_instructions[execute_index].point.x - temp.x)) > dx_pos) && (abs_value((float)(g_instructions[execute_index].point.y - temp.y)) > dy_pos)) {
-                    
+                // Dynamic slope correction
+                printf("dx = %.2f  ,  dy = %.2f\n", dx_pos, dy_pos);
+
+                while((abs_value((float)(g_instructions[execute_index].point.x - temp.x)) > dx_pos) || (abs_value((float)(g_instructions[execute_index].point.y - temp.y)) > dy_pos)) {
+                    printf("EnteringControlLoop\n");
                     float actual_slope = dy_pos/dx_pos;
                     
                     printf("dx = %.2f  ,  dy = %.2f, slope: %.2f  ,  PWM_x %d  ,  PWM_y %d\n", dx_pos, dy_pos, actual_slope, x_speed_adjustable, y_speed_adjustable);
@@ -281,13 +288,19 @@ int main(void) {
                         //PWM_T3B_set(x_speed_adjustable);                         
                         PWM_T3A_set(y_speed_adjustable);
                 
-                }  
+                }
+                printf("dx = %.2f  ,  dy = %.2f\n", dx_pos, dy_pos);  
                 
                 temp.x = g_instructions[execute_index].point.x;
                 temp.y = g_instructions[execute_index].point.y;
                 
                 dx_pos = 0.0;
                 dy_pos = 0.0;
+                
+                PWM_T3A_set(0);
+                PWM_T3B_set(0);
+
+                _delay_ms(5000);
 
                 execute_index++;
             }
