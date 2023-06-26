@@ -117,6 +117,7 @@ ISR(TIMER5_CAPT_vect) { // heeey
     TOGGLE_ONBOARD_LED
 
     dx_pos = dx_pos + TICKDISTANCE;
+    //printf("#x");
 }
 
 ISR(TIMER4_OVF_vect) {
@@ -131,6 +132,7 @@ ISR(TIMER4_CAPT_vect) {
     TOGGLE_ONBOARD_LED 
 
     dy_pos = dy_pos + TICKDISTANCE;
+    //printf("#y");
 }
 
 
@@ -277,7 +279,7 @@ int main(void) {
                             }
                         }
                         //PWM_T3B_set(x_speed_adjustable);                         
-                        PWM_T3B_set(y_speed_adjustable);
+                        PWM_T3A_set(y_speed_adjustable);
                 
                 }  
                 
@@ -289,6 +291,8 @@ int main(void) {
 
                 execute_index++;
             }
+            PWM_T3A_set(0);
+            PWM_T3B_set(0);
             //g_instructions[];
 
             printf("10s delay\n");

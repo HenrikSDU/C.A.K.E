@@ -423,8 +423,8 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
         }
 
         // Set the new value of PWM
-        PWM_T3A_set(motor_A_PWM);
-        PWM_T3B_set(motor_B_PWM);
+        //PWM_T3A_set(motor_A_PWM);
+        //PWM_T3B_set(motor_B_PWM);
     }
     
     // Reset distances 
