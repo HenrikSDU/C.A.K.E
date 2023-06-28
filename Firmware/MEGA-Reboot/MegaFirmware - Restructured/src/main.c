@@ -247,7 +247,7 @@ int main(void) {
             dy_pos = 0.0;
 
             // This new and improved version needs to be tested
-            unsigned char desired_PWM = 150;
+            unsigned char desired_PWM = 130;
 
             coordinate temp;
             temp.x = 0;
@@ -275,12 +275,12 @@ int main(void) {
                     
                     printf("dx = %.2f  ,  dy = %.2f, slope: %.2f  ,  PWM_x %d  ,  PWM_y %d\n", dx_pos, dy_pos, actual_slope, x_speed_adjustable, y_speed_adjustable);
 
-                    if((actual_slope < PWM_control_feedback.slope) && (y_speed_adjustable < (0xFF - PWMADJUSTRATE))) {
+                    if((actual_slope < PWM_control_feedback.slope) && (y_speed_adjustable < (0xFF - PWMADJUSTRATE)) && (PWM_control_feedback.slope != 0.0)) {
                             y_speed_adjustable += PWMADJUSTRATE;
                             printf("y_speed adjusted to: %u\n", y_speed_adjustable);
                         } 
                         else {
-                            if((actual_slope > PWM_control_feedback.slope) && (y_speed_adjustable > (0x00 + PWMADJUSTRATE))) {
+                            if((actual_slope > PWM_control_feedback.slope) && (y_speed_adjustable > (0x00 + PWMADJUSTRATE)) && (PWM_control_feedback.slope != 0.0)) {
                                 y_speed_adjustable -= PWMADJUSTRATE;
                                 printf("y_speed adjusted to: %u\n", y_speed_adjustable);
                             }
@@ -310,6 +310,7 @@ int main(void) {
             //g_instructions[];
 
             printf("10s delay\n");
+            phase = paused;
             _delay_ms(10000);
             ////////////////////////
             //cli();
