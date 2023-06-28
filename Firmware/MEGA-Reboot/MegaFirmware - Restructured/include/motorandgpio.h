@@ -34,7 +34,7 @@
 #define TICKDISTANCE (double) 0.2083333333333333333333333333333 // mm
 
 #define PWMADJUSTRATE 5
-#define EXTRUDERSQUISHSTRENGTH 20
+#define EXTRUDERSQUISHSTRENGTH 255
 #define ORIGIN_PWM_STRENGTH 100
 
 #define PWMADJUSTVALUE(ERROR) (18.9 * ERROR) + 1
@@ -249,14 +249,16 @@ PWM_CONTROL_RETURN PWM_control(unsigned char base_PWM, unsigned char x1, unsigne
             PWM_T3B_set(0);
         }
         else if(x_dir != 'S') {
-            PWM_T3B_set(base_PWM);
+            x_speed = base_PWM;
+            PWM_T3B_set(x_speed);
         }
         
         if(y_dir == 'S') {
             PWM_T3A_set(0);
         }
         else if(y_dir != 'S') {
-            PWM_T3A_set(base_PWM);
+            y_speed = base_PWM;
+            PWM_T3A_set(y_speed);
         }
     } else {
         slope = dy / dx; // Had problems with unsigned chars being divided so I used floats
@@ -434,7 +436,7 @@ void alternative_PWM_control(unsigned char x1, unsigned char x2, unsigned char y
 
 void extruder_control(extruder_instruction g_instruction) {
     
-    PWM_T3C_direction_change(0); // Inward
+    PWM_T3C_direction_change(1); // Inward
     if(g_instruction == 1) {
         PWM_T3C_set(0);
     }
